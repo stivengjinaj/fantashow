@@ -1,0 +1,32 @@
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.animated-bg {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #62C3ED 30%, #403CF2 70%);
+  background-size: 200% 200%;
+  animation: GradientBackground 10s ease infinite;
+}
+
+@keyframes GradientBackground {
+  0% {
+    background-position: 0 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+
+
+

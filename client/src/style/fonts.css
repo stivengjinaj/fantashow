@@ -1,0 +1,31 @@
+h1{
+    font-size: 5.2em;
+    line-height: 1.1;
+}
+
+.main-title-margin{
+    line-height: 3;
+    font-family: Itim, serif;
+}
+
+.simple-button-text{
+    font-family: Itim, serif;
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Itim-Regular.ttf") format("truetype");
+}
+
+@media (max-width:961px){
+    h1{
+        font-size: 4em;
+        line-height: 0.3;
+    }
+
+    .main-title-margin{
+        line-height: 2;
+        font-family: Itim, serif;
+    }
+}

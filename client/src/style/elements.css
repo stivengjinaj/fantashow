@@ -1,0 +1,24 @@
+.guideButton{
+    background: #FF914D;
+    border: solid 1px #FF914D;
+    border-radius: 30px;
+}
+
+.guideButton:hover{
+    background: #cf651c;
+    border: solid 1px #cf651c;
+}
+
+.outlined-orange-button {
+    background: transparent;
+    border: solid 2px #FF914D;
+    color: white;
+    border-radius: 30px;
+    font-weight: bold;
+}
+
+.outlined-orange-button:hover{
+    background: #FF914D;
+    border: solid 2px #FF914D;
+    color: white;
+}
