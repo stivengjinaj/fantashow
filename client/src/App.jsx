@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./assets/fonts/Itim-Regular.ttf";
 import {Route, Routes} from "react-router";
-import Homepage from "./screens/Homepage.jsx";
+import Homepage from "./screens/Home/Homepage.jsx";
 import Login from "./screens/Login.jsx";
 import ReferralLink from "./screens/Referral/ReferralLink.jsx";
 
