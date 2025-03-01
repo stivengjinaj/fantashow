@@ -52,19 +52,13 @@ function Homepage() {
         }
     }, [isEmailValid, isTelegramValid, submitted, email, telegram]);
 
-    // Determine if the form is valid overall
     const isFormValid = () => {
         // If email is provided and valid, form is valid regardless of telegram
         if (email.length > 0 && isEmailValid) {
             return true;
         }
-
         // If email is empty or invalid, telegram must be valid and present
-        if (telegram.length >= 4 && isTelegramValid) {
-            return true;
-        }
-
-        return false;
+        return telegram.length >= 4 && isTelegramValid;
     }
 
     const handleSubmit = (e) => {
@@ -82,11 +76,9 @@ function Homepage() {
         const value = e.target.value;
         setEmail(value);
 
-        // Validate email only if it has content
         if (value.length > 0) {
             setIsEmailValid(value.includes("@") && value.includes(".") && value.length >= 4);
         } else {
-            // Empty email is "valid" as long as telegram is provided
             setIsEmailValid(true);
         }
 
@@ -99,12 +91,10 @@ function Homepage() {
         setIsTelegramValid(value.length >= 4 || value.length === 0);
         submitted && setSubmitted(false);
     }
-
-    // Show error for email if it has content and is invalid
     const shouldShowEmailError = !isEmailValid && email.length > 0 && submitted;
 
-    // Show error for telegram if it has content and is invalid, and either:
-    // 1. Email is empty, OR
+    // Show error for telegram if it has content and is invalid when:
+    // 1. Email is empty
     // 2. Email is invalid
     const shouldShowTelegramError = telegram.length > 0 && !isTelegramValid && submitted &&
         (email.length === 0 || !isEmailValid);
