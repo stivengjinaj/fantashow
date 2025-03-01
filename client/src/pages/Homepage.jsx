@@ -1,46 +1,121 @@
-import {Button, Container} from "react-bootstrap";
+import {Button, Container, Form, Image} from "react-bootstrap";
 import {useNavigate} from "react-router";
 import gsap from "gsap";
 import {useGSAP} from "@gsap/react";
+import {useState} from "react";
+import sendIcon from "../assets/icons/sendIcon.svg";
+import back from "../assets/icons/back.svg";
 
 gsap.registerPlugin(useGSAP);
 
 function Homepage() {
     const navigate = useNavigate();
+    const [contactUs, setContactUs] = useState(false);
+    const [email, setEmail] = useState("");
+    const [isEmailValid, setIsEmailValid] = useState(true);
+    const [telegram, setTelegram] = useState("");
+    const [isTelegramValid, setIsTelegramValid] = useState(true);
+    const [submitted, setSubmitted] = useState(false);
 
     useGSAP(() => {
-        gsap.from(".animated-bg", {
-            autoAlpha: 0,
-            duration: 0.8,
-            ease: "power2.inOut",
-            stagger: 0.2
-        })
-    })
+        gsap.from(".form-buttons-container", {
+                duration: 0.4,
+                opacity: 0,
+                y: 20,
+                ease: "power2.inOut",
+            }
+        )
+    }, [contactUs])
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if(email.length === 0 && telegram.length === 0){
+            setContactUs(false);
+        }else{
+            if (isEmailValid && isTelegramValid) {
+                navigate("/login");
+            }else {
+                setSubmitted(true);
+            }
+        }
+    }
+
+    const handleEmailChange = (e) => {
+        submitted && setSubmitted(false);
+        setEmail(e.target.value);
+        if (e.target.value.includes("@") && e.target.value.length >= 4 && e.target.value.includes(".")) {
+            setIsEmailValid(true);
+        }else {
+            setIsEmailValid(false);
+        }
+    }
+
+    const handleTelegramChange = (e) => {
+        submitted && setSubmitted(false);
+        setTelegram(e.target.value);
+        if (e.target.value.length >= 4) {
+            setIsTelegramValid(true);
+        }else {
+            setIsTelegramValid(false);
+        }
+    }
 
     return (
         <Container fluid className="animated-bg">
+            {/*Guide Button*/}
             <Container fluid className="d-flex justify-content-end">
                 <Button className="guideButton px-5 mt-4 mx-3 fw-bold">
                     Guida
                 </Button>
             </Container>
 
+            {/*Main Title*/}
             <Container fluid className="d-flex justify-content-center mt-5">
                 <h1 className="mt-5 main-title-margin text-light text-center">
                     Non sei ancora iscritto?
                 </h1>
             </Container>
 
-            <Container fluid className="d-flex flex-column align-items-center justify-content-center">
-                <Button className="outlined-orange-button mt-5 px-5 py-2">
-                    Contattaci
-                </Button>
-
-                <p className="mt-4 text-light fw-bold">O</p>
-
-                <Button onClick={() => navigate('/login')} className="outlined-orange-button mt-4 px-5 py-2">
-                    Accedi
-                </Button>
+            {/*Buttons or Text input*/}
+            <Container fluid className="d-flex flex-column align-items-center justify-content-center form-buttons-container">
+                {/*If contactUs is clicked*/}
+                {contactUs
+                    ? (
+                        <Form className="mt-5 d-flex flex-column align-items-center justify-content-center">
+                            <Form.Group className="mb-3" controlId="formEmail">
+                                <Form.Control onChange={handleEmailChange} className="outlined-orange-input px-4" type="email" placeholder="Email" />
+                                {!isEmailValid && submitted && (<Form.Text className="text-danger mx-3 fw-bold">
+                                    Email non valida.
+                                </Form.Text>)}
+                            </Form.Group>
+                            <p className="text-light text-center mt-4">Oppure</p>
+                            <Form.Group className="mb-3 mt-4" controlId="formTelegram">
+                                <Form.Control onChange={handleTelegramChange} className="outlined-orange-input px-4" type="text" placeholder="Telegram" />
+                                {!isTelegramValid && submitted && (<Form.Text className="text-danger mx-3 fw-bold">
+                                    Telegram non valido.
+                                </Form.Text>)}
+                            </Form.Group>
+                            <Button type={"submit"} className="mt-5 p-3 sendIcon" onClick={handleSubmit}>
+                                {
+                                    (email.length > 0 || telegram.length > 0)
+                                        ? (<Image src={sendIcon} width={30} height={30}/>)
+                                        : (<Image src={back} width={30} height={30}/>)
+                                }
+                            </Button>
+                        </Form>
+                    )
+                    : (
+                        <>
+                            <Button onClick={() => setContactUs(true)} className="outlined-orange-button mt-5 px-5 py-2">
+                                Contattaci
+                            </Button>
+                            <p className="mt-4 text-light fw-bold">O</p>
+                            <Button onClick={() => navigate('/login')} className="outlined-orange-button mt-4 px-5 py-2">
+                                Accedi
+                            </Button>
+                        </>
+                    )
+                }
             </Container>
         </Container>
     )
