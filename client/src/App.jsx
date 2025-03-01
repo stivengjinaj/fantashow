@@ -1,8 +1,9 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./assets/fonts/Itim-Regular.ttf";
 import {Route, Routes} from "react-router";
-import Homepage from "./pages/Homepage.jsx";
-import Login from "./pages/Login.jsx";
+import Homepage from "./screens/Homepage.jsx";
+import Login from "./screens/Login.jsx";
+import ReferralLink from "./screens/Referral/ReferralLink.jsx";
 
 function App() {
 
@@ -10,6 +11,7 @@ function App() {
       <Routes>
           <Route index path="/" element={<Homepage/>}/>
           <Route path="/login" element={<Login/>}/>
+          <Route path="/referral/:referral" element={<ReferralLink/>}/>
       </Routes>
   )
 }
