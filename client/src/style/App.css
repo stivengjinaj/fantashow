@@ -10,7 +10,15 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #62C3ED 30%, #403CF2 70%);
   background-size: 200% 200%;
-  animation: GradientBackground 10s ease infinite;
+  animation: GradientBackground 15s ease infinite;
+}
+
+.animated-error-bg {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(70deg, #ff00a8 30%, #ea0000 70%);
+  background-size: 200% 200%;
+  animation: GradientBackground 15s ease infinite;
 }
 
 @keyframes GradientBackground {

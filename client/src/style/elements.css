@@ -23,6 +23,20 @@
     color: white;
 }
 
+.blue-button {
+    background: #08bdff;
+    border: solid 1px #08bdff;
+    color: white;
+    border-radius: 30px;
+    font-weight: bold;
+}
+
+.blue-button:hover{
+    background: #006893;
+    border: solid 1px #006893;
+    color: white;
+}
+
 .outlined-orange-input {
     background: transparent;
     border: solid 2px #FF914D;

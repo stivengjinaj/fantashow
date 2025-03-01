@@ -12,10 +12,14 @@ h1{
     font-family: Itim, serif;
 }
 
-@font-face {
-    font-family: "Itim";
-    src: local("Itim-Regular"),
-    url("../assets/fonts/Itim-Regular.ttf") format("truetype");
+h2 {
+    font-size: 3rem;
+}
+
+@media (max-width:1080px){
+    h2 {
+        font-size: 2.5rem;
+    }
 }
 
 @media (max-width:961px){
@@ -28,4 +32,10 @@ h1{
         line-height: 2;
         font-family: Itim, serif;
     }
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Itim-Regular.ttf") format("truetype");
 }
