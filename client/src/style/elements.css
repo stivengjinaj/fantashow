@@ -64,3 +64,29 @@
     background: #cf651c;
     border: solid 1px #cf651c;
 }
+
+.top-back-button {
+    background: transparent;
+    border: none;
+}
+
+.top-back-button:hover {
+    background: transparent;
+    border: none;
+    scale: 1.5;
+}
+
+.top-back-button:focus,
+.top-back-button:active {
+    background-color: transparent !important;
+    outline: none;
+    box-shadow: none;
+}
+
+.top-back-button:focus-visible {
+    outline: none;
+}
+
+.top-back-button:active {
+    -webkit-tap-highlight-color: transparent; /* Mobile */
+}
