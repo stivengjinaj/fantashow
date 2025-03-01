@@ -1,10 +1,8 @@
-import {Button, Container, Form, Image} from "react-bootstrap";
+import {Button, Container} from "react-bootstrap";
 import {useNavigate} from "react-router";
 import gsap from "gsap";
 import {useGSAP} from "@gsap/react";
 import {useState} from "react";
-import sendIcon from "../../assets/icons/sendIcon.svg";
-import back from "../../assets/icons/back.svg";
 import RequestRegistration from "./RequestRegistration.jsx";
 
 gsap.registerPlugin(useGSAP);
