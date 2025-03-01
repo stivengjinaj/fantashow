@@ -22,3 +22,31 @@
     border: solid 2px #FF914D;
     color: white;
 }
+
+.outlined-orange-input {
+    background: transparent;
+    border: solid 2px #FF914D;
+    border-radius: 30px;
+    color: white;
+}
+
+.outlined-orange-input::placeholder {
+    color: #eaeaea;
+}
+
+.outlined-orange-input:focus {
+    background: transparent;
+    border: solid 2px #FF914D;
+    border-radius: 30px;
+    color: white;
+}
+
+.sendIcon {
+    background-color: #FF914D;
+    border-radius: 50%;
+    border: solid 1px #FF914D;
+}
+.sendIcon:hover {
+    background: #cf651c;
+    border: solid 1px #cf651c;
+}
