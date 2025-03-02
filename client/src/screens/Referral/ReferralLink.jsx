@@ -10,7 +10,7 @@ function ReferralLink() {
         params.referral === "ffff"
             ? (
                 <Container fluid className="animated-bg">
-                    {/*Guide Button*/}
+                    {/*Guide and back button*/}
                     <Container fluid className="d-flex justify-content-between">
                         <Button className="top-back-button" onClick={() => navigate("/")}>
                             <Image src={navigateBack} width={50} height={50}/>
