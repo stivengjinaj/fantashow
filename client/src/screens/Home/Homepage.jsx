@@ -22,6 +22,14 @@ function Homepage() {
         )
     }, [contactUs])
 
+    useGSAP(() => {
+        gsap.from(".main-title-margin", {
+            duration: 0.5,
+            opacity: 0,
+            x: -20,
+        })
+    })
+
     return (
         <Container fluid className="animated-bg">
             {/*Guide Button*/}
