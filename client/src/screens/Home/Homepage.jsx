@@ -2,7 +2,7 @@ import {Button, Container} from "react-bootstrap";
 import {useNavigate, useParams} from "react-router";
 import gsap from "gsap";
 import {useGSAP} from "@gsap/react";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import RequestRegistration from "./RequestRegistration.jsx";
 
 gsap.registerPlugin(useGSAP);
@@ -11,6 +11,10 @@ function Homepage() {
     const navigate = useNavigate();
     const params = useParams();
     const [contactUs, setContactUs] = useState(params.contact === "contact");
+
+    useEffect(() => {
+        params.contact !== "contact" && navigate("/");
+    });
 
     useGSAP(() => {
         gsap.from(".form-buttons-container", {
