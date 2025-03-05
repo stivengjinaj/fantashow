@@ -69,9 +69,9 @@ function Login(){
 
     return(
         <Container fluid className="animated-bg">
-            <Container fluid className="d-flex justify-content-between">
+            <Container fluid className="d-flex align-items-center justify-content-between">
                 <Button className="top-back-button" onClick={() => navigate("/")}>
-                    <Image src={navigateBack} width={50} height={50}/>
+                    <Image src={navigateBack} width={35} height={35}/>
                 </Button>
                 <Button className="guideButton px-5 mt-4 mx-3 fw-bold">
                     Guida
