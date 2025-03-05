@@ -17,7 +17,10 @@ function ReferralError() {
                 <h2 className="mt-5 main-title-margin text-light text-center pt-5">
                     Il link di referral non è valido
                 </h2>
-                <h4 className={"text-light"}>Sembra che tu abbia seguito un link errato o scaduto. <a style={{color: "#62C3ED"}} href={"/contact"}>Contatta il nostro supporto</a> o richiedi un nuovo referral per continuare.</h4>
+                <h4 className={"mt-3 text-light text-center"}>
+                    Sembra che tu abbia seguito un link errato o scaduto. <br/>
+                    <a style={{color: "#62C3ED"}} href={"/support"}>Contatta il nostro supporto</a> o <a style={{color: "#62C3ED"}} href={"/contact"}>richiedi un nuovo referral</a> per continuare.
+                </h4>
             </Container>
 
             {/*Registration Button*/}
