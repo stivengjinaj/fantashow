@@ -9,7 +9,7 @@ function App() {
 
   return (
       <Routes>
-          <Route index path="/" element={<Homepage/>}/>
+          <Route index path="/:contact?" element={<Homepage/>}/>
           <Route path="/login" element={<Login/>}/>
           <Route path="/referral/:referral" element={<ReferralLink/>}/>
       </Routes>

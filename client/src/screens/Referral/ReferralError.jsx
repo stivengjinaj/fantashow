@@ -13,10 +13,11 @@ function ReferralError() {
             </Container>
 
             {/*Error Title*/}
-            <Container fluid className="d-flex justify-content-center mt-5 pt-5">
+            <Container fluid className="d-flex flex-column align-items-center justify-content-center mt-5 pt-5">
                 <h2 className="mt-5 main-title-margin text-light text-center pt-5">
-                    Errore 404: Referral non trovata
+                    Il link di referral non è valido
                 </h2>
+                <h4 className={"text-light"}>Sembra che tu abbia seguito un link errato o scaduto. <a style={{color: "#62C3ED"}} href={"/contact"}>Contatta il nostro supporto</a> o richiedi un nuovo referral per continuare.</h4>
             </Container>
 
             {/*Registration Button*/}

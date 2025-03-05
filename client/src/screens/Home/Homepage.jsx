@@ -1,5 +1,5 @@
 import {Button, Container} from "react-bootstrap";
-import {useNavigate} from "react-router";
+import {useNavigate, useParams} from "react-router";
 import gsap from "gsap";
 import {useGSAP} from "@gsap/react";
 import {useState} from "react";
@@ -9,8 +9,8 @@ gsap.registerPlugin(useGSAP);
 
 function Homepage() {
     const navigate = useNavigate();
-    const [contactUs, setContactUs] = useState(false);
-
+    const params = useParams();
+    const [contactUs, setContactUs] = useState(params.contact === "contact");
 
     useGSAP(() => {
         gsap.from(".form-buttons-container", {
