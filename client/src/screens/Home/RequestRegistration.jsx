@@ -53,7 +53,12 @@ function RequestRegistration(props) {
         setSubmitted(true);
 
         if(email.length === 0 && telegram.length === 0){
-            props.setContactUs(false);
+            if(props.contactParam === "contact"){
+                props.setContactUs(false);
+                navigate("/");
+            }else {
+                props.setContactUs(false);
+            }
         } else if (isFormValid()) {
             navigate("/login");
         }

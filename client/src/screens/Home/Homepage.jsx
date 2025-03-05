@@ -50,7 +50,7 @@ function Homepage() {
             <Container fluid className="d-flex flex-column align-items-center justify-content-center form-buttons-container">
                 {/*If contactUs is clicked*/}
                 {contactUs
-                    ? (<RequestRegistration navigate={navigate} setContactUs={setContactUs}/>)
+                    ? (<RequestRegistration navigate={navigate} setContactUs={setContactUs} contactParam={params.contact}/>)
                     : (
                         <>
                             <Button onClick={() => setContactUs(true)} className="outlined-orange-button mt-5 px-5 py-2">
