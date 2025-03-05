@@ -24,8 +24,8 @@ h2 {
 
 @media (max-width:961px){
     h1{
-        font-size: 4em;
-        line-height: 0.3;
+        font-size: 3em;
+        line-height: 1.5 !important;
     }
 
     .main-title-margin{
