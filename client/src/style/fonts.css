@@ -28,6 +28,11 @@ h2 {
         line-height: 1.5 !important;
     }
 
+    h2 {
+        font-size: 2.5rem;
+        line-height: 1.5 !important;
+    }
+
     .main-title-margin{
         line-height: 2;
         font-family: Itim, serif;
@@ -37,5 +42,107 @@ h2 {
 @font-face {
     font-family: "Itim";
     src: local("Itim-Regular"),
-    url("../assets/fonts/Itim-Regular.ttf") format("truetype");
+    url("../assets/fonts/Montserrat-Black.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-Bold.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-ExtraBold.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-ExtraLight.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-Light.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-Medium.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-SemiBold.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-Thin.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-ExtraBoldItalic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-ExtraLightItalic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-Italic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-LightItalic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-MediumItalic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-SemiBoldItalic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-ThinItalic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-BlackItalic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Itim";
+    src: local("Itim-Regular"),
+    url("../assets/fonts/Montserrat-BoldItalic.ttf") format("truetype");
 }
