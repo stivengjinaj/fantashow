@@ -1,17 +1,30 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
 import '../../style/support.css';
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 
 const SupportResponsive = () => {
-    const screenHeight = window.innerHeight;
-    const screenWidth = window.innerWidth;
+    const [screenHeight, setScreenHeight] = useState(window.innerHeight);
+    const [screenWidth, setScreenWith] = useState(window.innerWidth);
     const [isActive, setIsActive] = useState(false);
 
     const handleToggle = () => {
         setIsActive(!isActive);
     };
+
+    useEffect(() => {
+        const handleResize = () => {
+            setScreenHeight(window.innerHeight);
+            setScreenWith(window.innerWidth);
+        };
+
+        window.addEventListener("resize", handleResize);
+
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    });
 
     useGSAP(() => {
         gsap.from(".support-title", {
