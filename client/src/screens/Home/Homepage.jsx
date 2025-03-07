@@ -14,7 +14,7 @@ function Homepage() {
 
     useEffect(() => {
         params.contact !== "contact" && navigate("/");
-    });
+    }, []);
 
     useGSAP(() => {
         gsap.from(".form-buttons-container", {

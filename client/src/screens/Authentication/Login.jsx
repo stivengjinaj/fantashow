@@ -1,11 +1,14 @@
 import {Button, Container, Form, Image, InputGroup} from "react-bootstrap";
-import navigateBack from "../assets/icons/navigate_back.svg";
-import person from "../assets/icons/person.svg";
-import lock from "../assets/icons/lock.svg";
+import navigateBack from "../../assets/icons/navigate_back.svg";
+import person from "../../assets/icons/person.svg";
+import lock from "../../assets/icons/lock.svg";
 import {useNavigate} from "react-router";
 import {useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
+import loginWithEmail from "../../utils/auth.js";
+import Loading from "../../misc/Loading.jsx";
+
 
 function Login(){
     const navigate = useNavigate();
@@ -13,6 +16,8 @@ function Login(){
     const [password, setPassword] = useState("");
     const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
     useGSAP(() => {
         if(error){
@@ -42,28 +47,37 @@ function Login(){
         })
     })
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError(false);
+        setLoading(true);
         if(email === "" || password === ""){
+            setErrorMessage("Inserisci email e password");
             setError(true);
+            setLoading(false);
         }
         else{
-            if(email === "stivengjinaj@hotmail.com" && password === "123"){
-                navigate("/");
-            }else {
+            const response = await loginWithEmail(email, password);
+            if(response.success){
+                navigate("/profile");
+            }
+            else {
                 setError(true);
+                setErrorMessage(response.message);
+                setLoading(false);
             }
         }
     }
 
     const handleEmailChange = (e) => {
         setError(false);
+        setLoading(false);
         setEmail(e.target.value);
     }
 
     const handlePasswordChange = (e) => {
         setError(false);
+        setLoading(false);
         setPassword(e.target.value);
     }
 
@@ -86,7 +100,7 @@ function Login(){
             </Container>
 
             <Container fluid className="d-flex flex-column align-items-center justify-content-center mt-5">
-                {error && <p className="text-danger fw-bold">Email o password errati</p>}
+                {error && <p className="text-danger fw-bold">{errorMessage}</p>}
                 <Form className={"login-form-width"}>
                     <Form.Group className="mb-3" controlId="formBasicEmail">
                         <InputGroup className="mb-3">
@@ -108,6 +122,7 @@ function Login(){
                         <Form.Check type="checkbox" label="Ricordami" className={"text-light"} onChange={() => setRememberMe(!rememberMe)}/>
                     </Form.Group>
                 </Form>
+                {/*TODO: Loading*/}
                 <Button className="mt-5 outlined-orange-button border-2 rounded-3" variant="primary" type="submit" onClick={handleSubmit}>
                     Accedi
                 </Button>
