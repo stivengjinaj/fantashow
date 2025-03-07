@@ -7,8 +7,11 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+client/node_modules
+server/node_modules
+server/fantashow-bologna-firebase-adminsdk-fbsvc-31e48d8073.json
 dist
+server/.env
 dist-ssr
 *.local
 
