@@ -1,11 +1,11 @@
 import express from "express";
 import { v4 as uuidv4 } from "uuid";
-require('dotenv').config();
+import dotenv from "dotenv";
+import admin from "firebase-admin";
 
+dotenv.config();
 
 const router = express.Router();
-
-const admin = require('firebase-admin');
 
 const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
 
