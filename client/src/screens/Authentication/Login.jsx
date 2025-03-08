@@ -1,4 +1,4 @@
-import {Button, Container, Form, Image, InputGroup} from "react-bootstrap";
+import {Button, Container, Form, Image, InputGroup, Spinner} from "react-bootstrap";
 import navigateBack from "../../assets/icons/navigate_back.svg";
 import person from "../../assets/icons/person.svg";
 import lock from "../../assets/icons/lock.svg";
@@ -7,7 +7,6 @@ import {useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import loginWithEmail from "../../utils/auth.js";
-import Loading from "../../misc/Loading.jsx";
 
 
 function Login(){
@@ -59,6 +58,8 @@ function Login(){
         else{
             const response = await loginWithEmail(email, password);
             if(response.success){
+                // Add last login update.
+                //getLastLogin(response.user.uid);
                 navigate("/profile");
             }
             else {
@@ -123,8 +124,8 @@ function Login(){
                     </Form.Group>
                 </Form>
                 {/*TODO: Loading*/}
-                <Button className="mt-5 outlined-orange-button border-2 rounded-3" variant="primary" type="submit" onClick={handleSubmit}>
-                    Accedi
+                <Button className="mt-5 outlined-orange-button border-2 rounded-3" variant="primary" type="submit" onClick={!loading ? handleSubmit : () => {}}>
+                    {loading ? <Spinner animation="border" variant="warning" /> : "Accedi"}
                 </Button>
                 <Container fluid className="d-flex justify-content-center mt-5 forgot-password-container">
                     <p className="text-light fw-bold"><a href={"/reset"} className="text-light">Password dimenticata?</a></p>
