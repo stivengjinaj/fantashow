@@ -6,7 +6,7 @@ import gsap from "gsap";
 
 const SupportResponsive = () => {
     const [screenHeight, setScreenHeight] = useState(window.innerHeight);
-    const [screenWidth, setScreenWith] = useState(window.innerWidth);
+    const [screenWidth, setScreenWidth] = useState(window.innerWidth);
     const [isActive, setIsActive] = useState(false);
 
     const handleToggle = () => {
@@ -16,7 +16,7 @@ const SupportResponsive = () => {
     useEffect(() => {
         const handleResize = () => {
             setScreenHeight(window.innerHeight);
-            setScreenWith(window.innerWidth);
+            setScreenWidth(window.innerWidth);
         };
 
         window.addEventListener("resize", handleResize);
@@ -24,7 +24,7 @@ const SupportResponsive = () => {
         return () => {
             window.removeEventListener("resize", handleResize);
         };
-    });
+    }, []);
 
     useGSAP(() => {
         gsap.from(".support-title", {
