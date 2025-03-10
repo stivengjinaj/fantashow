@@ -10,6 +10,7 @@ import {useEffect, useState} from "react";
 import {onAuthStateChanged} from "firebase/auth";
 import {auth} from "./utils/firebase.mjs";
 import Profile from "./screens/Profile/Profile.jsx";
+import Register from "./screens/Registration/Register.jsx";
 
 function App() {
     const [user, setUser] = useState(null);
@@ -29,6 +30,7 @@ function App() {
           <Route path="/referral/:referral" element={<ReferralLink/>}/>
           <Route path="/support" element={<Support/>}/>
           <Route path="/profile" element={user ? <Profile/> : <Navigate to="/login"/>}/>
+          <Route path="/register/:referral" element={<Register/>}/>
           <Route path="*" element={<NotFound/>}/>
       </Routes>
   )
