@@ -1,9 +1,10 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, browserSessionPersistence, browserLocalPersistence, setPersistence } from "firebase/auth";
 import { auth } from "./firebase.mjs";
 import getError from "./errorHandler.js";
 
-const loginWithEmail = async (email, password) => {
+const loginWithEmail = async (email, password, rememberMe=false) => {
     try {
+        await setPersistence(auth, rememberMe ? browserSessionPersistence : browserLocalPersistence);
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         return { success: true, user: userCredential.user };
     } catch (error) {
