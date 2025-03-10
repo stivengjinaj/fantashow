@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./style/fonts.css";
-import {Route, Routes} from "react-router";
+import {Navigate, Route, Routes} from "react-router";
 import Homepage from "./screens/Home/Homepage.jsx";
 import Login from "./screens/Authentication/Login.jsx";
 import ReferralLink from "./screens/Referral/ReferralLink.jsx";
@@ -9,6 +9,7 @@ import Support from "./screens/Support/Support.jsx";
 import {useEffect, useState} from "react";
 import {onAuthStateChanged} from "firebase/auth";
 import {auth} from "./utils/firebase.mjs";
+import Profile from "./screens/Profile/Profile.jsx";
 
 function App() {
     const [user, setUser] = useState(null);
@@ -23,10 +24,11 @@ function App() {
 
   return (
       <Routes>
-          <Route index path="/:contact?" element={<Homepage/>}/>
-          <Route path="/login" element={<Login user={user}/>}/>
+          <Route index path="/:contact?" element={user ? <Profile/> : <Homepage/>}/>
+          <Route path="/login" element={user ? <Navigate to="/profile"/> : <Login user={user}/>}/>
           <Route path="/referral/:referral" element={<ReferralLink/>}/>
           <Route path="/support" element={<Support/>}/>
+          <Route path="/profile" element={user ? <Profile/> : <Navigate to="/login"/>}/>
           <Route path="*" element={<NotFound/>}/>
       </Routes>
   )
