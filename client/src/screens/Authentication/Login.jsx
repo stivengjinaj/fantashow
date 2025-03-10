@@ -3,13 +3,13 @@ import navigateBack from "../../assets/icons/navigate_back.svg";
 import person from "../../assets/icons/person.svg";
 import lock from "../../assets/icons/lock.svg";
 import {useNavigate} from "react-router";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import loginWithEmail from "../../utils/auth.js";
 
 
-function Login({ user }){
+function Login(){
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -17,12 +17,6 @@ function Login({ user }){
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        if (user) {
-            navigate("/");
-        }
-    }, [navigate, user]);
 
     function tweenError(){
         gsap.to(".login-form-width", {
@@ -71,7 +65,7 @@ function Login({ user }){
             if(response.success){
                 // Add last login update.
                 //getLastLogin(response.user.uid);
-                navigate("/");
+                navigate("/profile");
             }
             else {
                 setError(true);
