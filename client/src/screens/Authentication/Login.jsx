@@ -3,13 +3,13 @@ import navigateBack from "../../assets/icons/navigate_back.svg";
 import person from "../../assets/icons/person.svg";
 import lock from "../../assets/icons/lock.svg";
 import {useNavigate} from "react-router";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import loginWithEmail from "../../utils/auth.js";
 
 
-function Login(){
+function Login({ user }){
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -17,6 +17,18 @@ function Login(){
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            navigate("/");
+        }
+    }, [navigate, user]);
+
+    function tweenError(){
+        gsap.to(".login-form-width", {
+                x: 0
+        });
+    }
 
     useGSAP(() => {
         if(error){
@@ -26,11 +38,10 @@ function Login(){
                 repeat: 3,
                 yoyo: true,
                 ease: "power2.inOut",
-                onComplete: () => gsap.to(".login-form-width", {x: 0})
-
-            })
+                onComplete: tweenError,
+            });
         }
-    }, [error])
+    }, [error]);
 
     useGSAP(() => {
         gsap.from([".login-form-width", ".outlined-orange-button", ".forgot-password-container"], {
@@ -38,29 +49,29 @@ function Login(){
             duration: 0.5,
             opacity: 0,
             ease: "power2.inOut",
-        })
+        });
         gsap.from(".main-title-margin", {
             duration: 0.5,
             opacity: 0,
             x: -20,
-        })
-    })
+        });
+    });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(false);
         setLoading(true);
-        if(email === "" || password === ""){
+        if(email.trim() === "" || password.trim() === ""){
             setErrorMessage("Inserisci email e password");
             setError(true);
             setLoading(false);
         }
         else{
-            const response = await loginWithEmail(email, password);
+            const response = await loginWithEmail(email, password, rememberMe);
             if(response.success){
                 // Add last login update.
                 //getLastLogin(response.user.uid);
-                navigate("/profile");
+                navigate("/");
             }
             else {
                 setError(true);
@@ -102,7 +113,7 @@ function Login(){
 
             <Container fluid className="d-flex flex-column align-items-center justify-content-center mt-5">
                 {error && <p className="text-danger fw-bold">{errorMessage}</p>}
-                <Form className={"login-form-width"}>
+                <Form className={"login-form-width"} onSubmit={handleSubmit}>
                     <Form.Group className="mb-3" controlId="formBasicEmail">
                         <InputGroup className="mb-3">
                             <InputGroup.Text className="login-input-icon">
@@ -122,11 +133,12 @@ function Login(){
                     <Form.Group className="mt-3 mx-3">
                         <Form.Check type="checkbox" label="Ricordami" className={"text-light"} onChange={() => setRememberMe(!rememberMe)}/>
                     </Form.Group>
+                    <Form.Group className="d-flex justify-content-center">
+                        <Button className="mt-5 outlined-orange-button border-2 rounded-3" variant="primary" type="submit">
+                            {loading ? <Spinner animation="border" variant="warning" /> : "Accedi"}
+                        </Button>
+                    </Form.Group>
                 </Form>
-                {/*TODO: Loading*/}
-                <Button className="mt-5 outlined-orange-button border-2 rounded-3" variant="primary" type="submit" onClick={!loading ? handleSubmit : () => {}}>
-                    {loading ? <Spinner animation="border" variant="warning" /> : "Accedi"}
-                </Button>
                 <Container fluid className="d-flex justify-content-center mt-5 forgot-password-container">
                     <p className="text-light fw-bold"><a href={"/reset"} className="text-light">Password dimenticata?</a></p>
                 </Container>
