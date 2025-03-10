@@ -55,10 +55,23 @@
     color: white;
 }
 
+.outlined-orange-select {
+    background: transparent;
+    border: solid 2px #FF914D;
+    border-radius: 30px;
+    color: white;
+}
+
 .sendIcon {
     background-color: #FF914D;
     border-radius: 50%;
     border: solid 1px #FF914D;
+}
+
+.finishIcon {
+    background-color: #28d10e;
+    border-radius: 50%;
+    border: solid 1px #28d10e;
 }
 .sendIcon:hover {
     background: #cf651c;
