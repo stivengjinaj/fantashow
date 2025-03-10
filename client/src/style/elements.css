@@ -131,8 +131,30 @@
     background-position: -100% 0;
 }
 
+.topbar-gradient-bg{
+    background: linear-gradient(135deg, #62C3ED 30%, #403CF2 70%);
+    background-size: 200% 200%;
+    animation: GradientBackground 15s ease infinite;
+}
+
+.profile-picture {
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+
 @media (max-width: 768px) {
     .login-form-width {
         width: 80%;
+    }
+    .profile-picture {
+        position: absolute;
+        top: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
     }
 }
