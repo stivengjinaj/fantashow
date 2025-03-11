@@ -31,8 +31,8 @@ function Register() {
             </Container>
 
             {step === 0 && <PersonalData dispatch={dispatch} state={state} nextStep={nextStep}/>}
-            {step === 1 && <ContactData dispatch={dispatch} state={state}/>}
-            {step === 2 && <LoginData dispatch={dispatch} state={state}/>}
+            {step === 1 && <ContactData dispatch={dispatch} state={state} nextStep={nextStep} prevStep={prevStep}/>}
+            {step === 2 && <LoginData dispatch={dispatch} state={state} nextStep={nextStep} prevStep={prevStep}/>}
             {step === 3 && <Payment dispatch={dispatch} state={state}/>}
 
 
@@ -44,7 +44,7 @@ function Register() {
             </Container>
 
             <Container fluid className="d-flex justify-content-center">
-                <h5 className="text-light">I dati personali contrassegnati con l'asterisco (*) sono obbligatori.</h5>
+                <h5 className="text-light text-center">I dati personali contrassegnati con l'asterisco (*) sono obbligatori.</h5>
             </Container>
         </Container>
     );
