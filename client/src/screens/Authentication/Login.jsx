@@ -1,12 +1,12 @@
 import {Button, Container, Form, Image, InputGroup, Spinner} from "react-bootstrap";
-import navigateBack from "../../assets/icons/navigate_back.svg";
 import person from "../../assets/icons/person.svg";
 import lock from "../../assets/icons/lock.svg";
 import {useNavigate} from "react-router";
 import {useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import loginWithEmail from "../../utils/auth.js";
+import {getLastLogin, updateLastLogin} from "../../API.js";
+import {loginWithEmail} from "../../utils/auth.js";
 
 
 function Login(){
@@ -63,8 +63,8 @@ function Login(){
         else{
             const response = await loginWithEmail(email, password, rememberMe);
             if(response.success){
-                // Add last login update.
-                //getLastLogin(response.user.uid);
+                const idToken = await response.user.getIdToken();
+                await updateLastLogin(response.user.uid, idToken);
                 navigate("/profile");
             }
             else {

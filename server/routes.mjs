@@ -174,7 +174,8 @@ router.post("/api/register", verifyToken, async (req, res) => {
 
         const last_login = {
             last_login: admin.firestore.FieldValue.serverTimestamp(),
-            username,
+            last_streak_update: admin.firestore.FieldValue.serverTimestamp(),
+            streak: 1
         };
 
         // Save user to Firestore
@@ -269,7 +270,7 @@ router.post("/api/register/admin", async (req, res) => {
 });
 
 /**
- * @route POST /api/get/last_login
+ * @route GET /api/get/last_login
  * @description Retrieves the last login time of a user.
  * @param {object} req.body.userId - ID of the user.
  * @returns {object} - JSON response with last login time and username.
@@ -289,25 +290,32 @@ router.post("/api/register/admin", async (req, res) => {
  * "last_login": "2022-01-01T00:00:00.000Z"
  * }
  * */
-router.post("/api/get/last_login", async (req, res) => {
+router.get("/api/last_login/:userId", verifyToken, async (req, res) => {
     try {
-        const { userId } = req.body;
-        if(!userId || userId === "") {
+        const { userId } = req.params;
+        if (!userId || userId.trim() === "") {
             return res.status(400).json({ error: "User ID is required" });
         }
-        const last_login = await db.collection("last_login").doc(userId).get();
-        if(!last_login.exists) {
+
+        const lastLoginDoc = await db.collection("last_login").doc(userId).get();
+
+        if (!lastLoginDoc.exists) {
             return res.status(404).json({ error: "Last login not found" });
         }
-        res.status(200).json({message: "Last login retrieved successfully", last_login: last_login.data().last_login});
+
+        res.status(200).json({
+            message: "Last login retrieved successfully",
+            last_login: lastLoginDoc.data(),
+        });
     } catch (error) {
-        // console.error("Error getting last login:", error);
+        console.error("Error getting last login:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
-})
+});
+
 
 /**
- * @route POST /api/last_login
+ * @route PATCH /api/last_login
  * @description Updates the last login time of a user.
  * @param {object} req.body.userId - ID of the user.
  * @returns {object} - JSON response with success message.
@@ -319,34 +327,62 @@ router.post("/api/get/last_login", async (req, res) => {
  * @example
  * Request Body:
  * {
- * "userId": "pgppaqcbqcbhqebkyuyxu"
+ * "uid": "pgppaqcbqcbhqebkyuyxu"
  * }
  * Response:
  * {
  * "message": "Last login updated successfully"
  * }
  */
-router.post("/api/update/last_login", async (req, res) => {
+router.patch("/api/last_login", verifyToken, async (req, res) => {
     try {
-        const { userId } = req.body;
-        if(!userId || userId === "") {
+        const { uid } = req.body;
+        if (!uid || uid.trim() === "") {
             return res.status(400).json({ error: "User ID is required" });
         }
-        const userRef = await db.collection("users").doc(userId).get();
-        if(!userRef.exists) {
+
+        const userRef = db.collection("users").doc(uid);
+        const userDoc = await userRef.get();
+
+        if (!userDoc.exists) {
             return res.status(404).json({ error: "User not found" });
         }
-        const last_login = {
-            last_login: admin.firestore.FieldValue.serverTimestamp(),
-            username: userRef.data().username,
+
+        const lastLoginRef = db.collection("last_login").doc(uid);
+        const lastLoginDoc = await lastLoginRef.get();
+
+        const now = new Date();
+        const today = now.toISOString().split("T")[0]; // YYYY-MM-DD format
+
+        const lastValidStreakUpdate = lastLoginDoc.exists ? lastLoginDoc.data().last_streak_update : today;
+        const lastUpdateDate = new Date(lastValidStreakUpdate);
+        const dayDifference = Math.floor((now - lastUpdateDate) / (1000 * 60 * 60 * 24));
+
+        let streak = userDoc.data().streak || 0;
+
+        if (dayDifference === 1) {
+            streak += 1;
+        } else if (dayDifference > 1) {
+            streak = 0;
         }
-        await db.collection("last_login").doc(userId).set(last_login);
-        res.status(201).json({ message: "Last login updated successfully" });
+
+        await userRef.update({ streak });
+        await lastLoginRef.set(
+            {
+                last_login: admin.firestore.FieldValue.serverTimestamp(),
+                last_streak_update: today,
+            },
+            { merge: true }
+        );
+
+        res.status(200).json({ message: "Last login updated successfully", streak });
     } catch (error) {
-        // console.error("Error updating last login:", error);
+        console.error("Error updating last login:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+
 
 /**
  * @route GET /api/check-verification/:uid

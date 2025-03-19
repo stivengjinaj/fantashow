@@ -138,5 +138,3 @@ export async function verifyUser(uid) {
         return {success: false, error: error};
     }
 }
-
-export default loginWithEmail;
