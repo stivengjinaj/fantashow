@@ -1,11 +1,14 @@
 import express from "express";
-import { v4 as uuidv4 } from "uuid";
+import {v4 as uuidv4} from "uuid";
 import dotenv from "dotenv";
 import admin from "firebase-admin";
 
 dotenv.config();
 
 const router = express.Router();
+
+router.use(express.json());
+router.use(express.urlencoded({ extended: true }));
 
 const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
 
@@ -25,7 +28,7 @@ async function generateReferralCode() {
     let referralCode;
     let isUnique = false;
     while (!isUnique) {
-        referralCode = uuidv4().slice(0, 8); // Shorten UUID to 8 characters
+        referralCode = uuidv4().slice(0, 8);
         const existingUser = await db.collection("users")
             .where("referralCode", "==", referralCode)
             .get();
@@ -34,16 +37,30 @@ async function generateReferralCode() {
     return referralCode;
 }
 
+const verifyToken = async (req, res, next) => {
+    const idToken = req.headers.authorization?.split("Bearer ")[1];
+
+    if (!idToken) {
+        return res.status(401).json({ error: "Unauthorized: Missing ID token" });
+    }
+    try {
+        req.user = await admin.auth().verifyIdToken(idToken);
+        next();
+    } catch (error) {
+        return res.status(403).json({ error: "Invalid or expired token" });
+    }
+};
+
 /**
  * @route POST /register
  * @description Registers a new user.
- * @param {object} req.body.username - Username of the user.
- * @param {object} res.body.email - Email of the user.
- * @param {object} res.body.referredBy - Referral code of the user who referred this user.
+ * @param {object} req.body - User data to be registered.
  * @returns {object} - JSON response with success message, userId, and referralCode.
  * @returns {201} - If the user is registered successfully.
- * @throws {400} - If username or email are missing.
+ * @throws {400} - If data is missing.
  * @throws {401} - If the provided referral code is invalid.
+ * @throws {402} - User already registered.
+ * @throws {403} - Unauthorized request.
  * @throws {500} - If an internal server error occurs.
  * @async
  * @example
@@ -61,19 +78,52 @@ async function generateReferralCode() {
  * "referralCode": "john-fffc"
  * }
  */
-router.post("/register", async (req, res) => {
+router.post("/register", verifyToken, async (req, res) => {
     try {
-        const { username, email, referredBy} = req.body;
-        if (username === undefined || username === null || username === "" ||
-            email === undefined || email === null || email === "" ||
-            referredBy === undefined || referredBy === null || referredBy === "") {
-            return res.status(400).json({ error: "Username, email, and referral code are required" });
+        const {
+            username, email, referredBy, password,
+            nome, cognome, annoNascita, cap, squadraDelCuore, cellulare, telegram, uid
+        } = req.body;
+
+        // Ensure the UID in the request body matches the one from the token
+        const annoNascitaNum = parseInt(annoNascita, 10);
+
+        if (uid !== req.user.uid) {
+            return res.status(403).json({ error: "Unauthorized: UID mismatch" });
+        }
+
+        const existingUser = await db.collection("users").doc(uid).get();
+        if (existingUser.exists) {
+            return res.status(402).json({ error: "User already registered" });
+        }
+        if (!username || !email || !password || !nome || !cognome || !squadraDelCuore || !cellulare || !telegram) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+        if (annoNascita && (isNaN(annoNascitaNum) || annoNascitaNum < 1900 || annoNascitaNum > new Date().getFullYear())) {
+            return res.status(400).json({ error: "Invalid birth year value" });
+        }
+        if (cap && (!/^\d{4,5}$/.test(cap))) {
+            return res.status(400).json({ error: "Invalid postal code" });
+        }
+        if (cellulare && !/^\d{10,15}$/.test(cellulare.trim())) {
+            return res.status(400).json({ error: "Invalid phone number format" });
+        }
+
+        // Check if username or email already exists
+        const existingUsers = await db.collection("users").where("username", "==", username).get();
+        if (!existingUsers.empty) {
+            return res.status(400).json({ error: "Username already taken" });
+        }
+
+        const existingEmails = await db.collection("users").where("email", "==", email).get();
+        if (!existingEmails.empty) {
+            return res.status(400).json({ error: "Email already registered" });
         }
 
         // Generate referral code
         const referralCode = await generateReferralCode();
 
-        // Validate referredBy (check if referralCode exists)
+        // Validate referral code
         let referrerId = null;
         if (referredBy) {
             const referrerSnapshot = await db.collection("users")
@@ -85,40 +135,53 @@ router.post("/register", async (req, res) => {
                 const referrerDoc = referrerSnapshot.docs[0];
                 referrerId = referredBy;
 
-                // Referral award logics
+                // Reward referral points
                 await referrerDoc.ref.update({
                     points: admin.firestore.FieldValue.increment(1),
                 });
             } else {
                 return res.status(401).json({ error: "Invalid referral code" });
             }
+        }else {
+            return res.status(401).json({ error: "Invalid referral code" });
         }
 
-        // Create user data
+        // Create user object
         const newUser = {
-            username: username,
-            email: email,
+            uid, // Store the verified UID from Firebase
+            username,
+            email,
+            nome,
+            cognome,
+            annoNascita,
+            cap,
+            squadraDelCuore,
+            cellulare,
+            telegram,
             isAdmin: false,
-            referralCode: referralCode,
+            referralCode,
             referredBy: referrerId,
-            verified: true,
+            verified: false,
+            paid: false,
             points: 0,
-            createdAt: admin.firestore.FieldValue.serverTimestamp()
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
         };
+
         const last_login = {
             last_login: admin.firestore.FieldValue.serverTimestamp(),
-            username: username,
-        }
+            username,
+        };
 
-        // Save user to Firestore and last login to Firestore
-        const userRef = await db.collection("users").add(newUser);
-        await db.collection("last_login").doc(userRef.id).set(last_login);
+        // Save user to Firestore
+        await db.collection("users").doc(uid).set(newUser);
+        await db.collection("last_login").doc(uid).set(last_login);
 
         res.status(201).json({
             message: "User registered successfully",
-            userId: userRef.id,
+            userId: uid,
             referralCode: referralCode,
         });
+
     } catch (error) {
         console.error("Error registering user:", error);
         res.status(500).json({ error: "Internal Server Error" });
