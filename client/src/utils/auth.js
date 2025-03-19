@@ -137,6 +137,6 @@ export async function verifyUser(uid) {
         console.error("Error:", error);
         return {success: false, error: error};
     }
-};
+}
 
 export default loginWithEmail;
