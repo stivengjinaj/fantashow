@@ -1,4 +1,4 @@
-import {Button, Container, Form, Image} from "react-bootstrap";
+import {Button, Container, Form, Image, Spinner} from "react-bootstrap";
 import next from "../../assets/icons/next.svg";
 import {useState} from "react";
 import {registerUser} from "../../API.js";
@@ -7,6 +7,7 @@ import getError from "../../utils/errorHandler.js";
 
 function LoginData({dispatch, state, nextStep, prevStep}) {
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         if (Object.keys(errors).length > 0) {
@@ -17,7 +18,7 @@ function LoginData({dispatch, state, nextStep, prevStep}) {
 
     const register = async (e) => {
         e.preventDefault();
-
+        setLoading(true);
         if(validate()){
             let newErrors = {};
 
@@ -28,6 +29,7 @@ function LoginData({dispatch, state, nextStep, prevStep}) {
                 if (success) {
                     nextStep();
                 } else {
+                    setLoading(false);
                     await deleteUnregisteredUser();
                     newErrors.passwordConfirm = "Errore di sistema. Riprova più tardi."
                 }
@@ -36,6 +38,7 @@ function LoginData({dispatch, state, nextStep, prevStep}) {
             }
             setErrors(newErrors);
         }
+        setLoading(false);
     }
 
     const validate = () => {
@@ -119,7 +122,7 @@ function LoginData({dispatch, state, nextStep, prevStep}) {
                     <Image src={next} width={30} height={30} style={{transform: `rotate(-180deg)`}}/>
                 </Button>
                 <Button onClick={register} className="guideButton p-3 mt-3 mx-3">
-                    Vai al pagamento
+                    {loading ? <Spinner animation="border" variant="warning" /> : "Vai al pagamento"}
                 </Button>
             </Container>
         </Container>
