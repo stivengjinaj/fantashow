@@ -36,6 +36,8 @@ const getError = (errorCode) => {
             return "Password non sicura.";
         case ERROR_MESSAGES.FIREBASE_AUTHENTICATION.WRONG_PASSWORD:
             return "Password errata."
+        case "User not authenticated":
+            return "Utente non valido.";
     }
 };
 
