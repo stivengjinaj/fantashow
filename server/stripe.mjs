@@ -12,7 +12,7 @@ const clientLink = "http://localhost:5173";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-checkoutRoutes.post('/create-payment-intent', async (req, res) => {
+checkoutRoutes.post('/api/create-payment-intent', async (req, res) => {
     try {
         const paymentIntent = await stripe.paymentIntents.create({
             amount: 2000,
@@ -27,7 +27,7 @@ checkoutRoutes.post('/create-payment-intent', async (req, res) => {
     }
 });
 
-checkoutRoutes.post("/verify-payment", async (req, res) => {
+checkoutRoutes.post("/api/verify-payment", async (req, res) => {
     const { paymentIntentId } = req.body;
     if (!paymentIntentId) {
         return res.status(400).json({ success: false, error: "Missing paymentIntentId" });
