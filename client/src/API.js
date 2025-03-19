@@ -3,7 +3,7 @@ const remoteURL = "http://localhost:3000";
 
 const fetchClientSecret = async () => {
     try {
-        const response = await fetch(`${remoteURL}/create-payment-intent`, {
+        const response = await fetch(`${remoteURL}/api/create-payment-intent`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -26,7 +26,7 @@ const verifyPayment = async (onErrorNavigate, onVerificationTrue, paymentIntentI
     }
 
     try {
-        const response = await fetch(`${remoteURL}/verify-payment`, {
+        const response = await fetch(`${remoteURL}/api/verify-payment`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -49,7 +49,7 @@ const verifyPayment = async (onErrorNavigate, onVerificationTrue, paymentIntentI
 
 const registerUser = async (userData, uid, idToken) => {
     try {
-        const response = await fetch(`${remoteURL}/register`, {
+        const response = await fetch(`${remoteURL}/api/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -69,6 +69,7 @@ const registerUser = async (userData, uid, idToken) => {
         return { success: false, error: error };
     }
 };
+
 
 
 export { fetchClientSecret, verifyPayment, registerUser };
