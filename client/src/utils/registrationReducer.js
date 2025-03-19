@@ -1,15 +1,16 @@
 export const initialState = {
     nome: "",
     cognome: "",
-    eta: 0,
+    annoNascita: 0,
     cap: 0,
-    sesso: "",
+    squadraDelCuore: "",
     cellulare: "",
     telegram: "",
     email: "",
     username: "",
     password: "",
     passwordConfirm: "",
+    referredBy: "",
 };
 
 export default function registrationReducer(state, action) {
