@@ -5,7 +5,7 @@ import {useNavigate} from "react-router";
 import {useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import {getLastLogin, updateLastLogin} from "../../API.js";
+import {updateLastLogin} from "../../API.js";
 import {loginWithEmail} from "../../utils/auth.js";
 
 
