@@ -21,14 +21,15 @@ const db = admin.firestore();
 
 /**
  * @description Generates a unique referral code. It searches in the database if the referral code already exists. If it does, it generates a new one.
+ * @param name - Username used to generate the referral code.
  * @returns {string} - A unique referral code.
  * @async
  * */
-async function generateReferralCode() {
+async function generateReferralCode(name) {
     let referralCode;
     let isUnique = false;
     while (!isUnique) {
-        referralCode = uuidv4().slice(0, 8);
+        referralCode = `${name.toLowerCase()}-${uuidv4().slice(0, 8)}`;
         const existingUser = await db.collection("users")
             .where("referralCode", "==", referralCode)
             .get();
@@ -37,9 +38,15 @@ async function generateReferralCode() {
     return referralCode;
 }
 
+/**
+ * @description Checks if the request is authorized by checking the token in headers.
+ * @returns req.user - If the request is authorized it returns the user in the request.
+ * @throws 401 - Unauthorized: Missing ID token
+ * @throws 403 - Invalid or expired token
+ * @async
+ * */
 const verifyToken = async (req, res, next) => {
     const idToken = req.headers.authorization?.split("Bearer ")[1];
-
     if (!idToken) {
         return res.status(401).json({ error: "Unauthorized: Missing ID token" });
     }
@@ -52,7 +59,7 @@ const verifyToken = async (req, res, next) => {
 };
 
 /**
- * @route POST /register
+ * @route POST /api/register
  * @description Registers a new user.
  * @param {object} req.body - User data to be registered.
  * @returns {object} - JSON response with success message, userId, and referralCode.
@@ -78,20 +85,21 @@ const verifyToken = async (req, res, next) => {
  * "referralCode": "john-fffc"
  * }
  */
-router.post("/register", verifyToken, async (req, res) => {
+router.post("/api/register", verifyToken, async (req, res) => {
     try {
         const {
             username, email, referredBy, password,
             nome, cognome, annoNascita, cap, squadraDelCuore, cellulare, telegram, uid
         } = req.body;
 
-        // Ensure the UID in the request body matches the one from the token
         const annoNascitaNum = parseInt(annoNascita, 10);
 
+        // Checking if the request is being send by a user who recently registered on firebase.
         if (uid !== req.user.uid) {
             return res.status(403).json({ error: "Unauthorized: UID mismatch" });
         }
 
+        // Checking data validity.
         const existingUser = await db.collection("users").doc(uid).get();
         if (existingUser.exists) {
             return res.status(402).json({ error: "User already registered" });
@@ -109,11 +117,10 @@ router.post("/register", verifyToken, async (req, res) => {
             return res.status(400).json({ error: "Invalid phone number format" });
         }
 
-        // Check if username or email already exists
-        const existingUsers = await db.collection("users").where("username", "==", username).get();
+        /*const existingUsers = await db.collection("users").where("username", "==", username).get();
         if (!existingUsers.empty) {
             return res.status(400).json({ error: "Username already taken" });
-        }
+        }*/
 
         const existingEmails = await db.collection("users").where("email", "==", email).get();
         if (!existingEmails.empty) {
@@ -121,7 +128,7 @@ router.post("/register", verifyToken, async (req, res) => {
         }
 
         // Generate referral code
-        const referralCode = await generateReferralCode();
+        const referralCode = await generateReferralCode(nome);
 
         // Validate referral code
         let referrerId = null;
@@ -146,9 +153,7 @@ router.post("/register", verifyToken, async (req, res) => {
             return res.status(401).json({ error: "Invalid referral code" });
         }
 
-        // Create user object
         const newUser = {
-            uid, // Store the verified UID from Firebase
             username,
             email,
             nome,
@@ -189,7 +194,7 @@ router.post("/register", verifyToken, async (req, res) => {
 });
 
 /**
- * @route POST /register/admin
+ * @route POST /api/register/admin
  * @description Registers a new admin.
  * @param {object} req.body.username - Username of the admin.
  * @param {object} res.body.email - Email of the admin.
@@ -215,7 +220,7 @@ router.post("/register", verifyToken, async (req, res) => {
  * "referralCode": "john-39fa"
  * }
  * */
-router.post("/register/admin", async (req, res) => {
+router.post("/api/register/admin", async (req, res) => {
    try {
        const { username, email, existingAdminUUID } = req.body;
        if(!username || !email || username === "" || email === "") {
@@ -264,7 +269,7 @@ router.post("/register/admin", async (req, res) => {
 });
 
 /**
- * @route POST /get/last_login
+ * @route POST /api/get/last_login
  * @description Retrieves the last login time of a user.
  * @param {object} req.body.userId - ID of the user.
  * @returns {object} - JSON response with last login time and username.
@@ -284,7 +289,7 @@ router.post("/register/admin", async (req, res) => {
  * "last_login": "2022-01-01T00:00:00.000Z"
  * }
  * */
-router.post("/get/last_login", async (req, res) => {
+router.post("/api/get/last_login", async (req, res) => {
     try {
         const { userId } = req.body;
         if(!userId || userId === "") {
@@ -302,7 +307,7 @@ router.post("/get/last_login", async (req, res) => {
 })
 
 /**
- * @route POST /last_login
+ * @route POST /api/last_login
  * @description Updates the last login time of a user.
  * @param {object} req.body.userId - ID of the user.
  * @returns {object} - JSON response with success message.
@@ -321,7 +326,7 @@ router.post("/get/last_login", async (req, res) => {
  * "message": "Last login updated successfully"
  * }
  */
-router.post("/update/last_login", async (req, res) => {
+router.post("/api/update/last_login", async (req, res) => {
     try {
         const { userId } = req.body;
         if(!userId || userId === "") {
@@ -342,5 +347,91 @@ router.post("/update/last_login", async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+/**
+ * @route GET /api/check-verification/:uid
+ * @description Checks if a user is verified based on their UID.
+ * @param {string} req.params.uid - The UID of the user to check verification status for.
+ * @returns {object} - JSON response with the verification status.
+ * @returns {200} - If the user is found and the verification status is retrieved successfully.
+ * @returns {404} - If the user is not found.
+ * @returns {304} - If the data hasn't changed since the last time it was requested.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request:
+ * GET /api/check-verification/pgppaqcbqcbhqebkyuyxu
+ *
+ * Response:
+ * {
+ * "verified": true
+ * }
+ */
+router.get("/api/verify-user/:uid", verifyToken, async (req, res) => {
+    try {
+        const { uid } = req.params;
+
+        const userDoc = await db.collection("users").doc(uid).get();
+
+        if (!userDoc.exists) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const userData = userDoc.data();
+        const isVerified = userData.verified ?? false;
+
+        res.status(200).json({ verified: isVerified });
+    } catch (error) {
+        console.error("Error checking verification:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+/**
+ * @route PATCH /api/verify-user
+ * @description Updates verification status of a user based on their UID.
+ * @param {object} req.body.uid - The UID of the user to verify.
+ * @returns {object} - JSON response with a success message.
+ * @returns {200} - If the user verification is updated successfully.
+ * @returns {400} - If the UID is missing.
+ * @returns {404} - If the user is not found.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request Body:
+ * {
+ * "uid": "pgppaqcbqcbhqebkyuyxu"
+ * }
+ *
+ * Response:
+ * {
+ * "message": "User verified successfully"
+ * }
+ */
+router.patch("/api/verify-user", verifyToken, async (req, res) => {
+    try {
+        const { uid } = req.body;
+
+        if (!uid) {
+            return res.status(400).json({ error: "UID is required" });
+        }
+
+        const userRef = db.collection("users").doc(uid);
+        const userDoc = await userRef.get();
+
+        if (!userDoc.exists) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        await userRef.update({ verified: true });
+
+        res.status(200).json({ message: "User verified successfully" });
+    } catch (error) {
+        console.error("Error verifying user:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
 
 export default router;
