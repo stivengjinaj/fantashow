@@ -5,16 +5,16 @@ import next from "../../assets/icons/next.svg";
 
 function PersonalData({ nextStep, dispatch, state }) {
     const [capInfo, setCapInfo] = useState(false);
-    const [sexInfo, setSexInfo] = useState(false);
+    const [squadraInfo, setSquadraInfo] = useState(false);
     const [errors, setErrors] = useState({});
 
     const validate = () => {
         let newErrors = {};
         if (!state.nome.trim()) newErrors.nome = "Il campo è obbligatorio.";
         if (!state.cognome.trim()) newErrors.cognome = "Il campo è obbligatorio.";
-        if (!state.eta || state.eta < 16 || state.eta > 70) newErrors.eta = "L'età deve essere un numero compreso tra 16 e 70.";
+        if (!state.annoNascita || state.annoNascita < 1970 || state.annoNascita > new Date().getFullYear()) newErrors.annoNascita = "Anno di nascita non valido.";
         if (!state.cap) newErrors.cap = "Il campo è obbligatorio.";
-        if (!state.sesso) newErrors.sesso = "Il campo è obbligatorio.";
+        if (!state.squadraDelCuore) newErrors.squadraDelCuore = "Il campo è obbligatorio.";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0; // Return true if no errors
@@ -27,7 +27,7 @@ function PersonalData({ nextStep, dispatch, state }) {
     };
 
     const handleCapInfo = () => setCapInfo(!capInfo);
-    const handleSexInfo = () => setSexInfo(!sexInfo);
+    const handleSquadra = () => setSquadraInfo(!squadraInfo);
 
     const handleChange = (e) => {
         if (Object.keys(errors).length > 0) {
@@ -44,9 +44,9 @@ function PersonalData({ nextStep, dispatch, state }) {
                 </Modal.Header>
                 <Modal.Body>Woohoo, you are reading this text in a modal!</Modal.Body>
             </Modal>
-            <Modal show={sexInfo} onHide={handleSexInfo}>
+            <Modal show={squadraInfo} onHide={handleSquadra}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Perchè devi specificare il sesso?</Modal.Title>
+                    <Modal.Title>Perchè devi specificare la squadra del cuore?</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>Woohoo, you are reading this text in a modal!</Modal.Body>
             </Modal>
@@ -77,14 +77,14 @@ function PersonalData({ nextStep, dispatch, state }) {
                 <Form.Group className="mb-md-5 mb-4">
                     <Form.Control
                         type="number"
-                        placeholder="Età*"
+                        placeholder="Anno di nascita*"
                         className="outlined-orange-input"
                         min={16} max={70}
-                        name="eta"
-                        value={state.eta || ""}
+                        name="annoNascita"
+                        value={state.annoNascita || ""}
                         onChange={handleChange}
                     />
-                    <p className="mx-2 text-danger">{errors.eta}</p>
+                    <p className="mx-2 text-danger">{errors.annoNascita}</p>
                 </Form.Group>
                 <InputGroup>
                     <Form.Control
@@ -101,21 +101,19 @@ function PersonalData({ nextStep, dispatch, state }) {
                 </InputGroup>
                 <p className="mb-md-5 mb-4 mx-2 text-danger">{errors.cap}</p>
                 <InputGroup>
-                    <Form.Select
-                        className="outlined-orange-select"
-                        name="sesso"
-                        value={state.sesso || ""}
+                    <Form.Control
+                        type="text"
+                        placeholder="Squadra del cuore*"
+                        className="outlined-orange-input"
+                        name="squadraDelCuore"
+                        value={state.squadraDelCuore || ""}
                         onChange={handleChange}
-                    >
-                        <option value="">Sesso*</option>
-                        <option value="M">M</option>
-                        <option value="F">F</option>
-                    </Form.Select>
+                    />
                     <InputGroup.Text className="rounded-end-5 bg-transparent" style={{border: "2px solid #FF914D"}}>
-                        <Image src={infoIcon} width={20} height={20} onClick={handleSexInfo}/>
+                        <Image src={infoIcon} width={20} height={20} onClick={handleSquadra}/>
                     </InputGroup.Text>
                 </InputGroup>
-                <p className="mb-4 mx-2 text-danger">{errors.sesso}</p>
+                <p className="mb-4 mx-2 text-danger">{errors.squadraDelCuore}</p>
             </Form>
             <Container fluid className="d-flex justify-content-center mt-3">
                 <Button onClick={handleNext} className="sendIcon p-3 mt-3 mx-5">

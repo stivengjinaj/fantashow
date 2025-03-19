@@ -7,16 +7,15 @@ import currentStep from "../../assets/icons/currentStep.svg";
 import registrationReducer, {initialState} from "../../utils/registrationReducer.js";
 import ContactData from "./ContactData.jsx";
 import LoginData from "./LoginData.jsx";
-import Payment from "./Payment.jsx";
+import Checkout from "../Checkout/Checkout.jsx";
 
 function Register() {
     const params = useParams();
-    const [referral, setReferral] = useState("");
     const [step, setStep] = useState(0);
     const [state, dispatch] = useReducer(registrationReducer, initialState);
 
     useEffect(() => {
-        setReferral(params.referral);
+        dispatch({type: "UPDATE_DATA", payload: {["referredBy"]: params.referral}});
     }, [params.referral]);
 
     const nextStep = () => setStep((prev) => prev + 1);
@@ -33,7 +32,7 @@ function Register() {
             {step === 0 && <PersonalData dispatch={dispatch} state={state} nextStep={nextStep}/>}
             {step === 1 && <ContactData dispatch={dispatch} state={state} nextStep={nextStep} prevStep={prevStep}/>}
             {step === 2 && <LoginData dispatch={dispatch} state={state} nextStep={nextStep} prevStep={prevStep}/>}
-            {step === 3 && <Payment dispatch={dispatch} state={state}/>}
+            {step === 3 && <Checkout dispatch={dispatch} state={state}/>}
 
 
             <Container fluid className="d-flex justify-content-center mt-3 py-5">
