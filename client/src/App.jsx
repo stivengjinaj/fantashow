@@ -11,19 +11,29 @@ import {onAuthStateChanged} from "firebase/auth";
 import {auth} from "./utils/firebase.mjs";
 import Profile from "./screens/Profile/Profile.jsx";
 import Register from "./screens/Registration/Register.jsx";
-import Checkout from "./screens/Checkout/Checkout.jsx";
 import PaymentSuccess from "./screens/Checkout/PaymentSuccess.jsx";
+import {logout} from "./utils/auth.js";
 
 function App() {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            if (currentUser) {
+                await currentUser.reload();
+                if (currentUser.emailVerified) {
+                    setUser(currentUser);
+                } else {
+                    await logout();
+                    setUser(null);
+                }
+            } else {
+                setUser(null);
+            }
         });
 
         return () => unsubscribe();
-    }, []);
+    }, [auth]);
 
   return (
       <Routes>
