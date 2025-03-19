@@ -33,7 +33,7 @@ function ContactData({dispatch, state, nextStep, prevStep}) {
                 <Form.Group className="mb-5">
                     <Form.Control
                         type="text"
-                        placeholder="Telegram"
+                        placeholder="ID Telegram"
                         className="outlined-orange-input"
                         name="telegram"
                         value={state.telegram || ""}

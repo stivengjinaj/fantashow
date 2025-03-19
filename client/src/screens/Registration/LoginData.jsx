@@ -1,6 +1,9 @@
 import {Button, Container, Form, Image} from "react-bootstrap";
 import next from "../../assets/icons/next.svg";
 import {useState} from "react";
+import {registerUser} from "../../API.js";
+import {deleteUnregisteredUser, registerUserWithFirebase} from "../../utils/auth.js";
+import getError from "../../utils/errorHandler.js";
 
 function LoginData({dispatch, state, nextStep, prevStep}) {
     const [errors, setErrors] = useState({});
@@ -10,6 +13,29 @@ function LoginData({dispatch, state, nextStep, prevStep}) {
             setErrors({});
         }
         dispatch({type: "UPDATE_DATA", payload: {[e.target.name]: e.target.value}});
+    }
+
+    const register = async (e) => {
+        e.preventDefault();
+
+        if(validate()){
+            let newErrors = {};
+
+            const { success, idToken, uid, error } = await registerUserWithFirebase(state.email, state.password);
+            if(success){
+                const {success, data, error} = await registerUser(state, uid, idToken);
+
+                if (success) {
+                    nextStep();
+                } else {
+                    await deleteUnregisteredUser();
+                    newErrors.passwordConfirm = "Errore di sistema. Riprova più tardi."
+                }
+            }else {
+                newErrors.passwordConfirm = getError(error.code);
+            }
+            setErrors(newErrors);
+        }
     }
 
     const validate = () => {
@@ -92,8 +118,8 @@ function LoginData({dispatch, state, nextStep, prevStep}) {
                 <Button onClick={prevStep} className="sendIcon p-3 mt-3 mx-5">
                     <Image src={next} width={30} height={30} style={{transform: `rotate(-180deg)`}}/>
                 </Button>
-                <Button onClick={handleNext} className="sendIcon p-3 mt-3 mx-5">
-                    <Image src={next} width={30} height={30}/>
+                <Button onClick={register} className="guideButton p-3 mt-3 mx-3">
+                    Vai al pagamento
                 </Button>
             </Container>
         </Container>
