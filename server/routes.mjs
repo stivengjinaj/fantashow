@@ -29,7 +29,7 @@ async function generateReferralCode(name) {
     let referralCode;
     let isUnique = false;
     while (!isUnique) {
-        referralCode = `${name.toLowerCase()}-${uuidv4().slice(0, 8)}`;
+        referralCode = `${name.toLowerCase()}-${uuidv4().slice(0, 4)}`;
         const existingUser = await db.collection("users")
             .where("referralCode", "==", referralCode)
             .get();
@@ -341,13 +341,6 @@ router.patch("/api/last_login", verifyToken, async (req, res) => {
             return res.status(400).json({ error: "User ID is required" });
         }
 
-        const userRef = db.collection("users").doc(uid);
-        const userDoc = await userRef.get();
-
-        if (!userDoc.exists) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
         const lastLoginRef = db.collection("last_login").doc(uid);
         const lastLoginDoc = await lastLoginRef.get();
 
@@ -358,7 +351,7 @@ router.patch("/api/last_login", verifyToken, async (req, res) => {
         const lastUpdateDate = new Date(lastValidStreakUpdate);
         const dayDifference = Math.floor((now - lastUpdateDate) / (1000 * 60 * 60 * 24));
 
-        let streak = userDoc.data().streak || 0;
+        let streak = lastLoginDoc.exists ? lastLoginDoc.data().streak || 0 : 0;
 
         if (dayDifference === 1) {
             streak += 1;
@@ -366,11 +359,11 @@ router.patch("/api/last_login", verifyToken, async (req, res) => {
             streak = 0;
         }
 
-        await userRef.update({ streak });
         await lastLoginRef.set(
             {
                 last_login: admin.firestore.FieldValue.serverTimestamp(),
                 last_streak_update: today,
+                streak,
             },
             { merge: true }
         );
@@ -381,7 +374,6 @@ router.patch("/api/last_login", verifyToken, async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
-
 
 
 /**
@@ -468,6 +460,99 @@ router.patch("/api/verify-user", verifyToken, async (req, res) => {
     }
 });
 
+/**
+ * @route POST /api/cash-payment
+ * @description Registers a cash payment request for a user.
+ * @param {object} req.body.uid - The UID of the user requesting the cash payment.
+ * @returns {object} - JSON response with a success message.
+ * @returns {201} - If the cash payment request is registered successfully.
+ * @returns {400} - If the UID is missing.
+ * @returns {402} - If a request already exists for the given UID.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request Body:
+ * {
+ * "uid": "pgppaqcbqcbhqebkyuyxu"
+ * }
+ *
+ * Response:
+ * {
+ * "message": "Cash payment request registered"
+ * }
+ */
+router.post("/api/cash-payment", async (req, res) => {
+    try {
+        const { uid } = req.body;
+        console.log(uid);
 
+        if (!uid) {
+            return res.status(400).json({ error: "UID is required" });
+        }
+
+        const checkExistingRequestRef = db.collection("cash_payments").doc(uid);
+        const checkExistingRequestDoc = await checkExistingRequestRef.get();
+
+        if (checkExistingRequestDoc.exists) {
+            return res.status(402).json({ error: "Request already exists" });
+        }
+
+        const newCashPayment = {
+            requestDate: admin.firestore.FieldValue.serverTimestamp(),
+            paid: false
+        };
+
+        await db.collection("cash_payments").doc(uid).set(newCashPayment);
+
+        return res.status(201).json({ message: "Cash payment request registered" });
+    } catch (error) {
+        console.error("Error registering cash payment:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
+/**
+ * @route DELETE /api/cash_payment/:uid
+ * @description Deletes a cash payment request for a user based on their UID.
+ * @param {string} req.params.uid - The UID of the user whose cash payment request is to be deleted.
+ * @returns {object} - JSON response with a success message.
+ * @returns {200} - If the cash payment request is deleted successfully.
+ * @returns {400} - If the UID is missing.
+ * @returns {404} - If the cash payment request is not found.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request:
+ * DELETE /api/cash_payment/pgppaqcbqcbhqebkyuyxu
+ *
+ * Response:
+ * {
+ * "message": "Cash payment request deleted successfully"
+ * }
+ */
+router.delete("/api/cash-payment/:uid", async (req, res) => {
+    try {
+        const { uid } = req.params;
+
+        if (!uid) {
+            return res.status(400).json({ error: "UID is required" });
+        }
+
+        const cashPaymentRef = db.collection("cash_payments").doc(uid);
+        const cashPaymentDoc = await cashPaymentRef.get();
+
+        if (!cashPaymentDoc.exists) {
+            return res.status(404).json({ error: "Cash payment request not found" });
+        }
+
+        await cashPaymentRef.delete();
+
+        return res.status(200).json({ message: "Cash payment request deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting cash payment request:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 
 export default router;

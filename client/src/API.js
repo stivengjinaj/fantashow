@@ -114,12 +114,55 @@ const updateLastLogin = async (uid, idToken) => {
     }
 }
 
+const registerCashPaymentRequest = async (uid) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/cash-payment/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({uid}),
+        })
 
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to register cash payment request");
+        }
+
+        return { success: true, message: data.message };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
+const deleteCashPaymentRequest = async (uid) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/cash-payment/${uid}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to delete cash payment request");
+        }
+
+        return { success: true, message: data.message };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
 
 export {
     fetchClientSecret,
     verifyPayment,
     registerUser,
     getLastLogin,
-    updateLastLogin
+    updateLastLogin,
+    registerCashPaymentRequest,
+    deleteCashPaymentRequest,
 };

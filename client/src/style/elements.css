@@ -158,6 +158,17 @@
     z-index: 10;
 }
 
+.payment-method-button {
+    background: #f5871f;
+    transition: transform 0.3s ease;
+    transform: scale(1);
+}
+
+.payment-method-button:hover {
+    background: #f5871f;
+    transform: scale(1.1);
+}
+
 
 @media (max-width: 768px) {
     .login-form-width {

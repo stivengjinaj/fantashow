@@ -3,9 +3,9 @@ import {useEffect, useState} from "react";
 import {fetchClientSecret} from "../../API.js";
 import {stripePromise} from "../../utils/stripe.js";
 import CheckoutForm from "./CheckoutForm.jsx";
-import {Col, Container, Row, Spinner} from "react-bootstrap";
+import {Button, Col, Container, Row, Spinner} from "react-bootstrap";
 
-const CheckoutPage = () => {
+const CheckoutPage = (props) => {
     const [clientSecret, setClientSecret] = useState("");
 
     useEffect(() => {
@@ -14,8 +14,10 @@ const CheckoutPage = () => {
 
     return (
         <Container fluid className="d-flex flex-column align-items-center justify-content-center">
-            <h2 className="text-light text-center mt-5 mb-5">Pagamento</h2>
-
+            <h2 className="text-light text-center mt-5 mb-2">Pagamento</h2>
+            <Button className="bg-success text-white px-3 py-2 rounded-2 my-4" onClick={props.prevStep} >
+                Cambia metodo di pagamento
+            </Button>
             <Container>
                 <Row className="g-4">
                     {/* Left Container - Payment Form */}

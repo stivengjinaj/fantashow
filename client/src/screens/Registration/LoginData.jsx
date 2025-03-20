@@ -5,7 +5,7 @@ import {registerUser} from "../../API.js";
 import {deleteUnregisteredUser, registerUserWithFirebase} from "../../utils/auth.js";
 import getError from "../../utils/errorHandler.js";
 
-function LoginData({dispatch, state, nextStep, prevStep}) {
+function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
@@ -23,6 +23,7 @@ function LoginData({dispatch, state, nextStep, prevStep}) {
             let newErrors = {};
 
             const { success, idToken, uid, error } = await registerUserWithFirebase(state.email, state.password);
+            saveUid(uid);
             if(success){
                 const {success, data, error} = await registerUser(state, uid, idToken);
 
