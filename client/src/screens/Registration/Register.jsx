@@ -8,7 +8,6 @@ import registrationReducer, {initialState} from "../../utils/registrationReducer
 import ContactData from "./ContactData.jsx";
 import LoginData from "./LoginData.jsx";
 import Checkout from "../Checkout/Checkout.jsx";
-import CashCheckout from "./CashCheckout.jsx";
 import PaymentMethod from "./PaymentMethod.jsx";
 
 function Register() {
