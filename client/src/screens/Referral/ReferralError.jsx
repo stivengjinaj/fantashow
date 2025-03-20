@@ -1,16 +1,12 @@
 import {Button, Container} from "react-bootstrap";
 import {useNavigate} from "react-router";
+import Guide from "../misc/Guide.jsx";
 
 function ReferralError() {
     const navigate = useNavigate();
     return (
         <Container fluid className="animated-error-bg">
-            {/*Guide Button*/}
-            <Container fluid className="d-flex justify-content-end">
-                <Button className="blue-button px-5 mt-4 mx-3 fw-bold">
-                    Guida
-                </Button>
-            </Container>
+            <Guide/>
 
             {/*Error Title*/}
             <Container fluid className="d-flex flex-column align-items-center justify-content-center mt-5 pt-5">

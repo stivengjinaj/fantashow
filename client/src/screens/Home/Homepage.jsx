@@ -4,6 +4,7 @@ import gsap from "gsap";
 import {useGSAP} from "@gsap/react";
 import {useEffect, useState} from "react";
 import RequestRegistration from "./RequestRegistration.jsx";
+import Guide from "../misc/Guide.jsx";
 
 gsap.registerPlugin(useGSAP);
 
@@ -37,11 +38,7 @@ function Homepage() {
     return (
         <Container fluid className="animated-bg">
             {/*Guide Button*/}
-            <Container fluid className="d-flex justify-content-end">
-                <Button className="guideButton px-5 mt-4 mx-3 fw-bold">
-                    Guida
-                </Button>
-            </Container>
+            <Guide/>
 
             {/*Main Title*/}
             <Container fluid className="d-flex justify-content-center mt-5">

@@ -1,6 +1,6 @@
 import {useEffect, useReducer, useState} from "react";
 import { useParams } from "react-router";
-import {Button, Container, Image} from "react-bootstrap";
+import {Container, Image} from "react-bootstrap";
 import PersonalData from "./PersonalData.jsx";
 import stepIcon from "../../assets/icons/step.svg";
 import currentStep from "../../assets/icons/currentStep.svg";
@@ -9,6 +9,7 @@ import ContactData from "./ContactData.jsx";
 import LoginData from "./LoginData.jsx";
 import Checkout from "../Checkout/Checkout.jsx";
 import PaymentMethod from "./PaymentMethod.jsx";
+import Guide from "../misc/Guide.jsx";
 
 function Register() {
     const params = useParams();
@@ -32,11 +33,7 @@ function Register() {
             ? (<PaymentMethod step={step} nextStep={nextStep} uid={uid}/>)
             : (
                 <Container fluid className="animated-bg">
-                    <Container fluid className="d-flex justify-content-end">
-                        <Button className="guideButton px-5 mt-4 mx-3 fw-bold">
-                            Guida
-                        </Button>
-                    </Container>
+                    <Guide/>
 
                     {step === 0 && <PersonalData dispatch={dispatch} state={state} nextStep={nextStep}/>}
                     {step === 1 && <ContactData dispatch={dispatch} state={state} nextStep={nextStep} prevStep={prevStep}/>}

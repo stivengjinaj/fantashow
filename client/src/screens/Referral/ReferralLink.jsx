@@ -1,24 +1,16 @@
-import {Button, Container, Image} from "react-bootstrap";
-import {useNavigate, useParams} from "react-router";
+import {Button, Container} from "react-bootstrap";
+import {useParams} from "react-router";
 import ReferralError from "./ReferralError.jsx";
-import navigateBack from "../../assets/icons/navigate_back.svg";
+import Guide from "../misc/Guide.jsx";
 
 function ReferralLink() {
     const params = useParams();
-    const navigate = useNavigate();
     return (
         params.referral === "ffff"
             ? (
                 <Container fluid className="animated-bg">
-                    {/*Guide and back button*/}
-                    <Container fluid className="d-flex justify-content-between">
-                        <Button className="top-back-button" onClick={() => navigate("/")}>
-                            <Image src={navigateBack} width={35} height={35}/>
-                        </Button>
-                        <Button className="guideButton px-5 mt-4 mx-3 fw-bold">
-                            Guida
-                        </Button>
-                    </Container>
+
+                    <Guide/>
 
                     {/*Main Title*/}
                     <Container fluid className="d-flex justify-content-center mt-5 pt-5">
