@@ -134,6 +134,10 @@
     width: 400px;
 }
 
+.reset-password-form-width {
+    width: 500px;
+}
+
 .bg-transition {
     background-size: 200% 100%;
     background-image: linear-gradient(to right, white 50%, #FF914D 50%);
@@ -172,6 +176,9 @@
 
 @media (max-width: 768px) {
     .login-form-width {
+        width: 80%;
+    }
+    .reset-password-form-width {
         width: 80%;
     }
     .profile-picture {
