@@ -5,6 +5,7 @@ import {
     setPersistence,
     createUserWithEmailAndPassword,
     sendEmailVerification,
+    sendPasswordResetEmail,
     getIdToken,
     deleteUser
 } from "firebase/auth";
@@ -107,7 +108,6 @@ export async function checkUserVerification(uid) {
 
         return { success: true, verified: data.verified };
     } catch (error) {
-        console.error("Error:", error);
         return { success: false, error: error.message };
     }
 }
@@ -134,7 +134,15 @@ export async function verifyUser(uid) {
 
         return {success: true};
     } catch (error) {
-        console.error("Error:", error);
         return {success: false, error: error};
+    }
+}
+
+export async function resetPassword(email) {
+    try {
+        await sendPasswordResetEmail(auth, email);
+        return { success: true , message: "Password reset successfully." };
+    }catch (error) {
+        return { success: false, error: error };
     }
 }
