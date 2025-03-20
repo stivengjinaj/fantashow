@@ -555,4 +555,70 @@ router.delete("/api/cash-payment/:uid", async (req, res) => {
     }
 });
 
+/**
+ * @route POST /api/support
+ * @description Handles support requests submitted by users.
+ * @param {object} req.body - The request body containing support request details.
+ * @param {string} req.body.supportMode - The mode of support requested (either "email" or "telegram").
+ * @param {string} [req.body.name] - The name of the user (required if supportMode is "email").
+ * @param {string} [req.body.email] - The email of the user (required if supportMode is "email").
+ * @param {string} [req.body.telegram] - The Telegram username of the user (required if supportMode is "telegram").
+ * @param {string} req.body.description - The description of the support request.
+ * @returns {object} - JSON response with a success message.
+ * @returns {201} - If the support request is submitted successfully.
+ * @returns {400} - If support mode is unknown.
+ * @returns {401} - If required field are missing
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request Body:
+ * {
+ * "supportMode": "email",
+ * "name": "John Doe",
+ * "email": "john.doe@example.com",
+ * "description": "I need help with my account."
+ * }
+ *
+ * Response:
+ * {
+ * "message": "Support request submitted successfully."
+ * }
+ */
+router.post("/api/support", async (req, res) => {
+    try {
+        const { supportMode, name, email, telegram, description } = req.body;
+
+        if (supportMode !== "email" && supportMode !== "telegram") {
+            return res.status(400).json({ error: "Support mode unknown" });
+        }
+
+        const supportData = {
+            supportMode: supportMode,
+            description,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        };
+
+        if (supportMode === "email") {
+            if (!name || !email) {
+                return res.status(401).json({ error: "Name and email are required for email support." });
+            }
+            supportData.name = name;
+            supportData.email = email;
+        } else if (supportMode === "telegram") {
+            if (!telegram) {
+                return res.status(401).json({ error: "Telegram username is required for Telegram support." });
+            }
+            supportData.telegram = telegram;
+        }
+
+        await db.collection("support").add(supportData);
+
+        res.status(201).json({ message: "Support request submitted successfully." });
+    } catch (error) {
+        console.error("Error handling support request:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
 export default router;

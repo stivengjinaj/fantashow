@@ -157,6 +157,30 @@ const deleteCashPaymentRequest = async (uid) => {
     }
 }
 
+const sendSupportRequest = async (supportMode, name, email, telegram, description) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/support`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                supportMode, name, email, telegram, description
+            })
+        })
+
+        const data = await response.json();
+
+        if(!response.ok) {
+            throw new Error(data.error || "Failed to send support");
+        }
+
+        return { success: true, message: data.message };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
 export {
     fetchClientSecret,
     verifyPayment,
@@ -165,4 +189,5 @@ export {
     updateLastLogin,
     registerCashPaymentRequest,
     deleteCashPaymentRequest,
+    sendSupportRequest,
 };
