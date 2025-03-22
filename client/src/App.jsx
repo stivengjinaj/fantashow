@@ -41,10 +41,10 @@ function App() {
           <Route index path="/:contact?" element={user ? <Profile/> : <Homepage/>}/>
           <Route path="/login" element={user ? <Navigate to="/profile"/> : <Login user={user}/>}/>
           <Route path="/reset" element={user ? <Navigate to="/profile"/> : <ResetPassword/>}/>
-          <Route path="/referral/:referral" element={<ReferralLink/>}/>
+          <Route path="/referral/:referralCode" element={user ? <Navigate to="/profile"/> : <ReferralLink/>}/>
           <Route path="/support" element={<Support/>}/>
           <Route path="/profile" element={user ? <Profile/> : <Navigate to="/login"/>}/>
-          <Route path="/register/:referral" element={<Register/>}/>
+          <Route path="/register/:referralCode" element={user ? <Navigate to="/profile"/> : <Register/>}/>
           <Route path="/checkout/success/" element={<PaymentSuccess/>}/>
           <Route path="*" element={<NotFound/>}/>
       </Routes>
