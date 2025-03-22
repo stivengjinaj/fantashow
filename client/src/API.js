@@ -181,6 +181,27 @@ const sendSupportRequest = async (supportMode, name, email, telegram, descriptio
     }
 }
 
+const checkReferral = async (referralCode) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/referral/${referralCode}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to check referral");
+        }
+
+        return { success: true, message: data.referralUser };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
 export {
     fetchClientSecret,
     verifyPayment,
@@ -190,4 +211,5 @@ export {
     registerCashPaymentRequest,
     deleteCashPaymentRequest,
     sendSupportRequest,
+    checkReferral,
 };
