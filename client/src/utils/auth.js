@@ -146,3 +146,7 @@ export async function resetPassword(email) {
         return { success: false, error: error };
     }
 }
+
+export function checkLoggedIn() {
+    return auth.currentUser;
+}
