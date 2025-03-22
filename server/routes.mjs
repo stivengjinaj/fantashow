@@ -154,17 +154,17 @@ router.post("/api/register", verifyToken, async (req, res) => {
         }
 
         const newUser = {
-            username,
-            email,
-            nome,
-            cognome,
-            annoNascita,
-            cap,
-            squadraDelCuore,
-            cellulare,
-            telegram,
+            username: username,
+            email: email,
+            name: nome,
+            surname: cognome,
+            birthYear: annoNascita,
+            cap: cap,
+            team: squadraDelCuore,
+            phone: cellulare,
+            telegram: telegram,
             isAdmin: false,
-            referralCode,
+            referralCode: referralCode,
             referredBy: referrerId,
             verified: false,
             paid: false,
@@ -613,12 +613,53 @@ router.post("/api/support", async (req, res) => {
 
         await db.collection("support").add(supportData);
 
-        res.status(201).json({ message: "Support request submitted successfully." });
+        return res.status(201).json({ message: "Support request submitted successfully." });
     } catch (error) {
         console.error("Error handling support request:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        return res.status(500).json({ error: "Internal Server Error" });
     }
 });
 
+/**
+ * @route GET /api/referral/:referralCode
+ * @description Checks if a referral code exists and retrieves the name of the user associated with it.
+ * @param {string} req.params.referralCode - The referral code to check.
+ * @returns {object} - JSON response with the name of the user associated with the referral code.
+ * @returns {200} - If the referral code exists and the user is found.
+ * @returns {400} - If the referral code is missing.
+ * @returns {401} - If the referral code does not exist.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request:
+ * GET /api/referral/abc123
+ *
+ * Response:
+ * {
+ * "referralUser": "John Doe"
+ * }
+ */
+router.get("/api/referral/:referralCode", async (req, res) => {
+    try {
+        const { referralCode } = req.params;
+
+        if(!referralCode){
+            return res.status(400).json({ error: "Referral code required" });
+        }
+
+        const referralUser = await db.collection("users")
+            .where("referralCode", "==", referralCode)
+            .get();
+
+        if(referralUser.empty) {
+            return res.status(401).json({ error: "Referral code does not exist" });
+        }
+
+        return res.status(200).json({ referralUser: referralUser.docs[0].get("name")});
+    }catch (error){
+        console.log("Error checking referral code: ", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 
 export default router;
