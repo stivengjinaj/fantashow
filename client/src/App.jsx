@@ -14,9 +14,12 @@ import Register from "./screens/Registration/Register.jsx";
 import PaymentSuccess from "./screens/Checkout/PaymentSuccess.jsx";
 import {logout} from "./utils/auth.js";
 import ResetPassword from "./screens/Authentication/ResetPassword.jsx";
+import UserDashboard from "./screens/UserDashboard/UserDashboard.jsx";
+import {Container, Spinner} from "react-bootstrap";
 
 function App() {
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);  // Add loading state
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -31,24 +34,36 @@ function App() {
             } else {
                 setUser(null);
             }
+            setLoading(false);
         });
 
         return () => unsubscribe();
     }, [auth]);
 
-  return (
-      <Routes>
-          <Route index path="/:contact?" element={user ? <Profile/> : <Homepage/>}/>
-          <Route path="/login" element={user ? <Navigate to="/profile"/> : <Login user={user}/>}/>
-          <Route path="/reset" element={user ? <Navigate to="/profile"/> : <ResetPassword/>}/>
-          <Route path="/referral/:referralCode" element={user ? <Navigate to="/profile"/> : <ReferralLink/>}/>
-          <Route path="/support" element={<Support/>}/>
-          <Route path="/profile" element={user ? <Profile/> : <Navigate to="/login"/>}/>
-          <Route path="/register/:referralCode" element={user ? <Navigate to="/profile"/> : <Register/>}/>
-          <Route path="/checkout/success/" element={<PaymentSuccess/>}/>
-          <Route path="*" element={<NotFound/>}/>
-      </Routes>
-  )
+    if (loading) {
+        return (
+            <Container fluid className="p-0">
+                <Container fluid className="min-vh-100 d-flex flex-column justify-content-center align-items-center dashboard-bg">
+                    <Spinner variant="light" animation="border" />
+                </Container>
+            </Container>
+        );
+    }
+
+    return (
+        <Routes>
+            <Route index path="/:contact?" element={user ? <UserDashboard/> : <Homepage/>}/>
+            <Route path="/login" element={user ? <Navigate to="/dashboard"/> : <Login user={user}/>}/>
+            <Route path="/reset" element={user ? <Navigate to="/dashboard"/> : <ResetPassword/>}/>
+            <Route path="/referral/:referralCode" element={user ? <Navigate to="/dashboard"/> : <ReferralLink/>}/>
+            <Route path="/support" element={<Support/>}/>
+            <Route path="/profile" element={user ? <Profile/> : <Navigate to="/login"/>}/>
+            <Route path="/register/:referralCode" element={user ? <Navigate to="/dashboard"/> : <Register/>}/>
+            <Route path="/dashboard" element={user ? <UserDashboard user={user} /> : <Navigate to="/login"/>}/>
+            <Route path="/checkout/success/" element={<PaymentSuccess/>}/>
+            <Route path="*" element={<NotFound/>}/>
+        </Routes>
+    );
 }
 
 export default App
