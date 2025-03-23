@@ -1,7 +1,6 @@
 import {Button, Container, Form, Image, InputGroup, Spinner} from "react-bootstrap";
 import person from "../../assets/icons/person.svg";
 import lock from "../../assets/icons/lock.svg";
-import {useNavigate} from "react-router";
 import {useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
@@ -10,7 +9,6 @@ import {loginWithEmail} from "../../utils/auth.js";
 
 
 function Login(){
-    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [rememberMe, setRememberMe] = useState(false);
