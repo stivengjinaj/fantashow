@@ -21,6 +21,16 @@
   animation: GradientBackground 15s ease infinite;
 }
 
+.dashboard-bg {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #024767;
+}
+
+.dashboard-container-background {
+  background-color: #ed8101;
+}
+
 @keyframes GradientBackground {
   0% {
     background-position: 0 50%;

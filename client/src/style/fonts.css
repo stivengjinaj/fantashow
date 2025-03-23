@@ -17,6 +17,18 @@ h2 {
     font-size: 3rem;
 }
 
+.text-orange {
+    color: #ed8101;
+}
+
+.user-name {
+    font-size: calc(1.5em + 1vw);
+}
+
+.referral-text {
+    font-size: calc(0.1em + 1vw);
+}
+
 @media (max-width:1080px){
     h2 {
         font-size: 2.5rem;

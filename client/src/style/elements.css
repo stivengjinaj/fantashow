@@ -101,7 +101,7 @@
 }
 
 .top-back-button:active {
-    -webkit-tap-highlight-color: transparent; /* Mobile */
+    -webkit-tap-highlight-color: transparent;
 }
 
 .login-input {
@@ -173,6 +173,33 @@
     transform: scale(1.1);
 }
 
+.glowing-border {
+    border: 2px solid #024767;
+    box-shadow: 0 0 10px #024767;
+    background: #024767;
+    color: white;
+    transition: background 0.5s ease-in-out, color 0.3s ease-in-out, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.glowing-border:hover {
+    border: 2px solid #059de3;
+    background: #059de3;
+    color: white;
+}
+
+.hide-navbar {
+    transform: translateX(-130%);
+}
+
+.show-navbar {
+    transform: translateX(0);
+}
+
+.transition-all {
+    transition: all 0.3s ease-in-out;
+}
 
 @media (max-width: 768px) {
     .login-form-width {
@@ -187,5 +214,8 @@
         left: 50%;
         transform: translateX(-50%);
         z-index: 10;
+    }
+    .hide-navbar + .spacer {
+        width: 0;
     }
 }
