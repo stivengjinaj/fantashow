@@ -65,7 +65,6 @@ function Login(){
             if(response.success){
                 const idToken = await response.user.getIdToken();
                 await updateLastLogin(response.user.uid, idToken);
-                navigate("/profile");
             }
             else {
                 setError(true);
