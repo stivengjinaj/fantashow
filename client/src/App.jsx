@@ -19,7 +19,7 @@ import {Container, Spinner} from "react-bootstrap";
 
 function App() {
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);  // Add loading state
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
