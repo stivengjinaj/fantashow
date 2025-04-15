@@ -60,8 +60,8 @@ function ReferralLink() {
 
                             {/*Main Title*/}
                             <Container fluid className="d-flex justify-content-center mt-5 pt-5">
-                                <h2 className="mt-5 main-title-margin text-light text-center pt-5">
-                                    {referrer} ti ha invitato al prossimo Fantashow
+                                <h2 className="mt-5 main-title-margin text-light text-center pt-5 lh-base">
+                                    {referrer} ti ha invitato a partecipare al prossimo fantashow, <br/> guadagna subito 20 coin
                                 </h2>
                             </Container>
 
