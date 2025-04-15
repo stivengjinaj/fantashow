@@ -12,7 +12,7 @@ const clientLink = "http://localhost:5173";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-checkoutRoutes.post('/api/create-payment-intent', async (req, res) => {
+checkoutRoutes.get('/api/create-payment-intent', async (req, res) => {
     try {
         const paymentIntent = await stripe.paymentIntents.create({
             amount: 2000,
