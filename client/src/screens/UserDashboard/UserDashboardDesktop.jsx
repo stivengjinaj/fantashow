@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Container, Row, Col, Button, Image } from 'react-bootstrap';
 import profilePicture from '../../assets/icons/profilepicture.png';
 import editIcon from '../../assets/icons/edit.svg';
@@ -7,7 +7,7 @@ import emailIcon from '../../assets/icons/email.svg';
 import telegramIcon from '../../assets/icons/telegram.svg';
 import {CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 
-const UserDashboardDesktop = () => {
+const UserDashboardDesktop = ({ userData }) => {
     const data = [
         { month: "Aprile", value: 4 },
         { month: "Maggio", value: 7 },
@@ -17,7 +17,7 @@ const UserDashboardDesktop = () => {
     ];
 
     const handleCopy = () => {
-        navigator.clipboard.writeText("http://localhost:5173/referral/giorganni-sfjr");
+        navigator.clipboard.writeText(`http://localhost:5173/referral/${userData.referralCode}`);
     };
 
     return (
@@ -25,8 +25,11 @@ const UserDashboardDesktop = () => {
             {/* Header section with profile */}
             <Row className="mx-0 mb-5">
                 <Col className="p-0">
-                    <div className="dashboard-container-background py-3 px-2 px-md-4 rounded-bottom-4 d-flex flex-row justify-content-between align-items-center">
-                        <Image src={profilePicture} alt="profile picture" width={80} height={80} roundedCircle/>
+                    <div className="dashboard-container-background py-3 px-2 px-md-4 rounded-bottom-4 d-flex flex-row flex-wrap justify-content-between align-items-center">
+                        <div className="d-flex flex-column align-items-center">
+                            <Image src={profilePicture} alt="profile picture" width={80} height={80} roundedCircle/>
+                            <h3 className="text-light fw-bold mt-2">{userData.name}</h3>
+                        </div>
                         <div className="d-flex flex-column align-items-center">
                             <h2 className="text-light text-center fw-bold user-name">Fantashow</h2>
                             <Button onClick={handleCopy} className="glowing-border-blue rounded-5">Copia referral</Button>

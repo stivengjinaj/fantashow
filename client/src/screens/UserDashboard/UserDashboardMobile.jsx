@@ -9,7 +9,7 @@ import emailIcon from "../../assets/icons/email.svg";
 import telegramIcon from "../../assets/icons/telegram.svg";
 import coin from "../../assets/icons/coin.svg";
 
-function UserDashboardMobile() {
+function UserDashboardMobile({ userData }) {
     const data = [
         { month: "Aprile", value: 4 },
         { month: "Maggio", value: 7 },
@@ -19,7 +19,7 @@ function UserDashboardMobile() {
     ];
 
     const handleCopy = () => {
-        navigator.clipboard.writeText("http://localhost:5173/referral/giorganni-sfjr");
+        navigator.clipboard.writeText(`http://localhost:5173/referral/${userData.referralCode}`);
     };
 
     return (
@@ -36,7 +36,7 @@ function UserDashboardMobile() {
                     <Row className="w-100 mb-2" style={{ height: "100%" }}>
                         <Col xs={6} className="d-flex flex-column justify-content-evenly">
                             <h4 className="text-center fw-bold mb-2" style={{color: "#ed8101"}}>Fantashow</h4>
-                            <h3 className="text-light text-center fw-bold mb-2">Giorgianni</h3>
+                            <h3 className="text-light text-center fw-bold mb-2">{userData.name}</h3>
                             <div className="text-center">
                                 <Button
                                     onClick={handleCopy}
@@ -57,8 +57,8 @@ function UserDashboardMobile() {
                                 <Image src={coin} width={60} height={60} alt={"coin"} />
                             </div>
                             <div className="d-flex flex-column container-fluid justify-content-center align-items-center mt-3">
-                                <h5 className="text-light fw-bold">Punti: 50</h5>
-                                <h5 className="text-light fw-bold">Coin: 20</h5>
+                                <h5 className="text-light fw-bold">Punti: {userData.points}</h5>
+                                <h5 className="text-light fw-bold">Coin: {userData.points}</h5>
                             </div>
                         </Col>
                     </Row>
