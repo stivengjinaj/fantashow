@@ -4,7 +4,7 @@ import { useStripe, useElements } from "@stripe/react-stripe-js";
 import { useNavigate } from "react-router-dom";
 import {Button, Form} from "react-bootstrap";
 
-function CheckoutForm() {
+function CheckoutForm(props) {
     const stripe = useStripe();
     const elements = useElements();
     const navigate = useNavigate();
@@ -29,10 +29,25 @@ function CheckoutForm() {
         });
 
         if (!error && paymentIntent?.status === "succeeded") {
-            navigate("/checkout/success", { state: { fromCheckout: true, paymentIntentId: paymentIntent.id } });
+            navigate("/checkout/success", {
+                state: {
+                    fromCheckout: true,
+                    paymentIntentId: paymentIntent.id,
+                    uid: props.uid
+                }
+            });
         } else {
-            navigate("/checkout/error");
+            navigate("/checkout/error", {
+                state: {
+                    fromCheckout: true,
+                    uid: props.uid,
+                    errorMessage: error?.message || "Unknown error during payment.",
+                    errorCode: error?.code || null,
+                    paymentIntentId: paymentIntent?.id || null
+                }
+            });
         }
+
 
         setIsProcessing(false);
     };

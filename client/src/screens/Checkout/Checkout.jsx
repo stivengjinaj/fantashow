@@ -27,7 +27,7 @@ const CheckoutPage = (props) => {
                             {
                                 (stripePromise && clientSecret)
                                     ? (<Elements stripe={stripePromise} options={{ clientSecret }}>
-                                        <CheckoutForm />
+                                        <CheckoutForm uid={props.uid}/>
                                         </Elements>)
                                     : (<Container fluid className="d-flex justify-content-center">
                                         <Spinner animation="border" variant="primary" />
