@@ -270,6 +270,50 @@ router.post("/api/register/admin", async (req, res) => {
 });
 
 /**
+ * @route POST /api/delete-user
+ * @description Deletes a user from Firebase Authentication based on their UID.
+ * @async
+ * @param {object} req - The HTTP request object.
+ * @param {string} req.body.uid - The UID of the user to be deleted.
+ * @param {object} res - The HTTP response object.
+ * @returns {object} - JSON response indicating the success or failure of the operation.
+ * @returns {400} - If the UID is missing from the request body.
+ * @returns {500} - If an error occurs while deleting the user.
+ * @example
+ * Request Body:
+ * {
+ *   "uid": "user123"
+ * }
+ *
+ * Successful Response:
+ * {
+ *   "success": true,
+ *   "message": "User deleted from Firebase Auth"
+ * }
+ *
+ * Error Response:
+ * {
+ *   "success": false,
+ *   "error": "Failed to delete user"
+ * }
+ */
+router.post("/api/delete-user", async (req, res) => {
+    const { uid } = req.body;
+
+    if (!uid) {
+        return res.status(400).json({ success: false, error: "Missing uid" });
+    }
+
+    try {
+        await admin.auth().deleteUser(uid);
+        return res.json({ success: true, message: "User deleted from Firebase Auth" });
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        return res.status(500).json({ success: false, error: "Failed to delete user" });
+    }
+});
+
+/**
  * @route GET /api/get/last_login
  * @description Retrieves the last login time of a user.
  * @param {object} req.body.userId - ID of the user.
