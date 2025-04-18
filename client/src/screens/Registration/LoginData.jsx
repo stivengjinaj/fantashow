@@ -3,7 +3,6 @@ import next from "../../assets/icons/next.svg";
 import {useState} from "react";
 import {registerUser} from "../../API.js";
 import {deleteUnregisteredUser, registerUserWithFirebase} from "../../utils/auth.js";
-import getError from "../../utils/errorHandler.js";
 
 function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
     const [errors, setErrors] = useState({});
@@ -25,17 +24,18 @@ function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
             const { success, idToken, uid, error } = await registerUserWithFirebase(state.email, state.password);
             saveUid(uid);
             if(success){
-                const {success, data, error} = await registerUser(state, uid, idToken);
+                const {success, error} = await registerUser(state, uid, idToken);
 
                 if (success) {
-                    nextStep();
+                    handleNext();
                 } else {
                     setLoading(false);
-                    await deleteUnregisteredUser();
-                    newErrors.passwordConfirm = "Errore di sistema. Riprova più tardi."
+                    await deleteUnregisteredUser(uid);
+                    newErrors.passwordConfirm = error;
                 }
             }else {
-                newErrors.passwordConfirm = getError(error.code);
+                await deleteUnregisteredUser(uid);
+                newErrors.passwordConfirm = error;
             }
             setErrors(newErrors);
         }

@@ -1,7 +1,7 @@
 import {Button, Container, Form, Image} from "react-bootstrap";
 import {useState} from "react";
 import next from "../../assets/icons/next.svg";
-
+import {validatePhoneNumber} from "../../utils/helper.js";
 
 function ContactData({dispatch, state, nextStep, prevStep}) {
     const [cellulareError, setCellulareError] = useState(false);
@@ -12,7 +12,11 @@ function ContactData({dispatch, state, nextStep, prevStep}) {
     }
 
     const handleNext = () => {
-        !state.cellulare ? setCellulareError(true) : nextStep();
+        if(validatePhoneNumber(state.cellulare)){
+            nextStep();
+        }else {
+            setCellulareError(true);
+        }
     }
 
     return (
@@ -28,7 +32,9 @@ function ContactData({dispatch, state, nextStep, prevStep}) {
                         value={state.cellulare || ""}
                         onChange={handleChange}
                     />
-                    {cellulareError && <p className="mx-2 text-danger mb-5">Il campo cellulare è obbligatorio</p>}
+                    {cellulareError && <p className="mx-2 text-danger mb-5">
+                        {state.cellulare.length > 0 ? `Numero di telefono non valido` : `Il campo cellulare è obbligatorio`}
+                    </p>}
                 </Form.Group>
                 <Form.Group className="mb-5">
                     <Form.Control
