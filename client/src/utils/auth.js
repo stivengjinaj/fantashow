@@ -1,15 +1,14 @@
 import {
-    signInWithEmailAndPassword,
-    browserSessionPersistence,
     browserLocalPersistence,
-    setPersistence,
+    browserSessionPersistence,
     createUserWithEmailAndPassword,
+    getIdToken,
     sendEmailVerification,
     sendPasswordResetEmail,
-    getIdToken,
-    deleteUser
+    setPersistence,
+    signInWithEmailAndPassword
 } from "firebase/auth";
-import { auth } from "./firebase.mjs";
+import {auth} from "./firebase.mjs";
 import getError from "./errorHandler.js";
 
 const remoteURL = "http://localhost:3000";
@@ -75,19 +74,20 @@ export async function registerUserWithFirebase(email, password) {
     }
 }
 
-export async function deleteUnregisteredUser() {
-    const user = auth.currentUser;
-
-    if (!user) {
-        return { success: false, error: "User not authenticated" };
-    }
+export async function deleteUnregisteredUser(uid) {
     try {
-        await deleteUser(user);
-        return { success: true };
+        const response = await fetch(`${remoteURL}/api/delete-user`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ uid }),
+        });
+
+        return await response.json();
     } catch (error) {
-        return { success: false, error: error };
+        return { success: false, error: error.message };
     }
 }
+
 
 export async function checkUserVerification(uid) {
     try {
