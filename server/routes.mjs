@@ -59,6 +59,55 @@ const verifyToken = async (req, res, next) => {
 };
 
 /**
+ * @description Middleware to verify if a user has completed a payment.
+ * @param {object} req - The HTTP request object.
+ * @param {string} req.body.uuid - The UUID of the user to verify payment for.
+ * @param {object} res - The HTTP response object.
+ * @param {function} next - The next middleware function to call if the user has paid.
+ * @returns {object} - JSON response with an error message if the user has not paid or if an error occurs.
+ * @returns {400} - If the UUID is missing from the request body.
+ * @returns {404} - If the user is not found in the database.
+ * @returns {403} - If the user has not completed the payment.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request Body:
+ * {
+ *   "uuid": "user123"
+ * }
+ *
+ * Error Response (User not found):
+ * {
+ *   "error": "User not found"
+ * }
+ *
+ * Error Response (User hasn't paid):
+ * {
+ *   "error": "User hasn't paid"
+ * }
+ */
+const verifyPayment = async (req, res, next) => {
+    const { uuid } = req.params;
+    if (!uuid) {
+        return res.status(400).json({ error: "UUID is required" });
+    }
+    try {
+        const userDoc = await db.collection("users").doc(uuid).get();
+        if (!userDoc.exists) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        const userData = userDoc.data();
+        if (!userData.paid) {
+            return res.status(403).json({ error: "User hasn't paid" });
+        } else {
+            next();
+        }
+    } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+/**
  * @route POST /api/register
  * @description Registers a new user.
  * @param {object} req.body - User data to be registered.
@@ -117,10 +166,6 @@ router.post("/api/register", verifyToken, async (req, res) => {
             return res.status(400).json({ error: "Invalid phone number format" });
         }
 
-        /*const existingUsers = await db.collection("users").where("username", "==", username).get();
-        if (!existingUsers.empty) {
-            return res.status(400).json({ error: "Username already taken" });
-        }*/
 
         const existingEmails = await db.collection("users").where("email", "==", email).get();
         if (!existingEmails.empty) {
@@ -701,9 +746,59 @@ router.get("/api/referral/:referralCode", async (req, res) => {
 
         return res.status(200).json({ referralUser: referralUser.docs[0].get("name")});
     }catch (error){
-        console.log("Error checking referral code: ", error);
         return res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+/**
+ * @route GET /api/user/:uuid
+ * @description Retrieves user data based on the provided UUID.
+ * @param {string} req.params.uuid - The UUID of the user to retrieve.
+ * @returns {object} - JSON response containing the user data.
+ * @returns {200} - If the user data is retrieved successfully.
+ * @returns {400} - If the UUID is missing from the request.
+ * @returns {403} - If user hasn't completed payment.
+ * @returns {404} - If the user is not found in the database.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request:
+ * GET /api/user/123e4567-e89b-12d3-a456-426614174000
+ *
+ * Response:
+ * {
+ *   "message": "User data retrieved successfully",
+ *   "user": {
+ *     "username": "john_doe",
+ *     "email": "john.doe@example.com",
+ *     ...
+ *   }
+ * }
+ */
+router.get("/api/user/:uuid", verifyToken, verifyPayment, async (req, res) => {
+    try {
+        const { uuid } = req.params;
+
+        if (!uuid) {
+            return res.status(400).json({ error: "UUID is required" });
+        }
+
+        const userDoc = await db.collection("users").doc(uuid).get();
+
+        if (!userDoc.exists) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({
+            message: "User data retrieved successfully",
+            user: userDoc.data(),
+        });
+    } catch (error) {
+        console.error("Error getting user data:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
 
 export default router;

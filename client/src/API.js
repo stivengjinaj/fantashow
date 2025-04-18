@@ -203,6 +203,28 @@ const checkReferral = async (referralCode) => {
     }
 }
 
+const getUserData = async (uuid, idToken) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/user/${uuid}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            }
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to get user data");
+        }
+
+        return { success: true, message: data.user };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
 export {
     fetchClientSecret,
     verifyPayment,
@@ -213,4 +235,5 @@ export {
     deleteCashPaymentRequest,
     sendSupportRequest,
     checkReferral,
+    getUserData
 };
