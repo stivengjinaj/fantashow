@@ -16,6 +16,7 @@ import {logout} from "./utils/auth.js";
 import ResetPassword from "./screens/Authentication/ResetPassword.jsx";
 import UserDashboard from "./screens/UserDashboard/UserDashboard.jsx";
 import {Container, Spinner} from "react-bootstrap";
+import PaymentError from "./screens/Checkout/PaymentError.jsx";
 
 function App() {
     const [user, setUser] = useState(null);
@@ -61,6 +62,7 @@ function App() {
             <Route path="/register/:referralCode" element={user ? <Navigate to="/dashboard"/> : <Register/>}/>
             <Route path="/dashboard" element={user ? <UserDashboard user={user} /> : <Navigate to="/login"/>}/>
             <Route path="/checkout/success/" element={<PaymentSuccess/>}/>
+            <Route path="/checkout/error" element={<PaymentError />}/>
             <Route path="*" element={<NotFound/>}/>
         </Routes>
     );
