@@ -18,7 +18,7 @@ const fetchClientSecret = async () => {
     }
 }
 
-const verifyPayment = async (onErrorNavigate, onVerificationTrue, paymentIntentId) => {
+const verifyPayment = async (onErrorNavigate, onVerificationTrue, paymentIntentId, uid) => {
 
     if (!paymentIntentId) {
         onErrorNavigate();
@@ -31,7 +31,7 @@ const verifyPayment = async (onErrorNavigate, onVerificationTrue, paymentIntentI
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ paymentIntentId }),
+            body: JSON.stringify({ paymentIntentId, uid }),
         });
 
         const data = await response.json();
@@ -61,14 +61,15 @@ const registerUser = async (userData, uid, idToken) => {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || "Registration failed");
+            return { success: false, error: data.error || "Registrazione fallita." };
         }
 
         return { success: true, data };
     } catch (error) {
-        return { success: false, error: error };
+        return { success: false, error: error.message || "Errore di rete." };
     }
 };
+
 
 const getLastLogin = async (uid, idToken) => {
     try {
