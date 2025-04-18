@@ -3,7 +3,6 @@ import { Container, Spinner } from "react-bootstrap";
 import UserDashboardDesktop from "./UserDashboardDesktop.jsx";
 import UserDashboardMobile from "./UserDashboardMobile.jsx";
 import { UserContext } from "../Contexts/UserContext.jsx";
-import { logout } from "../../utils/auth.js";
 import { getUserData } from "../../API.js";
 
 function UserDashboard() {

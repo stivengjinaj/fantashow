@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import { Container, Row, Col, Button, Image } from 'react-bootstrap';
 import profilePicture from '../../assets/icons/profilepicture.png';
 import editIcon from '../../assets/icons/edit.svg';
