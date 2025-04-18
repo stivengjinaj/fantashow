@@ -1,7 +1,6 @@
 import {useLocation, useNavigate} from "react-router";
 import {useEffect, useState} from "react";
 import {verifyPayment} from "../../API.js";
-import NotFound from "../misc/NotFound.jsx";
 import {Spinner} from "react-bootstrap";
 
 const PaymentSuccess = () => {

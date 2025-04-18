@@ -9,7 +9,7 @@ function CheckoutForm(props) {
     const elements = useElements();
     const navigate = useNavigate();
 
-    const [message, setMessage] = useState(null);
+    const [message] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
 
     const handleSubmit = async (e) => {
