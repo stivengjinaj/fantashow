@@ -9,7 +9,6 @@ function CheckoutForm(props) {
     const elements = useElements();
     const navigate = useNavigate();
 
-    const [message] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
 
     const handleSubmit = async (e) => {
@@ -58,7 +57,6 @@ function CheckoutForm(props) {
             <Button type="submit" variant={"dark"} disabled={isProcessing || !stripe || !elements} id="submit" className="mt-3">
                 <span id="button-text">{isProcessing ? "Processing ... " : "Pay now"}</span>
             </Button>
-            {message && <div id="payment-message">{message}</div>}
         </Form>
     );
 }
