@@ -115,6 +115,28 @@ const updateLastLogin = async (uid, idToken) => {
     }
 }
 
+const checkCashPaymentRequest = async (uid, idToken) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/cash-payment/${uid}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            }
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to check cash payment request");
+        }
+
+        return { success: true, message: data.message };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
 const registerCashPaymentRequest = async (uid) => {
     try {
         const response = await fetch(`${remoteURL}/api/cash-payment/`, {
@@ -235,5 +257,6 @@ export {
     deleteCashPaymentRequest,
     sendSupportRequest,
     checkReferral,
-    getUserData
+    getUserData,
+    checkCashPaymentRequest
 };
