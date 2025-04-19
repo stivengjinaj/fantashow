@@ -6,7 +6,6 @@ import { UserContext } from "../Contexts/UserContext.jsx";
 import { getUserData } from "../../API.js";
 import DashboardPayment from "./DashboardPayment.jsx";
 import Error from "../misc/Error.jsx";
-import {logout} from "../../utils/auth.js";
 
 function UserDashboard() {
     const [screenWidth, setScreenWidth] = useState(window.innerWidth);
