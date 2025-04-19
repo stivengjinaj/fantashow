@@ -1,7 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import router from "./routes.mjs";
+import generalRoutes from "./generalRoutes.mjs";
+import authenticationRoutes from "./authenticationRoutes.mjs";
+import paymentRoutes from "./paymentRoutes.mjs";
 import checkoutRoutes from "./stripe.mjs";
 
 const app = express();
@@ -16,7 +18,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
-app.use(router);
+app.use(generalRoutes);
+app.use(authenticationRoutes);
+app.use(paymentRoutes);
 app.use(checkoutRoutes);
 
 app.listen(3000, () => {

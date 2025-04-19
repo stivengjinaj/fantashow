@@ -1,14 +1,14 @@
 import express from "express";
-import {v4 as uuidv4} from "uuid";
-import dotenv from "dotenv";
 import admin from "firebase-admin";
+import dotenv from "dotenv";
+import {generateReferralCode, verifyPayment, verifyToken} from "./utils.mjs";
 
 dotenv.config();
 
-const router = express.Router();
+const authenticationRoutes = express.Router();
 
-router.use(express.json());
-router.use(express.urlencoded({ extended: true }));
+authenticationRoutes.use(express.json());
+authenticationRoutes.use(express.urlencoded({ extended: true }));
 
 const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
 
@@ -18,94 +18,6 @@ if (!admin.apps.length) {
     });
 }
 const db = admin.firestore();
-
-/**
- * @description Generates a unique referral code. It searches in the database if the referral code already exists. If it does, it generates a new one.
- * @param name - Username used to generate the referral code.
- * @returns {string} - A unique referral code.
- * @async
- * */
-async function generateReferralCode(name) {
-    let referralCode;
-    let isUnique = false;
-    while (!isUnique) {
-        referralCode = `${name.toLowerCase()}-${uuidv4().slice(0, 4)}`;
-        const existingUser = await db.collection("users")
-            .where("referralCode", "==", referralCode)
-            .get();
-        if (existingUser.empty) isUnique = true;
-    }
-    return referralCode;
-}
-
-/**
- * @description Checks if the request is authorized by checking the token in headers.
- * @returns req.user - If the request is authorized it returns the user in the request.
- * @throws 401 - Unauthorized: Missing ID token
- * @throws 403 - Invalid or expired token
- * @async
- * */
-const verifyToken = async (req, res, next) => {
-    const idToken = req.headers.authorization?.split("Bearer ")[1];
-    if (!idToken) {
-        return res.status(401).json({ error: "Unauthorized: Missing ID token" });
-    }
-    try {
-        req.user = await admin.auth().verifyIdToken(idToken);
-        next();
-    } catch (error) {
-        return res.status(403).json({ error: "Invalid or expired token" });
-    }
-};
-
-/**
- * @description Middleware to verify if a user has completed a payment.
- * @param {object} req - The HTTP request object.
- * @param {string} req.body.uuid - The UUID of the user to verify payment for.
- * @param {object} res - The HTTP response object.
- * @param {function} next - The next middleware function to call if the user has paid.
- * @returns {object} - JSON response with an error message if the user has not paid or if an error occurs.
- * @returns {400} - If the UUID is missing from the request body.
- * @returns {404} - If the user is not found in the database.
- * @returns {403} - If the user has not completed the payment.
- * @returns {500} - If an internal server error occurs.
- * @async
- * @example
- * Request Body:
- * {
- *   "uuid": "user123"
- * }
- *
- * Error Response (User not found):
- * {
- *   "error": "User not found"
- * }
- *
- * Error Response (User hasn't paid):
- * {
- *   "error": "User hasn't paid"
- * }
- */
-const verifyPayment = async (req, res, next) => {
-    const { uuid } = req.params;
-    if (!uuid) {
-        return res.status(400).json({ error: "UUID is required" });
-    }
-    try {
-        const userDoc = await db.collection("users").doc(uuid).get();
-        if (!userDoc.exists) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        const userData = userDoc.data();
-        if (!userData.paid) {
-            return res.status(403).json({ error: "User hasn't paid" });
-        } else {
-            next();
-        }
-    } catch (error) {
-        return res.status(500).json({ error: "Internal Server Error" });
-    }
-};
 
 /**
  * @route POST /api/register
@@ -134,7 +46,7 @@ const verifyPayment = async (req, res, next) => {
  * "referralCode": "john-fffc"
  * }
  */
-router.post("/api/register", verifyToken, async (req, res) => {
+authenticationRoutes.post("/api/register", verifyToken, async (req, res) => {
     try {
         const {
             username, email, referredBy, password,
@@ -266,52 +178,52 @@ router.post("/api/register", verifyToken, async (req, res) => {
  * "referralCode": "john-39fa"
  * }
  * */
-router.post("/api/register/admin", async (req, res) => {
-   try {
-       const { username, email, existingAdminUUID } = req.body;
-       if(!username || !email || username === "" || email === "") {
-           return res.status(400).json({ error: "Username and email are required" });
-       }
-       if(!existingAdminUUID || existingAdminUUID === "") {
-           return res.status(401).json({ error: "Unauthorized or invalid request from admin" });
-       }
-       const existingAdmin = await db.collection("users")
-           .where(admin.firestore.FieldPath.documentId(), "==", existingAdminUUID)
-           .get()
+authenticationRoutes.post("/api/register/admin", async (req, res) => {
+    try {
+        const { name, surname, username, email, existingAdminUUID } = req.body;
+        if(!username || !email || !name || !surname || username === "" || email === "" || name === "" || surname === "") {
+            return res.status(400).json({ error: "Username and email are required" });
+        }
+        if(!existingAdminUUID || existingAdminUUID === "") {
+            return res.status(401).json({ error: "Unauthorized or invalid request from admin" });
+        }
+        const existingAdmin = await db.collection("users")
+            .where(admin.firestore.FieldPath.documentId(), "==", existingAdminUUID)
+            .get()
 
-       if(existingAdmin.empty) {
-           //console.log("Admin not found");
-           return res.status(401).json({ error: "Unauthorized or invalid request from admin" });
-       }
-       if(existingAdmin.docs[0].data().isAdmin !== true) {
-           //console.log("User is not an admin");
-           return res.status(401).json({ error: "Unauthorized or invalid request from admin" });
-       }
+        if(existingAdmin.empty) {
+            //console.log("Admin not found");
+            return res.status(401).json({ error: "Unauthorized or invalid request from admin" });
+        }
+        if(existingAdmin.docs[0].data().isAdmin !== true) {
+            //console.log("User is not an admin");
+            return res.status(401).json({ error: "Unauthorized or invalid request from admin" });
+        }
 
-       // Generate referral code
-       const referralCode = await generateReferralCode();
+        // Generate referral code
+        const referralCode = await generateReferralCode(name);
 
-       const newAdmin = {
-           username,
-           email,
-           isAdmin: true,
-           createdAt: admin.firestore.FieldValue.serverTimestamp(),
-           referralCode: referralCode,
-           referredBy: "",
-           points: 0,
-           verified: true,
-       }
-       const adminRef = await db.collection("users").add(newAdmin);
+        const newAdmin = {
+            username,
+            email,
+            isAdmin: true,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            referralCode: referralCode,
+            referredBy: "",
+            points: 0,
+            verified: true,
+        }
+        const adminRef = await db.collection("users").add(newAdmin);
 
-       res.status(201).json({
-           message: "Admin registered successfully",
-           adminId: adminRef.id,
-           referralCode: referralCode,
-       });
-   } catch (error) {
-       // console.error("Error registering user:", error);
-       res.status(500).json({ error: "Internal Server Error" });
-   }
+        res.status(201).json({
+            message: "Admin registered successfully",
+            adminId: adminRef.id,
+            referralCode: referralCode,
+        });
+    } catch (error) {
+        // console.error("Error registering user:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 });
 
 /**
@@ -342,7 +254,7 @@ router.post("/api/register/admin", async (req, res) => {
  *   "error": "Failed to delete user"
  * }
  */
-router.post("/api/delete-user", async (req, res) => {
+authenticationRoutes.post("/api/delete-user", async (req, res) => {
     const { uid } = req.body;
 
     if (!uid) {
@@ -379,7 +291,7 @@ router.post("/api/delete-user", async (req, res) => {
  * "last_login": "2022-01-01T00:00:00.000Z"
  * }
  * */
-router.get("/api/last_login/:userId", verifyToken, async (req, res) => {
+authenticationRoutes.get("/api/last_login/:userId", verifyToken, async (req, res) => {
     try {
         const { userId } = req.params;
         if (!userId || userId.trim() === "") {
@@ -423,7 +335,7 @@ router.get("/api/last_login/:userId", verifyToken, async (req, res) => {
  * "message": "Last login updated successfully"
  * }
  */
-router.patch("/api/last_login", verifyToken, async (req, res) => {
+authenticationRoutes.patch("/api/last_login", verifyToken, async (req, res) => {
     try {
         const { uid } = req.body;
         if (!uid || uid.trim() === "") {
@@ -484,7 +396,7 @@ router.patch("/api/last_login", verifyToken, async (req, res) => {
  * "verified": true
  * }
  */
-router.get("/api/verify-user/:uid", verifyToken, async (req, res) => {
+authenticationRoutes.get("/api/verify-user/:uid", verifyToken, async (req, res) => {
     try {
         const { uid } = req.params;
 
@@ -525,7 +437,7 @@ router.get("/api/verify-user/:uid", verifyToken, async (req, res) => {
  * "message": "User verified successfully"
  * }
  */
-router.patch("/api/verify-user", verifyToken, async (req, res) => {
+authenticationRoutes.patch("/api/verify-user", verifyToken, async (req, res) => {
     try {
         const { uid } = req.body;
 
@@ -546,252 +458,6 @@ router.patch("/api/verify-user", verifyToken, async (req, res) => {
     } catch (error) {
         console.error("Error verifying user:", error);
         res.status(500).json({ error: "Internal Server Error" });
-    }
-});
-
-/**
- * @route GET /api/cash-payment/:uid
- * @description Retrieves a cash payment request for a user based on their UID.
- * @param {string} req.params.uid - The UID of the user whose cash payment request is to be retrieved.
- * @returns {object} - JSON response indicating the success or failure of the operation.
- * @returns {200} - If the cash payment request is found.
- * @returns {400} - If the UID is missing from the request.
- * @returns {404} - If the cash payment request is not found.
- * @returns {500} - If an internal server error occurs.
- * @async
- * @example
- * Request:
- * GET /api/cash-payment/pgppaqcbqcbhqebkyuyxu
- *
- * Response (Success):
- * {
- *   "message": "Cash payment request found"
- * }
- *
- * Response (Not Found):
- * {
- *   "error": "Cash payment request not found"
- * }
- */
-router.get("/api/cash-payment/:uid", verifyToken, async (req, res) => {
-    try {
-        const { uid } = req.params;
-
-        if (!uid) {
-            return res.status(400).json({ error: "UID is required" });
-        }
-
-        const checkExistingRequestRef = db.collection("cash_payments").doc(uid);
-        const checkExistingRequestDoc = await checkExistingRequestRef.get();
-
-        if (!checkExistingRequestDoc.exists) {
-            return res.status(404).json({ error: "Cash payment request not found" });
-        }
-
-        return res.status(200).json({ message: "Cash payment request found" })
-
-    }catch (error) {
-        return res.status(500).json({ error: "Internal Server Error" });
-    }
-})
-
-/**
- * @route POST /api/cash-payment
- * @description Registers a cash payment request for a user.
- * @param {object} req.body.uid - The UID of the user requesting the cash payment.
- * @returns {object} - JSON response with a success message.
- * @returns {201} - If the cash payment request is registered successfully.
- * @returns {400} - If the UID is missing.
- * @returns {402} - If a request already exists for the given UID.
- * @returns {500} - If an internal server error occurs.
- * @async
- * @example
- * Request Body:
- * {
- * "uid": "pgppaqcbqcbhqebkyuyxu"
- * }
- *
- * Response:
- * {
- * "message": "Cash payment request registered"
- * }
- */
-router.post("/api/cash-payment", async (req, res) => {
-    try {
-        const { uid } = req.body;
-
-        if (!uid) {
-            return res.status(400).json({ error: "UID is required" });
-        }
-
-        const checkExistingRequestRef = db.collection("cash_payments").doc(uid);
-        const checkExistingRequestDoc = await checkExistingRequestRef.get();
-
-        if (checkExistingRequestDoc.exists) {
-            return res.status(402).json({ error: "Request already exists" });
-        }
-
-        const newCashPayment = {
-            requestDate: admin.firestore.FieldValue.serverTimestamp(),
-            paid: false
-        };
-
-        await db.collection("cash_payments").doc(uid).set(newCashPayment);
-
-        return res.status(201).json({ message: "Cash payment request registered" });
-    } catch (error) {
-        console.error("Error registering cash payment:", error);
-        return res.status(500).json({ error: "Internal Server Error" });
-    }
-});
-
-
-/**
- * @route DELETE /api/cash_payment/:uid
- * @description Deletes a cash payment request for a user based on their UID.
- * @param {string} req.params.uid - The UID of the user whose cash payment request is to be deleted.
- * @returns {object} - JSON response with a success message.
- * @returns {200} - If the cash payment request is deleted successfully.
- * @returns {400} - If the UID is missing.
- * @returns {404} - If the cash payment request is not found.
- * @returns {500} - If an internal server error occurs.
- * @async
- * @example
- * Request:
- * DELETE /api/cash_payment/pgppaqcbqcbhqebkyuyxu
- *
- * Response:
- * {
- * "message": "Cash payment request deleted successfully"
- * }
- */
-router.delete("/api/cash-payment/:uid", async (req, res) => {
-    try {
-        const { uid } = req.params;
-
-        if (!uid) {
-            return res.status(400).json({ error: "UID is required" });
-        }
-
-        const cashPaymentRef = db.collection("cash_payments").doc(uid);
-        const cashPaymentDoc = await cashPaymentRef.get();
-
-        if (!cashPaymentDoc.exists) {
-            return res.status(404).json({ error: "Cash payment request not found" });
-        }
-
-        await cashPaymentRef.delete();
-
-        return res.status(200).json({ message: "Cash payment request deleted successfully" });
-    } catch (error) {
-        console.error("Error deleting cash payment request:", error);
-        return res.status(500).json({ error: "Internal Server Error" });
-    }
-});
-
-/**
- * @route POST /api/support
- * @description Handles support requests submitted by users.
- * @param {object} req.body - The request body containing support request details.
- * @param {string} req.body.supportMode - The mode of support requested (either "email" or "telegram").
- * @param {string} [req.body.name] - The name of the user (required if supportMode is "email").
- * @param {string} [req.body.email] - The email of the user (required if supportMode is "email").
- * @param {string} [req.body.telegram] - The Telegram username of the user (required if supportMode is "telegram").
- * @param {string} req.body.description - The description of the support request.
- * @returns {object} - JSON response with a success message.
- * @returns {201} - If the support request is submitted successfully.
- * @returns {400} - If support mode is unknown.
- * @returns {401} - If required field are missing
- * @returns {500} - If an internal server error occurs.
- * @async
- * @example
- * Request Body:
- * {
- * "supportMode": "email",
- * "name": "John Doe",
- * "email": "john.doe@example.com",
- * "description": "I need help with my account."
- * }
- *
- * Response:
- * {
- * "message": "Support request submitted successfully."
- * }
- */
-router.post("/api/support", async (req, res) => {
-    try {
-        const { supportMode, name, email, telegram, description } = req.body;
-
-        if (supportMode !== "email" && supportMode !== "telegram") {
-            return res.status(400).json({ error: "Support mode unknown" });
-        }
-
-        const supportData = {
-            supportMode: supportMode,
-            description,
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        };
-
-        if (supportMode === "email") {
-            if (!name || !email) {
-                return res.status(401).json({ error: "Name and email are required for email support." });
-            }
-            supportData.name = name;
-            supportData.email = email;
-        } else if (supportMode === "telegram") {
-            if (!telegram) {
-                return res.status(401).json({ error: "Telegram username is required for Telegram support." });
-            }
-            supportData.telegram = telegram;
-        }
-
-        await db.collection("support").add(supportData);
-
-        return res.status(201).json({ message: "Support request submitted successfully." });
-    } catch (error) {
-        console.error("Error handling support request:", error);
-        return res.status(500).json({ error: "Internal Server Error" });
-    }
-});
-
-/**
- * @route GET /api/referral/:referralCode
- * @description Checks if a referral code exists and retrieves the name of the user associated with it.
- * @param {string} req.params.referralCode - The referral code to check.
- * @returns {object} - JSON response with the name of the user associated with the referral code.
- * @returns {200} - If the referral code exists and the user is found.
- * @returns {400} - If the referral code is missing.
- * @returns {401} - If the referral code does not exist.
- * @returns {500} - If an internal server error occurs.
- * @async
- * @example
- * Request:
- * GET /api/referral/abc123
- *
- * Response:
- * {
- * "referralUser": "John Doe"
- * }
- */
-router.get("/api/referral/:referralCode", async (req, res) => {
-    try {
-        const { referralCode } = req.params;
-
-        if(!referralCode){
-            return res.status(400).json({ error: "Referral code required" });
-        }
-
-        const referralUser = await db.collection("users")
-            .where("referralCode", "==", referralCode)
-            .get();
-
-        if(referralUser.empty) {
-            return res.status(401).json({ error: "Referral code does not exist" });
-        }
-
-        return res.status(200).json({ referralUser: referralUser.docs[0].get("name")});
-    }catch (error){
-        return res.status(500).json({ error: "Internal Server Error" });
     }
 });
 
@@ -820,7 +486,7 @@ router.get("/api/referral/:referralCode", async (req, res) => {
  *   }
  * }
  */
-router.get("/api/user/:uuid", verifyToken, verifyPayment, async (req, res) => {
+authenticationRoutes.get("/api/user/:uuid", verifyToken, verifyPayment, async (req, res) => {
     try {
         const { uuid } = req.params;
 
@@ -844,6 +510,4 @@ router.get("/api/user/:uuid", verifyToken, verifyPayment, async (req, res) => {
     }
 });
 
-
-
-export default router;
+export default authenticationRoutes;
