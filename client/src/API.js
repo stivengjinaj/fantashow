@@ -247,6 +247,28 @@ const getUserData = async (uuid, idToken) => {
     }
 }
 
+const getAdminData = async (uuid, idToken) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/admin/${uuid}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            }
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to get admin data");
+        }
+
+        return { success: true, message: data.user };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
 export {
     fetchClientSecret,
     verifyPayment,
@@ -258,5 +280,6 @@ export {
     sendSupportRequest,
     checkReferral,
     getUserData,
+    getAdminData,
     checkCashPaymentRequest
 };
