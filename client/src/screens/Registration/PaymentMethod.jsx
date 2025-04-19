@@ -5,6 +5,8 @@ import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import {useState} from "react";
 import CashCheckout from "./CashCheckout.jsx";
+import {logout} from "../../utils/auth.js";
+import {breakLine} from "../../utils/helper.js";
 
 function PaymentMethod(props) {
     const [cashPayment, setCashPayment] = useState(false);
@@ -35,7 +37,12 @@ function PaymentMethod(props) {
                 <Container fluid className="animated-bg d-flex flex-column min-vh-100 justify-content-center align-items-center">
                     {
                         props.title
-                            ? <h3 className="text-center text-light mb-5 payment-method-title">{props.title}</h3>
+                            ?
+                            <>
+                                <h3 className="text-center text-light mb-2 payment-method-title">{breakLine(props.title)[0]}</h3>
+                                <h3 className="text-center text-light mb-2 payment-method-title">{breakLine(props.title)[1]}</h3>
+                                <h4 className="text-center mb-2" onClick={logout}><a className="text-danger" href="/login">Esci</a></h4>
+                            </>
                             : <h2 className="text-center text-light mb-5 payment-method-title">Scegli il metodo di pagamento</h2>
                     }
                     <Row className="w-100 justify-content-center mt-5">
