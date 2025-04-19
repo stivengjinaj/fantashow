@@ -1,6 +1,6 @@
 import {useLocation, useNavigate} from "react-router";
 import {useEffect, useState} from "react";
-import {verifyPayment} from "../../API.js";
+import {deleteCashPaymentRequest, verifyPayment} from "../../API.js";
 import {Spinner} from "react-bootstrap";
 
 const PaymentSuccess = () => {
@@ -16,7 +16,9 @@ const PaymentSuccess = () => {
             },
             location.state?.paymentIntentId,
             location.state?.uid
-        );
+        ).then(() => {
+            deleteCashPaymentRequest(location.state.uid);
+        });
     }, [location, navigate]);
 
     return (

@@ -32,7 +32,7 @@ function UserDashboard() {
                         setHasPaid(true);
                     } else {
                         setHasPaid(false);
-                        //await logout();
+
                         console.warn("User has not paid. Redirecting or blocking access.");
                     }
                 } catch (error) {
@@ -63,7 +63,8 @@ function UserDashboard() {
             ? <UserDashboardDesktop userData={userData}/>
             : <UserDashboardMobile userData={userData}/>
         :  !error
-            ? <DashboardPayment />
+            ? <DashboardPayment title={"Il tuo account non è attivo perché non hai ancora effettuato il pagamento.\n" +
+                "Puoi aggiornare il metodo di pagamento per attivarlo."}/>
             : <Error />
 }
 
