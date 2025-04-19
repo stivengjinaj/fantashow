@@ -1,11 +1,12 @@
 import React from 'react';
 import { Container, Row, Col, Button, Image } from 'react-bootstrap';
 import profilePicture from '../../assets/icons/profilepicture.png';
-import editIcon from '../../assets/icons/edit.svg';
+import logoutIcon from '../../assets/icons/logout.svg';
 import whatsappIcon from '../../assets/icons/whatsapp.svg';
 import emailIcon from '../../assets/icons/email.svg';
 import telegramIcon from '../../assets/icons/telegram.svg';
 import {CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
+import {logout} from "../../utils/auth.js";
 
 const UserDashboardDesktop = ({ userData }) => {
     const data = [
@@ -34,7 +35,7 @@ const UserDashboardDesktop = ({ userData }) => {
                             <h2 className="text-light text-center fw-bold user-name">Fantashow</h2>
                             <Button onClick={handleCopy} className="glowing-border-blue rounded-5">Copia referral</Button>
                         </div>
-                        <Image src={editIcon} alt="edit" width={40} height={40}/>
+                        <Image src={logoutIcon} alt="edit" width={50} height={50} className="image-button" onClick={logout}/>
                     </div>
                 </Col>
             </Row>

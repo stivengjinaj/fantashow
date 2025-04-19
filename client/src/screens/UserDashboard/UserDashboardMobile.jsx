@@ -1,13 +1,14 @@
 import { Button, Col, Container, Image, Row } from "react-bootstrap";
 import profilePicture from "../../assets/icons/profilepicture.png";
 import status from "../../assets/icons/status.svg";
-import editIcon from "../../assets/icons/edit.svg";
+import logoutIcon from "../../assets/icons/logout.svg";
 import React from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import whatsappIcon from "../../assets/icons/whatsapp.svg";
 import emailIcon from "../../assets/icons/email.svg";
 import telegramIcon from "../../assets/icons/telegram.svg";
 import coin from "../../assets/icons/coin.svg";
+import {logout} from "../../utils/auth.js";
 
 function UserDashboardMobile({ userData }) {
     const data = [
@@ -29,7 +30,7 @@ function UserDashboardMobile({ userData }) {
                 <Col xs={3} className="d-flex flex-column dashboard-container-background rounded-4 py-3 justify-content-between align-items-center rounded-3">
                     <Image src={profilePicture} alt="profile picture" width={50} height={50} roundedCircle className="mb-auto" />
                     <Image src={status} width={40} height={40} roundedCircle className="my-4" />
-                    <Image src={editIcon} alt="edit" width={20} height={20} className="mt-auto" />
+                    <Image src={logoutIcon} alt="edit" width={30} height={30} onClick={logout} className="mt-auto image-button" />
                 </Col>
                 {/* User information section */}
                 <Col xs={9} className="d-flex flex-column p-0 ps-2 align-items-center justify-content-between">
