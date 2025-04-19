@@ -550,6 +550,52 @@ router.patch("/api/verify-user", verifyToken, async (req, res) => {
 });
 
 /**
+ * @route GET /api/cash-payment/:uid
+ * @description Retrieves a cash payment request for a user based on their UID.
+ * @param {string} req.params.uid - The UID of the user whose cash payment request is to be retrieved.
+ * @returns {object} - JSON response indicating the success or failure of the operation.
+ * @returns {200} - If the cash payment request is found.
+ * @returns {400} - If the UID is missing from the request.
+ * @returns {404} - If the cash payment request is not found.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request:
+ * GET /api/cash-payment/pgppaqcbqcbhqebkyuyxu
+ *
+ * Response (Success):
+ * {
+ *   "message": "Cash payment request found"
+ * }
+ *
+ * Response (Not Found):
+ * {
+ *   "error": "Cash payment request not found"
+ * }
+ */
+router.get("/api/cash-payment/:uid", verifyToken, async (req, res) => {
+    try {
+        const { uid } = req.params;
+
+        if (!uid) {
+            return res.status(400).json({ error: "UID is required" });
+        }
+
+        const checkExistingRequestRef = db.collection("cash_payments").doc(uid);
+        const checkExistingRequestDoc = await checkExistingRequestRef.get();
+
+        if (!checkExistingRequestDoc.exists) {
+            return res.status(404).json({ error: "Cash payment request not found" });
+        }
+
+        return res.status(200).json({ message: "Cash payment request found" })
+
+    }catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+
+/**
  * @route POST /api/cash-payment
  * @description Registers a cash payment request for a user.
  * @param {object} req.body.uid - The UID of the user requesting the cash payment.
@@ -573,7 +619,6 @@ router.patch("/api/verify-user", verifyToken, async (req, res) => {
 router.post("/api/cash-payment", async (req, res) => {
     try {
         const { uid } = req.body;
-        console.log(uid);
 
         if (!uid) {
             return res.status(400).json({ error: "UID is required" });
