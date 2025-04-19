@@ -5,6 +5,7 @@ import generalRoutes from "./generalRoutes.mjs";
 import authenticationRoutes from "./authenticationRoutes.mjs";
 import paymentRoutes from "./paymentRoutes.mjs";
 import checkoutRoutes from "./stripe.mjs";
+import adminRoutes from "./adminRoutes.mjs";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(generalRoutes);
 app.use(authenticationRoutes);
 app.use(paymentRoutes);
 app.use(checkoutRoutes);
+app.use(adminRoutes)
 
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
