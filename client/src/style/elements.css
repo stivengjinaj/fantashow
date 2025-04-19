@@ -217,6 +217,19 @@
     transition: all 0.3s ease-in-out;
 }
 
+.image-button {
+    transform: scale(1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.image-button:hover {
+    transform: scale(1.1);
+}
+
+.image-button:active {
+    transform: scale(0.9);
+}
+
 @media (max-width: 768px) {
     .login-form-width {
         width: 80%;
