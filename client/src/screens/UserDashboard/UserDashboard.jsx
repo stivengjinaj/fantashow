@@ -32,13 +32,10 @@ function UserDashboard() {
                         setHasPaid(true);
                     } else {
                         setHasPaid(false);
-
-                        console.warn("User has not paid. Redirecting or blocking access.");
                     }
-                } catch (error) {
+                } catch {
                     setHasPaid(false);
                     setError(true);
-                    console.error("Error fetching user data:", error);
                 } finally {
                     setLoading(false);
                 }
