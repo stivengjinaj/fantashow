@@ -5,7 +5,7 @@ import {stripePromise} from "../../utils/stripe.js";
 import CheckoutForm from "./CheckoutForm.jsx";
 import {Button, Col, Container, Row, Spinner} from "react-bootstrap";
 
-const CheckoutPage = (props) => {
+const Checkout = (props) => {
     const [clientSecret, setClientSecret] = useState("");
 
     useEffect(() => {
@@ -75,4 +75,4 @@ const CheckoutPage = (props) => {
     );
 };
 
-export default CheckoutPage;
+export default Checkout;
