@@ -40,7 +40,8 @@ function CashCheckout(props) {
                 <div className="text-start mb-4">
                     <h4 className="mb-3">Ecco i passaggi da seguire:</h4>
                     <ol className="list-group list-group-numbered mb-4">
-                        <li className="list-group-item border-0">Fissare un appuntamento con un responsabile.</li>
+                        <li className="list-group-item border-0">Un responsabile ti contatterà a breve.</li>
+                        <li className="list-group-item border-0">Fissare un appuntamento con il responsabile.</li>
                         <li className="list-group-item border-0">Effettuare il pagamento in contanti.</li>
                         <li className="list-group-item border-0">Accedere al tuo account Fantashow.</li>
                         <li className="list-group-item border-0">Controllare se il tuo account è stato attivato.</li>
@@ -55,7 +56,7 @@ function CashCheckout(props) {
                 {/* Action Button */}
                 <div className="mt-4">
                     <Button className="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-bold" onClick={() => navigate("/login")}>
-                        Accedi
+                        Home
                         <i className="bi bi-arrow-right-circle ms-2"></i>
                     </Button>
                 </div>

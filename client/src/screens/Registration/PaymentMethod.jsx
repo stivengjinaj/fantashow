@@ -33,7 +33,11 @@ function PaymentMethod(props) {
             )
             : (
                 <Container fluid className="animated-bg d-flex flex-column min-vh-100 justify-content-center align-items-center">
-                    <h2 className="text-center text-light mb-5 payment-method-title">Scegli il metodo di pagamento</h2>
+                    {
+                        props.title
+                            ? <h3 className="text-center text-light mb-5 payment-method-title">{props.title}</h3>
+                            : <h2 className="text-center text-light mb-5 payment-method-title">Scegli il metodo di pagamento</h2>
+                    }
                     <Row className="w-100 justify-content-center mt-5">
                         <Col md={3} className="d-flex flex-column align-items-center mx-2 mx-md-5 payment-method-column">
                             <Button className="p-5 rounded-5 text-dark border-0 payment-method-button" onClick={changePaymentMethod}>

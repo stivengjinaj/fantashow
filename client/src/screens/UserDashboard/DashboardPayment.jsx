@@ -5,7 +5,7 @@ import Checkout from "../Checkout/Checkout.jsx";
 import {Container, Spinner} from "react-bootstrap";
 
 
-function DashboardPayment() {
+function DashboardPayment(props) {
     const [ cardPayment, setCardPayment ] = useState(false);
     const { user } = useContext(UserContext);
     const [loading, setLoading] = useState(true);
@@ -31,7 +31,7 @@ function DashboardPayment() {
                     <Checkout prevStep={() => setCardPayment(false)} uid={user.uid} />
                 </Container>
             )
-            : <PaymentMethod uid={user.uid} nextStep={() => setCardPayment(true)}/>
+            : <PaymentMethod title={props.title} uid={user.uid} nextStep={() => setCardPayment(true)}/>
     );
 }
 
