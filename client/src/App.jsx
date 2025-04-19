@@ -14,6 +14,7 @@ import PaymentSuccess from "./screens/Checkout/PaymentSuccess.jsx";
 import ResetPassword from "./screens/Authentication/ResetPassword.jsx";
 import UserDashboard from "./screens/UserDashboard/UserDashboard.jsx";
 import PaymentError from "./screens/Checkout/PaymentError.jsx";
+import ErrorBoundary from "./screens/misc/ErrorBoundary.jsx";
 import { UserProvider, UserContext } from "./screens/Contexts/UserContext.jsx";
 import { useContext } from "react";
 
@@ -50,7 +51,9 @@ function AppRoutes() {
 function App() {
     return (
         <UserProvider>
-            <AppRoutes />
+            <ErrorBoundary>
+                <AppRoutes />
+            </ErrorBoundary>
         </UserProvider>
     );
 }
