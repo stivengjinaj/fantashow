@@ -34,7 +34,8 @@ function AppRoutes() {
 
     return (
         <Routes>
-            <Route index path="/:contact?" element={user ? <UserDashboard /> : <Homepage />} />
+            <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Homepage />} />
+            <Route path="/:contact?" element={user ? <UserDashboard /> : <Homepage />} />
             <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
             <Route path="/reset" element={user ? <Navigate to="/dashboard" /> : <ResetPassword />} />
             <Route path="/referral/:referralCode" element={user ? <Navigate to="/dashboard" /> : <ReferralLink />} />
