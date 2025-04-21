@@ -27,3 +27,16 @@ export function formatFirebaseTimestamp(createdAt) {
         year: 'numeric',
     });
 }
+
+export function dateToFirebaseDate(dateString) {
+    if (!dateString) return null;
+
+    const parsedDate = new Date(Date.parse(dateString + ' GMT'));
+
+    if (isNaN(parsedDate)) return null;
+
+    return {
+        _seconds: Math.floor(parsedDate.getTime() / 1000),
+        _nanoseconds: 0,
+    };
+}
