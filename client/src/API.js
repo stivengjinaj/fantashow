@@ -262,7 +262,6 @@ const getAdminData = async (uuid, idToken) => {
         if (!response.ok) {
             throw new Error(data.error || "Failed to get admin data");
         }
-
         return { success: true, message: data.user };
     }catch (error) {
         return { success: false, error: error };

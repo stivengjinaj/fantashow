@@ -275,6 +275,11 @@ adminRoutes.patch("/api/admin/edit-user/:uid", verifyToken, verifyAdmin, async (
             return res.status(400).json({ error: "Target user UID is required in the body" });
         }
 
+        const allowedFields = ["name", "points", "isAdmin", "paid"];
+        const invalidFields = Object.keys(updatedFields).filter(field => !allowedFields.includes(field));
+        if (invalidFields.length > 0) {
+            return res.status(400).json({ error: `Invalid fields: ${invalidFields.join(", ")}` });
+        }
         const userRef = admin.firestore().collection("users").doc(targetUid);
         await userRef.update(updatedFields);
 
