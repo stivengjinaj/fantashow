@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import Sidebar from './Sidebar';
 import DashboardSummary from './DashboardSummary';
@@ -9,13 +9,18 @@ import AllPayments from './AllPayments';
 import SupportSection from './SupportSection';
 import UserEditModal from './UserEditModal';
 import { List } from 'react-bootstrap-icons';
+import {adminEditUser, getAllUsers} from "../../API.js";
+import {UserContext} from "../Contexts/UserContext.jsx";
+import { debounce } from 'lodash';
 
 function AdminDashboard() {
+    const { user } = useContext(UserContext);
     const [activeTab, setActiveTab] = useState('users');
     const [sidebarExpanded, setSidebarExpanded] = useState(true);
     const [showUserModal, setShowUserModal] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
+    const [users, setUsers ] = useState([]);
 
     useEffect(() => {
         const checkMobile = () => {
@@ -25,18 +30,34 @@ function AdminDashboard() {
             }
         };
 
+        const debouncedResize = debounce(checkMobile, 200);
+
         checkMobile();
-
-        window.addEventListener('resize', checkMobile);
-
-        return () => window.removeEventListener('resize', checkMobile);
+        window.addEventListener('resize', debouncedResize);
+        return () => window.removeEventListener('resize', debouncedResize);
     }, []);
 
-    const users = [
-        { id: 1, name: 'John Doe', email: 'john@example.com', points: 245, status: 'active', joinDate: '2024-01-15' },
-        { id: 2, name: 'Jane Smith', email: 'jane@example.com', points: 512, status: 'active', joinDate: '2023-11-20' },
-        { id: 3, name: 'Robert Johnson', email: 'robert@example.com', points: 187, status: 'inactive', joinDate: '2024-02-03' },
-    ];
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const token = await user.getIdToken();
+                const data = await getAllUsers(user.uid, token);
+                if (data.success) {
+                    setUsers(data.message);
+                } else {
+                    console.error(data.error);
+                }
+            } catch (error) {
+                console.error("Error fetching users:", error);
+            }
+        };
+
+        if (user) {
+            fetchUsers();
+        }
+    }, [user]);
+
 
     const paymentRequests = [
         { id: 101, userId: 2, amount: 150.00, status: 'pending', date: '2024-04-15' },
@@ -181,11 +202,8 @@ function AdminDashboard() {
             {/* User Edit Modal */}
             <UserEditModal
                 show={showUserModal}
-                user={currentUser}
+                edittingUser={currentUser}
                 onHide={() => setShowUserModal(false)}
-                onSave={() => {
-                    setShowUserModal(false);
-                }}
             />
         </Container>
     );
