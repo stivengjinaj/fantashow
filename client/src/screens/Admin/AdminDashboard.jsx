@@ -9,7 +9,7 @@ import AllPayments from './AllPayments';
 import SupportSection from './SupportSection';
 import UserEditModal from './UserEditModal';
 import { List } from 'react-bootstrap-icons';
-import {adminEditUser, getAllUsers} from "../../API.js";
+import {getAllUsers} from "../../API.js";
 import {UserContext} from "../Contexts/UserContext.jsx";
 import { debounce } from 'lodash';
 
