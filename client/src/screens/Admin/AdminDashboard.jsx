@@ -20,7 +20,7 @@ function AdminDashboard() {
     const [showUserModal, setShowUserModal] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
-    const [users, setUsers ] = useState([]);
+    const [users, setUsers] = useState([]);
 
     useEffect(() => {
         const checkMobile = () => {
@@ -58,6 +58,13 @@ function AdminDashboard() {
         }
     }, [user]);
 
+    const handleUserUpdate = (updatedUser) => {
+        setUsers(prevUsers =>
+            prevUsers.map(u =>
+                u.id === updatedUser.id ? { ...u, ...updatedUser } : u
+            )
+        );
+    };
 
     const paymentRequests = [
         { id: 101, userId: 2, amount: 150.00, status: 'pending', date: '2024-04-15' },
@@ -104,8 +111,8 @@ function AdminDashboard() {
     };
 
     // Calculate sidebar and content classes/styles based on state
-    const sidebarWidth = 240; // Width in pixels
-    const collapsedSidebarWidth = 60; // Width when collapsed
+    const sidebarWidth = 240;
+    const collapsedSidebarWidth = 60;
 
     const sidebarStyle = {
         width: sidebarExpanded ? `${sidebarWidth}px` : `${collapsedSidebarWidth}px`,
@@ -142,7 +149,7 @@ function AdminDashboard() {
         transition: 'all 0.3s ease'
     };
 
-    // Add visibility control for mobile
+    // Visibility control for mobile
     if (isMobile && sidebarExpanded) {
         contentStyle.opacity = 0;
         contentStyle.visibility = 'hidden';
@@ -189,8 +196,8 @@ function AdminDashboard() {
                     {/* Dashboard Summary Cards */}
                     <DashboardSummary
                         totalUsers={users.length}
-                        activeUsers={users.filter(u => u.status === 'active').length}
-                        pendingRequests={paymentRequests.filter(p => p.status === 'pending').length}
+                        paidUsers={users.filter(u => u.paid).length}
+                        pendingUsers={users.filter(p => !p.paid).length}
                         openTickets={supportTickets.filter(t => t.status === 'open').length}
                     />
 
@@ -204,6 +211,7 @@ function AdminDashboard() {
                 show={showUserModal}
                 edittingUser={currentUser}
                 onHide={() => setShowUserModal(false)}
+                onUserUpdated={handleUserUpdate}
             />
         </Container>
     );

@@ -28,7 +28,7 @@ function RegisteredUsers({ users, onEditUser }) {
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
-        setCurrentPage(1); // Reset to first page on search
+        setCurrentPage(1);
     };
 
     // Handle user deletion
@@ -42,11 +42,11 @@ function RegisteredUsers({ users, onEditUser }) {
     return (
         <Card>
             <Card.Header className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
-                <h5 className="mb-md-0">Registered Users</h5>
+                <h5 className="mb-md-0">Utenti Registrati</h5>
                 <InputGroup style={{ maxWidth: '300px' }}>
                     <Form.Control
                         type="text"
-                        placeholder="Search users..."
+                        placeholder="Cerca utente..."
                         value={searchTerm}
                         onChange={handleSearch}
                     />
@@ -60,7 +60,7 @@ function RegisteredUsers({ users, onEditUser }) {
                     <Table hover>
                         <thead>
                         <tr>
-                            <th>Nome</th>
+                            <th>Utente</th>
                             <th>Email</th>
                             <th>Punti</th>
                             <th>Stato</th>
@@ -72,7 +72,7 @@ function RegisteredUsers({ users, onEditUser }) {
                         {currentUsers.length > 0 ? (
                             currentUsers.map(user => (
                                 <tr key={user.id}>
-                                    <td>{user.name}</td>
+                                    <td>{user.name+" "+user.surname}</td>
                                     <td>{user.email}</td>
                                     <td>{user.points}</td>
                                     <td>

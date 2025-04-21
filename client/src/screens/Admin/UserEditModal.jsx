@@ -1,45 +1,99 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useContext} from 'react';
+import {UserContext} from "../Contexts/UserContext.jsx";
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
+import {formatFirebaseTimestamp} from "../../utils/helper.js";
+import {adminEditUser} from "../../API.js";
 
-function UserEditModal({ show, user, onHide, onSave }) {
+function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
+    const { user } = useContext(UserContext);
+    const [error, setError] = useState(false);
     const [formData, setFormData] = useState({
         id: '',
         name: '',
         email: '',
+        cap: '',
+        birthYear: '',
+        phone: '',
+        telegram: '',
+        referralCode: '',
+        referredBy: '',
+        team: '',
+        isAdmin: false,
         points: 0,
-        status: 'active',
-        joinDate: '',
-        notes: ''
+        paid: false,
+        createdAt: '',
     });
 
-    // Update form data when user changes
     useEffect(() => {
-        if (user) {
+        if (edittingUser) {
             setFormData({
-                id: user.id || '',
-                name: user.name || '',
-                email: user.email || '',
-                points: user.points || 0,
-                status: user.status || 'active',
-                joinDate: user.joinDate || '',
-                notes: user.notes || ''
+                id: edittingUser.id || '',
+                name: edittingUser.name || '',
+                email: edittingUser.email || '',
+                cap: edittingUser.cap || '',
+                birthYear: edittingUser.birthYear || '',
+                phone: edittingUser.phone || '',
+                referralCode: edittingUser.referralCode || '',
+                referredBy: edittingUser.referredBy || '',
+                team: edittingUser.team || '',
+                telegram: edittingUser.telegram || '',
+                isAdmin: edittingUser.isAdmin || false,
+                points: edittingUser.points || 0,
+                paid: edittingUser.paid || false,
+                createdAt: formatFirebaseTimestamp(edittingUser.createdAt),
             });
         }
-    }, [user]);
+    }, [edittingUser]);
 
-    // Handle form input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+
+        // Handle boolean values from select elements
+        if (name === "admin") {
+            setFormData(prev => ({
+                ...prev,
+                isAdmin: value === "true"
+            }));
+        } else if (name === "status") {
+            setFormData(prev => ({
+                ...prev,
+                paid: value === "true"
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
     };
 
-    // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onSave(formData);
+        try {
+            const idToken = await user.getIdToken();
+
+            const updateData = {
+                id: formData.id,
+                name: formData.name,
+                points: parseInt(formData.points, 10) || 0,
+                isAdmin: formData.isAdmin,
+                paid: formData.paid
+            };
+
+            const response = await adminEditUser(user.uid, idToken, updateData);
+
+            if (response.success) {
+                if (onUserUpdated) {
+                    onUserUpdated(updateData);
+                }
+                onHide();
+            } else {
+                setError(true);
+            }
+        } catch (error) {
+            console.error("Error updating user:", error);
+            setError(true);
+        }
     };
 
     return (
@@ -49,12 +103,21 @@ function UserEditModal({ show, user, onHide, onSave }) {
             </Modal.Header>
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
-                    {user && (
+                    {edittingUser && (
                         <>
+                            {error &&
+                                <Row className="my-2">
+                                    <Col xs={12}>
+                                    <span role="alert" className="bg-danger text-light px-3 py-2 rounded d-inline-block">
+                                        Errore durante la modifica dell'utente. Riprova più tardi.
+                                    </span>
+                                    </Col>
+                                </Row>
+                            }
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>User ID</Form.Label>
+                                        <Form.Label>ID</Form.Label>
                                         <Form.Control
                                             type="text"
                                             value={formData.id}
@@ -64,10 +127,10 @@ function UserEditModal({ show, user, onHide, onSave }) {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Join Date</Form.Label>
+                                        <Form.Label>Data registrazione</Form.Label>
                                         <Form.Control
                                             type="text"
-                                            value={formData.joinDate}
+                                            value={formData.createdAt}
                                             disabled
                                         />
                                     </Form.Group>
@@ -76,7 +139,7 @@ function UserEditModal({ show, user, onHide, onSave }) {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Name</Form.Label>
+                                        <Form.Label>Nome</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="name"
@@ -94,7 +157,7 @@ function UserEditModal({ show, user, onHide, onSave }) {
                                             name="email"
                                             value={formData.email}
                                             onChange={handleChange}
-                                            required
+                                            disabled
                                         />
                                     </Form.Group>
                                 </Col>
@@ -102,7 +165,7 @@ function UserEditModal({ show, user, onHide, onSave }) {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Points</Form.Label>
+                                        <Form.Label>Punti</Form.Label>
                                         <Form.Control
                                             type="number"
                                             name="points"
@@ -113,52 +176,125 @@ function UserEditModal({ show, user, onHide, onSave }) {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Status</Form.Label>
+                                        <Form.Label>Pagamento</Form.Label>
                                         <Form.Select
                                             name="status"
-                                            value={formData.status}
+                                            value={formData.paid.toString()}
                                             onChange={handleChange}
                                         >
-                                            <option value="active">Active</option>
-                                            <option value="inactive">Inactive</option>
-                                            <option value="suspended">Suspended</option>
+                                            <option value="true">Pagato</option>
+                                            <option value="false">Non pagato</option>
                                         </Form.Select>
                                     </Form.Group>
                                 </Col>
                             </Row>
-                            <hr />
-                            <h6>Additional Information</h6>
                             <Row>
-                                <Col md={12}>
+                                <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Notes</Form.Label>
+                                        <Form.Label>CAP</Form.Label>
                                         <Form.Control
-                                            as="textarea"
-                                            rows={3}
-                                            name="notes"
-                                            value={formData.notes}
+                                            name="cap"
+                                            value={formData.cap}
                                             onChange={handleChange}
+                                            disabled
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Anno Nascita</Form.Label>
+                                        <Form.Control
+                                            name="birthYear"
+                                            value={formData.birthYear}
+                                            onChange={handleChange}
+                                            disabled
                                         />
                                     </Form.Group>
                                 </Col>
                             </Row>
-
-                            {/* Transaction History Accordion - Optional */}
-                            <div className="mt-3">
-                                <h6>Transaction History</h6>
-                                <div className="bg-light p-2 rounded">
-                                    <p className="text-muted text-center mb-0">Transaction history would be displayed here</p>
-                                </div>
-                            </div>
+                            <Row>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Telefono</Form.Label>
+                                        <Form.Control
+                                            name="phone"
+                                            value={formData.phone}
+                                            onChange={handleChange}
+                                            disabled
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Telegram</Form.Label>
+                                        <Form.Control
+                                            name="telegram"
+                                            value={formData.telegram}
+                                            onChange={handleChange}
+                                            disabled
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Referral</Form.Label>
+                                        <Form.Control
+                                            name="referral"
+                                            value={formData.referralCode}
+                                            onChange={handleChange}
+                                            disabled
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Referred By</Form.Label>
+                                        <Form.Control
+                                            name="referredBy"
+                                            value={formData.referredBy}
+                                            onChange={handleChange}
+                                            disabled
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Squadra</Form.Label>
+                                        <Form.Control
+                                            name="team"
+                                            value={formData.team}
+                                            onChange={handleChange}
+                                            disabled
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Admin</Form.Label>
+                                        <Form.Select
+                                            name="admin"
+                                            value={formData.isAdmin.toString()}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="true">Si</option>
+                                            <option value="false">No</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
                         </>
                     )}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={onHide}>
-                        Cancel
+                        Anulla
                     </Button>
                     <Button variant="primary" type="submit">
-                        Save Changes
+                        Modifica
                     </Button>
                 </Modal.Footer>
             </Form>

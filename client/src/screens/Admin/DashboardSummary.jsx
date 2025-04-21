@@ -2,7 +2,7 @@ import React from 'react';
 import { Row, Col, Card } from 'react-bootstrap';
 import { PeopleFill, PersonCheckFill, ClockFill, ExclamationCircleFill } from 'react-bootstrap-icons';
 
-function DashboardSummary({ totalUsers, activeUsers, pendingRequests, openTickets }) {
+function DashboardSummary({ totalUsers, paidUsers, pendingUsers, openTickets }) {
     return (
         <Row className="g-3 mb-4">
             <Col sm={6} md={3}>
@@ -12,7 +12,7 @@ function DashboardSummary({ totalUsers, activeUsers, pendingRequests, openTicket
                             <PeopleFill size={28} />
                         </div>
                         <div>
-                            <h6 className="mb-0">Total Users</h6>
+                            <h6 className="mb-0">Utenti</h6>
                             <h3 className="mb-0">{totalUsers}</h3>
                         </div>
                     </Card.Body>
@@ -26,22 +26,8 @@ function DashboardSummary({ totalUsers, activeUsers, pendingRequests, openTicket
                             <PersonCheckFill size={28} />
                         </div>
                         <div>
-                            <h6 className="mb-0">Active Users</h6>
-                            <h3 className="mb-0">{activeUsers}</h3>
-                        </div>
-                    </Card.Body>
-                </Card>
-            </Col>
-
-            <Col sm={6} md={3}>
-                <Card className="text-white bg-warning h-100">
-                    <Card.Body className="d-flex align-items-center">
-                        <div className="me-3">
-                            <ClockFill size={28} />
-                        </div>
-                        <div>
-                            <h6 className="mb-0">Pending Requests</h6>
-                            <h3 className="mb-0">{pendingRequests}</h3>
+                            <h6 className="mb-0">Pagato</h6>
+                            <h3 className="mb-0">{paidUsers}</h3>
                         </div>
                     </Card.Body>
                 </Card>
@@ -49,6 +35,20 @@ function DashboardSummary({ totalUsers, activeUsers, pendingRequests, openTicket
 
             <Col sm={6} md={3}>
                 <Card className="text-white bg-danger h-100">
+                    <Card.Body className="d-flex align-items-center">
+                        <div className="me-3">
+                            <ClockFill size={28} />
+                        </div>
+                        <div>
+                            <h6 className="mb-0">Non pagato</h6>
+                            <h3 className="mb-0">{pendingUsers}</h3>
+                        </div>
+                    </Card.Body>
+                </Card>
+            </Col>
+
+            <Col sm={6} md={3}>
+                <Card className="text-white bg-warning h-100">
                     <Card.Body className="d-flex align-items-center">
                         <div className="me-3">
                             <ExclamationCircleFill size={28} />
