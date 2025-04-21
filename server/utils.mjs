@@ -88,3 +88,58 @@ export const verifyPayment = async (req, res, next) => {
         return res.status(500).json({ error: "Internal Server Error" });
     }
 };
+
+/**
+ * @description Middleware to verify if a user is an admin.
+ * @param {object} req - The HTTP request object.
+ * @param {object} req.params - The request parameters.
+ * @param {string} req.params.uuid - The UUID of the user to verify admin status for.
+ * @param {object} res - The HTTP response object.
+ * @param {function} next - The next middleware function to call if the user is an admin.
+ * @returns {object} - JSON response with an error message if the user is not an admin or if an error occurs.
+ * @returns {400} - If the UUID is missing from the request parameters.
+ * @returns {404} - If the user is not found in the database.
+ * @returns {403} - If the user is not an admin.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request Parameters:
+ * {
+ *   "uuid": "admin123"
+ * }
+ *
+ * Error Response (User not found):
+ * {
+ *   "error": "No admin found"
+ * }
+ *
+ * Error Response (User is not an admin):
+ * {
+ *   "error": "Forbidden request. User is not admin."
+ * }
+ */
+export const verifyAdmin = async (req, res, next) => {
+    const uid = req.user?.uid;
+
+    if (!uid) {
+        return res.status(400).json({ error: "UID is required" });
+    }
+
+    try {
+        const userDoc = await db.collection("users").doc(uid).get();
+
+        if (!userDoc.exists) {
+            return res.status(404).json({ error: "No admin found" });
+        }
+
+        const userData = userDoc.data();
+
+        if (!userData.isAdmin) {
+            return res.status(403).json({ error: "Forbidden. User is not an admin." });
+        }
+
+        next();
+    } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+};

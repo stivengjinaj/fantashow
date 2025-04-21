@@ -269,6 +269,51 @@ const getAdminData = async (uuid, idToken) => {
     }
 }
 
+const getAllUsers = async (uid, idToken) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/admin/all-users/:uid`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            }
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to get all users");
+        }
+
+        return { success: true, message: data.users };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
+const adminEditUser = async (adminUid, idToken, edittedUser) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/admin/edit-user/${adminUid}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
+            body: JSON.stringify(edittedUser)
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to edit user");
+        }
+
+        return { success: true, message: data.message };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
 export {
     fetchClientSecret,
     verifyPayment,
@@ -281,5 +326,7 @@ export {
     checkReferral,
     getUserData,
     getAdminData,
-    checkCashPaymentRequest
+    checkCashPaymentRequest,
+    getAllUsers,
+    adminEditUser,
 };
