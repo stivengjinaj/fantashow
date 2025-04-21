@@ -11,7 +11,7 @@ function SupportSection({ tickets, users }) {
         ? tickets
         : tickets.filter(ticket => ticket.status === statusFilter);
 
-    // Get user name by ID
+    // Get username by ID
     const getUserName = (userId) => {
         const user = users.find(u => u.id === userId);
         return user ? user.name : 'Unknown User';

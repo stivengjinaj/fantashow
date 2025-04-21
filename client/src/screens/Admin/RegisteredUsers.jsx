@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Table, Form, Button, Badge, InputGroup } from 'react-bootstrap';
 import { Search, PencilSquare, Trash, ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
+import {formatFirebaseTimestamp} from "../../utils/helper.js";
 
 function RegisteredUsers({ users, onEditUser }) {
     const [searchTerm, setSearchTerm] = useState('');
@@ -59,29 +60,27 @@ function RegisteredUsers({ users, onEditUser }) {
                     <Table hover>
                         <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
+                            <th>Nome</th>
                             <th>Email</th>
-                            <th>Points</th>
-                            <th>Status</th>
-                            <th>Join Date</th>
-                            <th>Actions</th>
+                            <th>Punti</th>
+                            <th>Stato</th>
+                            <th>Data Registrazione</th>
+                            <th>Operazioni</th>
                         </tr>
                         </thead>
                         <tbody>
                         {currentUsers.length > 0 ? (
                             currentUsers.map(user => (
                                 <tr key={user.id}>
-                                    <td>{user.id}</td>
                                     <td>{user.name}</td>
                                     <td>{user.email}</td>
                                     <td>{user.points}</td>
                                     <td>
-                                        <Badge bg={user.status === 'active' ? 'success' : 'danger'}>
-                                            {user.status}
+                                        <Badge bg={user.paid ? 'success' : 'danger'}>
+                                            {user.paid ? "Pagato" : "Non pagato"}
                                         </Badge>
                                     </td>
-                                    <td>{user.joinDate}</td>
+                                    <td>{formatFirebaseTimestamp(user.createdAt)}</td>
                                     <td>
                                         <Button
                                             variant="outline-primary"
