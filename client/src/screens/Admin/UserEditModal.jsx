@@ -117,7 +117,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>ID</Form.Label>
+                                        <Form.Label column={2}>ID</Form.Label>
                                         <Form.Control
                                             type="text"
                                             value={formData.id}
@@ -127,7 +127,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Data registrazione</Form.Label>
+                                        <Form.Label column={3}>Data registrazione</Form.Label>
                                         <Form.Control
                                             type="text"
                                             value={formData.createdAt}
@@ -139,7 +139,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Nome</Form.Label>
+                                        <Form.Label column={3}>Nome</Form.Label>
                                         <Form.Control
                                             type="text"
                                             name="name"
@@ -151,7 +151,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Email</Form.Label>
+                                        <Form.Label column={3}>Email</Form.Label>
                                         <Form.Control
                                             type="email"
                                             name="email"
@@ -165,7 +165,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Punti</Form.Label>
+                                        <Form.Label column={3}>Punti</Form.Label>
                                         <Form.Control
                                             type="number"
                                             name="points"
@@ -176,7 +176,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Pagamento</Form.Label>
+                                        <Form.Label column={3}>Pagamento</Form.Label>
                                         <Form.Select
                                             name="status"
                                             value={formData.paid.toString()}
@@ -191,7 +191,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>CAP</Form.Label>
+                                        <Form.Label column={3}>CAP</Form.Label>
                                         <Form.Control
                                             name="cap"
                                             value={formData.cap}
@@ -202,7 +202,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Anno Nascita</Form.Label>
+                                        <Form.Label column={3}>Anno Nascita</Form.Label>
                                         <Form.Control
                                             name="birthYear"
                                             value={formData.birthYear}
@@ -215,7 +215,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Telefono</Form.Label>
+                                        <Form.Label column={3}>Telefono</Form.Label>
                                         <Form.Control
                                             name="phone"
                                             value={formData.phone}
@@ -226,7 +226,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Telegram</Form.Label>
+                                        <Form.Label column={3}>Telegram</Form.Label>
                                         <Form.Control
                                             name="telegram"
                                             value={formData.telegram}
@@ -239,7 +239,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Referral</Form.Label>
+                                        <Form.Label column={3}>Referral</Form.Label>
                                         <Form.Control
                                             name="referral"
                                             value={formData.referralCode}
@@ -250,7 +250,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Referred By</Form.Label>
+                                        <Form.Label column={3}>Referred By</Form.Label>
                                         <Form.Control
                                             name="referredBy"
                                             value={formData.referredBy}
@@ -263,7 +263,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Squadra</Form.Label>
+                                        <Form.Label column={3}>Squadra</Form.Label>
                                         <Form.Control
                                             name="team"
                                             value={formData.team}
@@ -274,7 +274,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Admin</Form.Label>
+                                        <Form.Label column={3}>Admin</Form.Label>
                                         <Form.Select
                                             name="admin"
                                             value={formData.isAdmin.toString()}
