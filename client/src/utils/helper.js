@@ -16,3 +16,14 @@ export function breakLine(string) {
 
     return [firstPart, secondPart];
 }
+
+export function formatFirebaseTimestamp(createdAt) {
+    if (!createdAt || typeof createdAt._seconds !== 'number') return '';
+
+    const date = new Date(createdAt._seconds * 1000);
+    return date.toLocaleDateString('it-IT', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    });
+}
