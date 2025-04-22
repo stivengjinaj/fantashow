@@ -17,7 +17,7 @@ export const UserProvider = ({ children }) => {
 
             try {
                 if (currentUser) {
-                    await currentUser.reload();
+                    //await currentUser.reload();
 
                     if (currentUser.emailVerified) {
                         setUser(currentUser);
