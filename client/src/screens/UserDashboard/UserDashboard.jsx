@@ -1,15 +1,13 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Spinner } from "react-bootstrap";
 import UserDashboardDesktop from "./UserDashboardDesktop.jsx";
 import UserDashboardMobile from "./UserDashboardMobile.jsx";
-import { UserContext } from "../Contexts/UserContext.jsx";
 import { getUserData } from "../../API.js";
 import DashboardPayment from "./DashboardPayment.jsx";
 import Error from "../misc/Error.jsx";
 
-function UserDashboard() {
+function UserDashboard({ user}) {
     const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-    const { user } = useContext(UserContext);
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [hasPaid, setHasPaid] = useState(false);

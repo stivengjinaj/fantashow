@@ -47,13 +47,34 @@ const verifyPayment = async (onErrorNavigate, onVerificationTrue, paymentIntentI
     }
 };
 
-const registerUser = async (userData, uid, idToken) => {
+const registerFirebaseUser = async (email, password) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/firebase/register`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            return { success: false, error: data.error || "Error registering user" };
+        }
+
+        return { success: true, uid: data.uid };
+    } catch (error) {
+        return { success: false, error: error.message || "Error registering user" };
+    }
+}
+
+const registerUser = async (userData, uid) => {
     try {
         const response = await fetch(`${remoteURL}/api/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${idToken}`,
             },
             body: JSON.stringify({ ...userData, uid }),
         });
@@ -338,6 +359,7 @@ const adminEditUser = async (adminUid, idToken, edittedUser) => {
 export {
     fetchClientSecret,
     verifyPayment,
+    registerFirebaseUser,
     registerUser,
     getLastLogin,
     updateLastLogin,

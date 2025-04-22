@@ -1,8 +1,8 @@
 import {Button, Container, Form, Image, Spinner} from "react-bootstrap";
 import next from "../../assets/icons/next.svg";
 import {useState} from "react";
-import {registerUser} from "../../API.js";
-import {deleteUnregisteredUser, registerUserWithFirebase} from "../../utils/auth.js";
+import {registerFirebaseUser, registerUser} from "../../API.js";
+import {deleteUnregisteredUser} from "../../utils/auth.js";
 
 function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
     const [errors, setErrors] = useState({});
@@ -20,11 +20,11 @@ function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
         setLoading(true);
         if (validate()) {
             let newErrors = {};
-            const { success, idToken, uid, error } = await registerUserWithFirebase(state.email, state.password);
+            const { success, uid, error } = await registerFirebaseUser(state.email, state.password);
 
             if(success){
                 saveUid(uid);
-                const { success: apiSuccess, error: apiError } = await registerUser(state, uid, idToken);
+                const { success: apiSuccess, error: apiError } = await registerUser(state, uid);
 
                 if (apiSuccess) {
                     handleNext();

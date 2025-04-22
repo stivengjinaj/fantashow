@@ -19,6 +19,29 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
+authenticationRoutes.post("/api/firebase/register", async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const userRecord = await admin.auth().createUser({
+            email,
+            password,
+        });
+
+        if(!userRecord.uid){
+            return res.status(400).json({ error: "Failed to create user" });
+        }
+
+        res.status(201).json({
+            message: "User registered successfully",
+            uid: userRecord.uid,
+        });
+    } catch (error) {
+        console.error("Error creating user:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+
 /**
  * @route POST /api/register
  * @description Registers a new user.
@@ -46,7 +69,7 @@ const db = admin.firestore();
  * "referralCode": "john-fffc"
  * }
  */
-authenticationRoutes.post("/api/register", verifyToken, async (req, res) => {
+authenticationRoutes.post("/api/register", async (req, res) => {
     try {
         const {
             username, email, referredBy, password,
@@ -55,9 +78,9 @@ authenticationRoutes.post("/api/register", verifyToken, async (req, res) => {
 
         const annoNascitaNum = parseInt(annoNascita, 10);
 
-        // Checking if the request is being send by a user who recently registered on firebase.
-        if (uid !== req.user.uid) {
-            return res.status(403).json({ error: "Unauthorized: UID mismatch" });
+        // Checking if the request is being sent by a user who recently registered on firebase.
+        if (!uid) {
+            return res.status(403).json({ error: "Unauthorized request" });
         }
 
         // Checking data validity.

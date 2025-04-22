@@ -15,12 +15,57 @@ import ResetPassword from "./screens/Authentication/ResetPassword.jsx";
 import UserDashboard from "./screens/UserDashboard/UserDashboard.jsx";
 import PaymentError from "./screens/Checkout/PaymentError.jsx";
 import ErrorBoundary from "./screens/misc/ErrorBoundary.jsx";
-import { UserProvider, UserContext } from "./screens/Contexts/UserContext.jsx";
-import {useContext} from "react";
+import {useEffect, useState} from "react";
 import AdminDashboard from "./screens/Admin/AdminDashboard.jsx";
+import {onAuthStateChanged} from "firebase/auth";
+import {auth} from "./utils/firebase.mjs";
+import {getAdminData} from "./API.js";
+import {logout} from "./utils/auth.js";
 
 function AppRoutes() {
-    const { user, isAdmin, loading } = useContext(UserContext);
+    const [user, setUser] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            setLoading(true);
+
+            try {
+                if (currentUser) {
+                    await currentUser.reload();
+
+                    if (currentUser.emailVerified) {
+                        setUser(currentUser);
+
+                        try {
+                            const idToken = await currentUser.getIdToken();
+                            const adminData = await getAdminData(currentUser.uid, idToken);
+                            setIsAdmin(adminData.message.isAdmin);
+                        } catch (error) {
+                            console.error("Error fetching admin status:", error);
+                            setIsAdmin(false);
+                        }
+                    } else {
+                        await logout();
+                        setUser(null);
+                        setIsAdmin(false);
+                    }
+                } else {
+                    setUser(null);
+                    setIsAdmin(false);
+                }
+            } catch (error) {
+                console.error("Error in auth state change handler:", error);
+                setUser(null);
+                setIsAdmin(false);
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     if (loading) {
         return (
@@ -44,7 +89,7 @@ function AppRoutes() {
             <Route path="/register/:referralCode" element={user ? <Navigate to="/dashboard" /> : <Register />} />
             <Route path="/dashboard" element={
                 user
-                    ? isAdmin ? <AdminDashboard /> : <UserDashboard />
+                    ? isAdmin ? <AdminDashboard user={user}/> : <UserDashboard user={user}/>
                     : <Navigate to="/login" />
             } />
             <Route path="/checkout/success/" element={<PaymentSuccess />} />
@@ -56,11 +101,9 @@ function AppRoutes() {
 
 function App() {
     return (
-        <UserProvider>
-            <ErrorBoundary>
-                <AppRoutes />
-            </ErrorBoundary>
-        </UserProvider>
+        <ErrorBoundary>
+            <AppRoutes />
+        </ErrorBoundary>
     );
 }
 

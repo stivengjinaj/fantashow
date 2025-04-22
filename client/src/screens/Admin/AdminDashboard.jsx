@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import Sidebar from './Sidebar';
 import DashboardSummary from './DashboardSummary';
@@ -10,11 +10,9 @@ import SupportSection from './SupportSection';
 import UserEditModal from './UserEditModal';
 import { List } from 'react-bootstrap-icons';
 import {getAllUsers} from "../../API.js";
-import {UserContext} from "../Contexts/UserContext.jsx";
 import { debounce } from 'lodash';
 
-function AdminDashboard() {
-    const { user } = useContext(UserContext);
+function AdminDashboard({ user }) {
     const [activeTab, setActiveTab] = useState('users');
     const [sidebarExpanded, setSidebarExpanded] = useState(true);
     const [showUserModal, setShowUserModal] = useState(false);
