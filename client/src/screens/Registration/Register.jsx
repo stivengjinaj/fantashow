@@ -1,4 +1,4 @@
-import {useEffect, useReducer, useState} from "react";
+import {useEffect, useReducer, useRef, useState} from "react";
 import { useParams } from "react-router";
 import {Container, Image} from "react-bootstrap";
 import PersonalData from "./PersonalData.jsx";
@@ -15,6 +15,7 @@ import ReferralError from "../Referral/ReferralError.jsx";
 
 function Register() {
     const params = useParams();
+    const referralCodeRef = useRef(params.referralCode);
     const [step, setStep] = useState(0);
     const [state, dispatch] = useReducer(registrationReducer, initialState);
     const [uid, setUid] = useState("");
@@ -22,15 +23,18 @@ function Register() {
 
     useEffect(() => {
         const checkAndRetrieveReferral = async () => {
-            if(params.referralCode){
-                const response = await checkReferral(params.referralCode);
+            const code = referralCodeRef.current;
+            if (code) {
+                const response = await checkReferral(code);
                 response.success ? setWrongReferral(false) : setWrongReferral(true);
-            }else {
+                dispatch({type: "UPDATE_DATA", payload: { referredBy: code }});
+            } else {
                 setWrongReferral(true);
             }
-        }
-        checkAndRetrieveReferral().then(() => dispatch({type: "UPDATE_DATA", payload: {["referredBy"]: params.referralCode}}));
-    }, [params.referralCode]);
+        };
+        checkAndRetrieveReferral();
+    }, []);
+
 
     const nextStep = () => setStep((prev) => prev + 1);
     const prevStep = () => setStep((prev) => prev - 1);
@@ -44,7 +48,7 @@ function Register() {
             ? (<ReferralError/>)
             : (
                 step === 3
-                    ? (<PaymentMethod step={step} nextStep={nextStep} uid={uid}/>)
+                    ? (<PaymentMethod nextStep={nextStep} uid={uid}/>)
                     : (
                         <Container fluid className="animated-bg">
                             <Guide/>
@@ -52,7 +56,7 @@ function Register() {
                             {step === 0 && <PersonalData dispatch={dispatch} state={state} nextStep={nextStep}/>}
                             {step === 1 && <ContactData dispatch={dispatch} state={state} nextStep={nextStep} prevStep={prevStep}/>}
                             {step === 2 && <LoginData dispatch={dispatch} state={state} nextStep={nextStep} prevStep={prevStep} saveUid={saveUid}/>}
-                            {step === 4 && <Checkout dispatch={dispatch} state={state} prevStep={prevStep} uid={uid}/> }
+                            {step === 4 && <Checkout dispatch={dispatch} state={state} prevStep={prevStep}/> }
 
 
                             <Container fluid className="d-flex justify-content-center mt-3 py-5">

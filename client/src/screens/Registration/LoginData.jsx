@@ -18,22 +18,22 @@ function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
     const register = async (e) => {
         e.preventDefault();
         setLoading(true);
-        if(validate()){
+        if (validate()) {
             let newErrors = {};
-
             const { success, idToken, uid, error } = await registerUserWithFirebase(state.email, state.password);
-            saveUid(uid);
-            if(success){
-                const {success, error} = await registerUser(state, uid, idToken);
 
-                if (success) {
+            if(success){
+                saveUid(uid);
+                const { success: apiSuccess, error: apiError } = await registerUser(state, uid, idToken);
+
+                if (apiSuccess) {
                     handleNext();
                 } else {
                     setLoading(false);
                     await deleteUnregisteredUser(uid);
-                    newErrors.passwordConfirm = error;
+                    newErrors.passwordConfirm = apiError;
                 }
-            }else {
+            } else {
                 await deleteUnregisteredUser(uid);
                 newErrors.passwordConfirm = error;
             }
@@ -41,6 +41,7 @@ function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
         }
         setLoading(false);
     }
+
 
     const validate = () => {
         let newErrors = {};

@@ -8,7 +8,7 @@ import CashCheckout from "./CashCheckout.jsx";
 import {logout} from "../../utils/auth.js";
 import {breakLine} from "../../utils/helper.js";
 
-function PaymentMethod(props) {
+function PaymentMethod({nextStep, uid, title}) {
     const [cashPayment, setCashPayment] = useState(false);
 
     useGSAP(() => {
@@ -31,16 +31,16 @@ function PaymentMethod(props) {
     return (
         cashPayment
             ? (
-                <CashCheckout changePaymentMethod={changePaymentMethod} uid={props.uid}/>
+                <CashCheckout changePaymentMethod={changePaymentMethod} uid={uid}/>
             )
             : (
                 <Container fluid className="animated-bg d-flex flex-column min-vh-100 justify-content-center align-items-center">
                     {
-                        props.title
+                        title
                             ?
                             <>
-                                <h3 className="text-center text-light mb-2 payment-method-title">{breakLine(props.title)[0]}</h3>
-                                <h3 className="text-center text-light mb-2 payment-method-title">{breakLine(props.title)[1]}</h3>
+                                <h3 className="text-center text-light mb-2 payment-method-title">{breakLine(title)[0]}</h3>
+                                <h3 className="text-center text-light mb-2 payment-method-title">{breakLine(title)[1]}</h3>
                                 <h4 className="text-center mb-2" onClick={logout}><a className="text-danger" href="/login">Esci</a></h4>
                             </>
                             : <h2 className="text-center text-light mb-5 payment-method-title">Scegli il metodo di pagamento</h2>
@@ -54,7 +54,7 @@ function PaymentMethod(props) {
                         </Col>
 
                         <Col md={3} className="d-flex flex-column align-items-center mx-2 mx-md-5 payment-method-column">
-                            <Button className="p-5 rounded-5 text-dark border-0 payment-method-button" onClick={props.nextStep}>
+                            <Button className="p-5 rounded-5 text-dark border-0 payment-method-button" onClick={nextStep}>
                                 <Image width={150} height={150} src={creditCardIcon} alt="creditCard"/>
                             </Button>
                             <h3 className="my-3 mt-md-4 mt-sm-2 text-light fw-bold">Contactless</h3>

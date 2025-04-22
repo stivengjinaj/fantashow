@@ -1,24 +1,47 @@
-import {useLocation, useNavigate} from "react-router";
-import {useEffect, useState} from "react";
-import {deleteCashPaymentRequest, verifyPayment} from "../../API.js";
-import {Spinner} from "react-bootstrap";
+import { useLocation, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { deleteCashPaymentRequest, verifyPayment, insertTransactionId } from "../../API.js";
+import { Spinner } from "react-bootstrap";
 
 const PaymentSuccess = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isVerified, setIsVerified] = useState(false);
+    const [transactionStatus, setTransactionStatus] = useState(null);
 
     useEffect(() => {
-        verifyPayment(
-            () => navigate("/"),
-            () => {
-                setIsVerified(true)
-            },
-            location.state?.paymentIntentId,
-            location.state?.uid
-        ).then(() => {
-            deleteCashPaymentRequest(location.state.uid);
-        });
+        const processPayment = async () => {
+            try {
+                await verifyPayment(
+                    () => navigate("/"),
+                    () => {
+                        setIsVerified(true);
+                    },
+                    location.state?.paymentIntentId,
+                    location.state?.uid
+                );
+
+                await deleteCashPaymentRequest(location.state.uid);
+                console.log(location.state.paymentIntentId);
+                if (location.state?.paymentIntentId && location.state?.uid ) {
+                    const result = await insertTransactionId(
+                        location.state.uid,
+                        location.state.paymentIntentId
+                    );
+
+                    setTransactionStatus(result.success ? 'success' : 'error');
+
+                    if (!result.success) {
+                        console.error("Failed to insert transaction ID:", result.error);
+                    }
+                }
+            } catch (error) {
+                console.error("Error processing payment:", error);
+                setTransactionStatus('error');
+            }
+        };
+
+        processPayment();
     }, [location, navigate]);
 
     return (
@@ -32,6 +55,12 @@ const PaymentSuccess = () => {
                             </div>
                             <h2 className="mb-3">Pagamento Completato 🎉</h2>
                             <p className="mb-4">Riceverai a breve una email di conferma.</p>
+                            {transactionStatus === 'error' && (
+                                <p className="text-danger mb-3">
+                                    Nota: C'è stato un problema nel salvare i dettagli della transazione.
+                                    Per favore contatta il supporto.
+                                </p>
+                            )}
                             <button className="btn btn-primary px-4" onClick={() => window.location.href = "/login"}>
                                 Accedi
                             </button>

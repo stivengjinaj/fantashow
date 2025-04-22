@@ -13,7 +13,7 @@ export const UserProvider = ({ children }) => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-            setLoading(true); // Ensure loading is true when auth state changes
+            setLoading(true);
 
             try {
                 if (currentUser) {
