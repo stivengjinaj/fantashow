@@ -1,5 +1,5 @@
 import React from 'react';
-import { Nav } from 'react-bootstrap';
+import {Button, Nav, Row} from 'react-bootstrap';
 import {
     XLg,
     People,
@@ -8,10 +8,11 @@ import {
     CashCoin,
     Headset
 } from 'react-bootstrap-icons';
+import {logout} from "../../utils/auth.js";
 
 function Sidebar({ activeTab, setActiveTab, toggleSidebar, expanded, isMobile }) {
     return (
-        <div className="d-flex flex-column h-100">
+        <div className="d-flex flex-column align-items-center min-vh-100">
             <div className="d-flex justify-content-between align-items-center mb-4 px-3">
                 {expanded && <h3 className="m-0">Admin Panel</h3>}
                 {isMobile && expanded && (
@@ -68,12 +69,9 @@ function Sidebar({ activeTab, setActiveTab, toggleSidebar, expanded, isMobile })
             </Nav>
 
             {expanded && (
-                <div className="mt-auto p-3">
-                    <div className="text-muted small">
-                        <p>Logged in as admin</p>
-                        <p className="mb-0">© 2025 Fantashow</p>
-                    </div>
-                </div>
+                <Row className="mt-auto w-100 mb-3 p-3">
+                    <Button onClick={logout} className="bg-danger">Logout</Button>
+                </Row>
             )}
         </div>
     );
