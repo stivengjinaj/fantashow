@@ -126,6 +126,7 @@ authenticationRoutes.post("/api/register", verifyToken, async (req, res) => {
             verified: false,
             paid: false,
             points: 0,
+            coins: 0,
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
         };
 
@@ -181,7 +182,7 @@ authenticationRoutes.post("/api/register", verifyToken, async (req, res) => {
  */
 authenticationRoutes.post("/api/delete-user", async (req, res) => {
     const { uid } = req.body;
-
+    console.log(uid);
     if (!uid) {
         return res.status(400).json({ success: false, error: "Missing uid" });
     }

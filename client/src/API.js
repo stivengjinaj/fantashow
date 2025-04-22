@@ -115,6 +115,28 @@ const updateLastLogin = async (uid, idToken) => {
     }
 }
 
+const insertTransactionId = async (uid, paymentId) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/card-payment/${uid}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ paymentId })
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to insert transaction ID");
+        }
+
+        return { success: true, message: data.message };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
 const checkCashPaymentRequest = async (uid, idToken) => {
     try {
         const response = await fetch(`${remoteURL}/api/cash-payment/${uid}`, {
@@ -319,6 +341,7 @@ export {
     registerUser,
     getLastLogin,
     updateLastLogin,
+    insertTransactionId,
     registerCashPaymentRequest,
     deleteCashPaymentRequest,
     sendSupportRequest,
