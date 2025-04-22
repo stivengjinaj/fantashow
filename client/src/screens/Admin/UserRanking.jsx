@@ -31,6 +31,7 @@ function UserRanking({ users }) {
                             <th width="80">Rank</th>
                             <th>Utente</th>
                             <th>Punti</th>
+                            <th>Coins</th>
                             <th>Squadra</th>
                             <th>Codice referral</th>
                             <th>Data Registrazione</th>
@@ -51,6 +52,9 @@ function UserRanking({ users }) {
                                 <td>{user.name+" "+user.surname}</td>
                                 <td>
                                     <strong>{user.points}</strong>
+                                </td>
+                                <td>
+                                    <strong>{user.coins}</strong>
                                 </td>
                                 <td>
                                     {user.team}
