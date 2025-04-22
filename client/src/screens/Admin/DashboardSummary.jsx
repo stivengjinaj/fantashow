@@ -54,7 +54,7 @@ function DashboardSummary({ totalUsers, paidUsers, pendingUsers, openTickets }) 
                             <ExclamationCircleFill size={28} />
                         </div>
                         <div>
-                            <h6 className="mb-0">Open Tickets</h6>
+                            <h6 className="mb-0">Ticket Aperti</h6>
                             <h3 className="mb-0">{openTickets}</h3>
                         </div>
                     </Card.Body>
