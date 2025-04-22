@@ -4,7 +4,7 @@ import lock from "../../assets/icons/lock.svg";
 import {useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import {updateLastLogin} from "../../API.js";
+import {resendEmailVerification, updateLastLogin} from "../../API.js";
 import {loginWithEmail} from "../../utils/auth.js";
 
 
@@ -14,6 +14,7 @@ function Login(){
     const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [resendVerification, setResendVerification] = useState(false);
     const [loading, setLoading] = useState(false);
 
     function tweenError(){
@@ -66,6 +67,7 @@ function Login(){
             }
             else {
                 setError(true);
+                response.code === 406 && setResendVerification(true);
                 setErrorMessage(response.message);
                 setLoading(false);
             }
@@ -84,6 +86,13 @@ function Login(){
         setPassword(e.target.value);
     }
 
+    const sendEmail = () => {
+        resendEmailVerification(email).then(() => {
+            setResendVerification(false);
+            setErrorMessage("Controlla la tua email. Se non la trovi, controlla anche la cartella spam.");
+        });
+    }
+
     return(
         <Container fluid className="animated-bg">
             <Container fluid className="d-flex align-items-center justify-content-end">
@@ -100,7 +109,12 @@ function Login(){
             </Container>
 
             <Container fluid className="d-flex flex-column align-items-center justify-content-center mt-5">
-                {error && <p className="text-danger fw-bold">{errorMessage}</p>}
+                {
+                    error &&
+                    <p className="text-danger fw-bold">
+                        {errorMessage} {resendVerification && <span className="text-warning text-decoration-underline" onClick={sendEmail}>Invia di nuovo.</span>}
+                    </p>
+                }
                 <Form className={"login-form-width"} onSubmit={handleSubmit}>
                     <Form.Group className="mb-3" controlId="formBasicEmail">
                         <InputGroup className="mb-3">
