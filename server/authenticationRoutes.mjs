@@ -28,6 +28,9 @@ authenticationRoutes.post("/api/firebase/register", async (req, res) => {
             password,
         });
 
+        // Send email verification
+        await admin.auth().generateEmailVerificationLink(email);
+
         if(!userRecord.uid){
             return res.status(400).json({ error: "Failed to create user" });
         }
