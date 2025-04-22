@@ -1,6 +1,7 @@
 import express from "express";
 import admin from "firebase-admin";
 import dotenv from "dotenv";
+import sendVerificationEmail from "./verificationEmail.mjs";
 import {generateReferralCode, verifyPayment, verifyToken} from "./utils.mjs";
 
 dotenv.config();
@@ -18,6 +19,64 @@ if (!admin.apps.length) {
     });
 }
 const db = admin.firestore();
+
+authenticationRoutes.post("/api/firebase/register", async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const userRecord = await admin.auth().createUser({
+            email,
+            password,
+        });
+
+        if(!userRecord.uid){
+            return res.status(400).json({ error: "Failed to create user" });
+        }
+
+        const verificationLink = await admin.auth().generateEmailVerificationLink(
+            email
+        );
+
+        await sendVerificationEmail(email, verificationLink);
+
+        res.status(201).json({
+            message: "User registered successfully. Please check your email to verify your account.",
+            uid: userRecord.uid,
+        });
+    } catch (error) {
+        console.error("Error creating user:", error);
+        res.status(500).json({ error: error.message || "Internal Server Error" });
+    }
+});
+
+authenticationRoutes.post("/api/firebase/resend-verification", async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+    }
+
+    try {
+        try {
+            await admin.auth().getUserByEmail(email);
+        } catch (error) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const verificationLink = await admin.auth().generateEmailVerificationLink(
+            email
+        );
+
+        await sendVerificationEmail(email, verificationLink);
+
+        res.status(200).json({
+            message: "Verification email has been resent. Please check your inbox."
+        });
+    } catch (error) {
+        console.error("Error resending verification email:", error);
+        res.status(500).json({ error: error.message || "Internal Server Error" });
+    }
+});
 
 /**
  * @route POST /api/register
@@ -46,7 +105,7 @@ const db = admin.firestore();
  * "referralCode": "john-fffc"
  * }
  */
-authenticationRoutes.post("/api/register", verifyToken, async (req, res) => {
+authenticationRoutes.post("/api/register", async (req, res) => {
     try {
         const {
             username, email, referredBy, password,
@@ -55,9 +114,9 @@ authenticationRoutes.post("/api/register", verifyToken, async (req, res) => {
 
         const annoNascitaNum = parseInt(annoNascita, 10);
 
-        // Checking if the request is being send by a user who recently registered on firebase.
-        if (uid !== req.user.uid) {
-            return res.status(403).json({ error: "Unauthorized: UID mismatch" });
+        // Checking if the request is being sent by a user who recently registered on firebase.
+        if (!uid) {
+            return res.status(403).json({ error: "Unauthorized request" });
         }
 
         // Checking data validity.

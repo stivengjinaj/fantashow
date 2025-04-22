@@ -47,13 +47,56 @@ const verifyPayment = async (onErrorNavigate, onVerificationTrue, paymentIntentI
     }
 };
 
-const registerUser = async (userData, uid, idToken) => {
+const registerFirebaseUser = async (email, password) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/firebase/register`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            return { success: false, error: data.error || "Error registering user" };
+        }
+
+        return { success: true, uid: data.uid };
+    } catch (error) {
+        return { success: false, error: error.message || "Error registering user" };
+    }
+}
+
+const resendEmailVerification = async (email) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/firebase/resend-verification`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+
+        if(!response.ok) {
+            return { success: false, error: data.error || "Error sending email" };
+        }
+
+        return { success: true, message: "Mail inviata" };
+    }catch (error) {
+        return { success: false, error: error.message || "Error sending email" };
+    }
+}
+
+const registerUser = async (userData, uid) => {
     try {
         const response = await fetch(`${remoteURL}/api/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${idToken}`,
             },
             body: JSON.stringify({ ...userData, uid }),
         });
@@ -61,12 +104,11 @@ const registerUser = async (userData, uid, idToken) => {
         const data = await response.json();
 
         if (!response.ok) {
-            return { success: false, error: data.error || "Registrazione fallita." };
+            return { success: false, error: data.error || "Error registering user." };
         }
-
         return { success: true, data };
     } catch (error) {
-        return { success: false, error: error.message || "Errore di rete." };
+        return { success: false, error: error.message || "Error registering user." };
     }
 };
 
@@ -338,6 +380,8 @@ const adminEditUser = async (adminUid, idToken, edittedUser) => {
 export {
     fetchClientSecret,
     verifyPayment,
+    registerFirebaseUser,
+    resendEmailVerification,
     registerUser,
     getLastLogin,
     updateLastLogin,

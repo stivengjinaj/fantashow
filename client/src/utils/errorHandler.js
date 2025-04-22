@@ -1,5 +1,3 @@
-// src/utils/errorHandler.js
-
 import ERROR_MESSAGES from "../constants/errors.js";
 
 const getError = (errorCode) => {

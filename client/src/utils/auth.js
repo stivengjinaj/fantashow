@@ -18,11 +18,11 @@ export const loginWithEmail = async (email, password, rememberMe = false) => {
         await setPersistence(auth, rememberMe ? browserSessionPersistence : browserLocalPersistence);
 
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        await auth.currentUser.reload();
+        //await auth.currentUser.reload();
 
         if (!auth.currentUser.emailVerified) {
             await logout();
-            return { success: false, message: "Account non verificato. Controlla la tua email." };
+            return { success: false, message: "Account non verificato. Controlla la tua email.", code: 406 };
         }
 
         const userVerified = await checkUserVerification(auth.currentUser.uid);
