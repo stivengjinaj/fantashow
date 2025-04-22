@@ -20,6 +20,36 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
+/**
+ * @route POST /api/firebase/register
+ * @description Registers a new user in Firebase Authentication and sends a verification email.
+ * @param {object} req - The HTTP request object.
+ * @param {string} req.body.email - The email address of the user to register.
+ * @param {string} req.body.password - The password for the new user.
+ * @param {object} res - The HTTP response object.
+ * @returns {object} - JSON response indicating the success or failure of the operation.
+ * @returns {201} - If the user is registered successfully and the verification email is sent.
+ * @returns {400} - If the user creation fails (e.g., missing UID).
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request Body:
+ * {
+ *   "email": "user@example.com",
+ *   "password": "securePassword123"
+ * }
+ *
+ * Successful Response:
+ * {
+ *   "message": "User registered successfully. Please check your email to verify your account.",
+ *   "uid": "uniqueUserId123"
+ * }
+ *
+ * Error Response:
+ * {
+ *   "error": "Failed to create user"
+ * }
+ */
 authenticationRoutes.post("/api/firebase/register", async (req, res) => {
     const { email, password } = req.body;
 
@@ -49,6 +79,34 @@ authenticationRoutes.post("/api/firebase/register", async (req, res) => {
     }
 });
 
+/**
+ * @route POST /api/firebase/resend-verification
+ * @description Resends a verification email to the user based on their email address.
+ * @param {object} req - The HTTP request object.
+ * @param {string} req.body.email - The email address of the user to resend the verification email to.
+ * @param {object} res - The HTTP response object.
+ * @returns {object} - JSON response indicating the success or failure of the operation.
+ * @returns {200} - If the verification email is resent successfully.
+ * @returns {400} - If the email is missing from the request body.
+ * @returns {404} - If the user is not found in Firebase Authentication.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request Body:
+ * {
+ *   "email": "user@example.com"
+ * }
+ *
+ * Successful Response:
+ * {
+ *   "message": "Verification email has been resent. Please check your inbox."
+ * }
+ *
+ * Error Response:
+ * {
+ *   "error": "User not found"
+ * }
+ */
 authenticationRoutes.post("/api/firebase/resend-verification", async (req, res) => {
     const { email } = req.body;
 
