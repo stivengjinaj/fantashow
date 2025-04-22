@@ -69,7 +69,9 @@ paymentRoutes.patch("/api/card-payment/:uid", async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
-        await userDocRef.update({ paymentId });
+        const paymentDate = admin.firestore.FieldValue.serverTimestamp();
+
+        await userDocRef.update({ paymentId, paymentDate });
 
         return res.status(200).json({message: "Payment ID updated successfully"});
     }catch (error) {
