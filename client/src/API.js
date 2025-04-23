@@ -47,6 +47,29 @@ const verifyPayment = async (onErrorNavigate, onVerificationTrue, paymentIntentI
     }
 };
 
+const registerAdmin = async (uid, idToken, name, surname, username, email, password) => {
+         try {
+             const response = await fetch(`${remoteURL}/api/register/admin/${uid}`, {
+                 method: "POST",
+                 headers: {
+                     "Content-Type": "application/json",
+                     "Authorization": `Bearer ${idToken}`,
+                 },
+                 body: JSON.stringify({ name, surname, username, email, password }),
+             });
+
+             const data = await response.json();
+
+             if (!response.ok) {
+                 throw new Error(data.error || "Failed to register admin");
+             }
+
+             return { success: true, message: data.message };
+         } catch (error) {
+             return { success: false, error: error.message || "Error registering admin" };
+         }
+     }
+
 const registerFirebaseUser = async (email, password) => {
     try {
         const response = await fetch(`${remoteURL}/api/firebase/register`, {
@@ -512,5 +535,6 @@ export {
     adminEditUser,
     sendSupportRequest,
     getSupportTickets,
-    updateTicketStatus
+    updateTicketStatus,
+    registerAdmin,
 };

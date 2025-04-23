@@ -2,6 +2,7 @@ import express from "express";
 import admin from "firebase-admin";
 import dotenv from "dotenv";
 import {generateReferralCode, verifyAdmin, verifyToken} from "./utils.mjs";
+import sendVerificationEmail from "./verificationEmail.mjs";
 
 dotenv.config();
 
@@ -46,29 +47,25 @@ const db = admin.firestore();
  * "referralCode": "john-39fa"
  * }
  * */
-adminRoutes.post("/api/register/admin", async (req, res) => {
+adminRoutes.post("/api/register/admin/:uid", verifyToken, verifyAdmin, async (req, res) => {
     try {
-        const { name, surname, username, email, existingAdminUUID } = req.body;
-        if(!username || !email || !name || !surname || username === "" || email === "" || name === "" || surname === "") {
-            return res.status(400).json({ error: "Username and email are required" });
-        }
-        if(!existingAdminUUID || existingAdminUUID === "") {
-            return res.status(401).json({ error: "Unauthorized or invalid request from admin" });
-        }
-        const existingAdmin = await db.collection("users")
-            .where(admin.firestore.FieldPath.documentId(), "==", existingAdminUUID)
-            .get()
+        const { name, surname, username, email, password } = req.body;
 
-        if(existingAdmin.empty) {
-            //console.log("Admin not found");
-            return res.status(401).json({ error: "Unauthorized or invalid request from admin" });
-        }
-        if(existingAdmin.docs[0].data().isAdmin !== true) {
-            //console.log("User is not an admin");
-            return res.status(401).json({ error: "Unauthorized or invalid request from admin" });
+        if (!username || !email || !name || !surname || !password) {
+            return res.status(400).json({ error: "Missing data." });
         }
 
-        // Generate referral code
+        console.log(email);
+
+        const userRecord = await admin.auth().createUser({
+            email,
+            password,
+        });
+
+        if (!userRecord.uid) {
+            return res.status(400).json({ error: "Failed to create user" });
+        }
+
         const referralCode = await generateReferralCode(name);
 
         const newAdmin = {
@@ -80,19 +77,32 @@ adminRoutes.post("/api/register/admin", async (req, res) => {
             referredBy: "",
             points: 0,
             verified: true,
+        };
+
+        let adminRef;
+        try {
+            adminRef = await db.collection("users").doc(userRecord.uid).set(newAdmin);
+        } catch (dbError) {
+            await admin.auth().deleteUser(userRecord.uid);
+            console.error("Firestore failed, user rolled back:", dbError);
+            return res.status(500).json({ error: "Failed to store user data" });
         }
-        const adminRef = await db.collection("users").add(newAdmin);
+
+        const verificationLink = await admin.auth().generateEmailVerificationLink(email);
+
+        await sendVerificationEmail(email, verificationLink);
 
         res.status(201).json({
             message: "Admin registered successfully",
-            adminId: adminRef.id,
+            adminId: userRecord.uid,
             referralCode: referralCode,
         });
     } catch (error) {
-        // console.error("Error registering user:", error);
+        console.error("Registration error:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
 
 /**
  * @route GET /api/admin/:uid
@@ -294,7 +304,7 @@ adminRoutes.patch("/api/admin/edit-user/:uid", verifyToken, verifyAdmin, async (
 /**
  * @route GET /api/addmin/cash-payments/:uid
  * @description Retrieves all cash payment requests from the database.
- * @access Protected - Requires valid token and admin privileges.
+ * @access protected - Requires valid token and admin privileges.
  * @returns {object} - JSON response containing a list of cash payment requests.
  * @returns {200} - If cash payment requests are retrieved successfully.
  * @returns {400} - If the UID is missing from the request parameters.
@@ -350,7 +360,7 @@ adminRoutes.get("/api/admin/cash-payments/:uid", verifyToken, verifyAdmin, async
 /**
  * @route GET /api/admin/support/:uid
  * @description Retrieves all support tickets from the database.
- * @access Protected - Requires valid token and admin privileges.
+ * @access protected - Requires valid token and admin privileges.
  * @param {object} req - The HTTP request object.
  * @param {object} req.params - The request parameters.
  * @param {string} req.params.uid - The UID of the admin making the request.
@@ -419,7 +429,7 @@ adminRoutes.get("/api/admin/support/:uid", verifyToken, verifyAdmin, async(req, 
 /**
  * @route PATCH /api/admin/support/:uid
  * @description Updates the status of a support ticket in the database.
- * @access Protected - Requires valid token and admin privileges.
+ * @access protected - Requires valid token and admin privileges.
  * @param {object} req - The HTTP request object.
  * @param {object} req.body - The request body containing the ticket details.
  * @param {string} req.body.ticketId - The ID of the support ticket to update (required).
