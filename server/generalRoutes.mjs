@@ -52,27 +52,36 @@ generalRoutes.post("/api/support", async (req, res) => {
     try {
         const { supportMode, name, email, telegram, description } = req.body;
 
-        if (supportMode !== "email" && supportMode !== "telegram") {
+        if (!supportMode || !name || !description) {
+            return res.status(401).json ({ error: "Missing data"})
+        }
+
+        const normalizedSupportMode = supportMode.toString().toLowerCase();
+        if (normalizedSupportMode !== "email" && normalizedSupportMode !== "telegram") {
             return res.status(400).json({ error: "Support mode unknown" });
         }
 
         const supportData = {
             supportMode: supportMode,
+            solved: false,
             description,
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
         };
 
-        if (supportMode === "email") {
+        if (normalizedSupportMode === "email") {
             if (!name || !email) {
                 return res.status(401).json({ error: "Name and email are required for email support." });
+            }else {
+                supportData.name = name;
+                supportData.email = email;
             }
-            supportData.name = name;
-            supportData.email = email;
-        } else if (supportMode === "telegram") {
+        } else if (normalizedSupportMode === "telegram") {
             if (!telegram) {
                 return res.status(401).json({ error: "Telegram username is required for Telegram support." });
             }
             supportData.telegram = telegram;
+        } else {
+            return res.status(400).json({ error: "Support mode unknown" });
         }
 
         await db.collection("support").add(supportData);

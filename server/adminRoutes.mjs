@@ -347,5 +347,130 @@ adminRoutes.get("/api/admin/cash-payments/:uid", verifyToken, verifyAdmin, async
     }
 })
 
+/**
+ * @route GET /api/admin/support/:uid
+ * @description Retrieves all support tickets from the database.
+ * @access Protected - Requires valid token and admin privileges.
+ * @param {object} req - The HTTP request object.
+ * @param {object} req.params - The request parameters.
+ * @param {string} req.params.uid - The UID of the admin making the request.
+ * @param {object} res - The HTTP response object.
+ * @returns {object} - JSON response containing a list of support tickets or an error message.
+ * @returns {200} - If support tickets are retrieved successfully.
+ * @returns {200} - If no support tickets are found, with an appropriate message.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request:
+ * GET /api/admin/support/admin123
+ *
+ * Successful Response (With Data):
+ * {
+ *   "message": "Support tickets retrieved successfully",
+ *   "tickets": [
+ *     {
+ *       "id": "ticket1",
+ *       "subject": "Issue with account",
+ *       "status": "open",
+ *       "createdAt": "2023-10-01T12:00:00Z"
+ *     },
+ *     {
+ *       "id": "ticket2",
+ *       "subject": "Payment issue",
+ *       "status": "closed",
+ *       "createdAt": "2023-10-02T12:00:00Z"
+ *     }
+ *   ]
+ * }
+ *
+ * Successful Response (No Data):
+ * {
+ *   "message": "No support tickets found",
+ *   "tickets": []
+ * }
+ *
+ * Error Response:
+ * {
+ *   "error": "Internal Server Error"
+ * }
+ */
+adminRoutes.get("/api/admin/support/:uid", verifyToken, verifyAdmin, async(req, res) => {
+    try {
+        const supportTicketsRef = db.collection("support");
+        const snapshot = await supportTicketsRef.get();
+
+        if (snapshot.empty) {
+            return res.status(200).json({ message: "No support tickets found", tickets: [] });
+        }
+
+        const tickets = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+
+        return res.status(200).json({ message: "Support tickets retrieved successfully", tickets });
+    } catch (error) {
+        console.error("Error retrieving support tickets:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+/**
+ * @route PATCH /api/admin/support/:uid
+ * @description Updates the status of a support ticket in the database.
+ * @access Protected - Requires valid token and admin privileges.
+ * @param {object} req - The HTTP request object.
+ * @param {object} req.body - The request body containing the ticket details.
+ * @param {string} req.body.ticketId - The ID of the support ticket to update (required).
+ * @param {string} req.body.status - The new status to set for the support ticket (required).
+ * @param {object} res - The HTTP response object.
+ * @returns {object} - JSON response with a success message or an error message.
+ * @returns {200} - If the ticket status is updated successfully.
+ * @returns {400} - If the ticket ID or status is missing from the request body.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request:
+ * PATCH /api/admin/support/admin123
+ * Body:
+ * {
+ *   "ticketId": "ticket456",
+ *   "status": "closed"
+ * }
+ *
+ * Successful Response:
+ * {
+ *   "message": "Ticket status updated successfully"
+ * }
+ *
+ * Error Response (Missing Fields):
+ * {
+ *   "error": "Ticket ID and status are required"
+ * }
+ *
+ * Error Response (Internal Server Error):
+ * {
+ *   "error": "Internal Server Error"
+ * }
+ */
+adminRoutes.patch("/api/admin/support/:uid", verifyToken, verifyAdmin, async (req, res) => {
+    try {
+        const { ticketId, status } = req.body;
+
+        if (!ticketId || !status) {
+            return res.status(400).json({ error: "Ticket ID and status are required" });
+        }
+
+        const ticketRef = db.collection("support").doc(ticketId);
+        await ticketRef.update({ solved: status });
+
+        return res.status(200).json({ message: "Ticket status updated successfully" });
+    } catch (error) {
+        console.error("Error updating ticket status:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 
 export default adminRoutes;

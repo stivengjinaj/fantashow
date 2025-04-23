@@ -445,6 +445,51 @@ const adminEditUser = async (adminUid, idToken, edittedUser) => {
     }
 }
 
+const getSupportTickets = async (uid, idToken) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/admin/support/${uid}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            }
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to get support tickets");
+        }
+
+        return { success: true, message: data.tickets };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
+const updateTicketStatus = async (uid, idToken, ticketId, status) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/admin/support/${uid}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({ ticketId, status })
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to update ticket status");
+        }
+
+        return { success: true, message: data.message };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
 export {
     fetchClientSecret,
     verifyPayment,
@@ -459,11 +504,13 @@ export {
     updateCashPaymentRequest,
     updateCashPaymentList,
     deleteCashPaymentRequest,
-    sendSupportRequest,
     checkReferral,
     getUserData,
     getAdminData,
     checkCashPaymentRequest,
     getAllUsers,
     adminEditUser,
+    sendSupportRequest,
+    getSupportTickets,
+    updateTicketStatus
 };
