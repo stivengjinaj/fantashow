@@ -1,71 +1,101 @@
 import React, { useState } from 'react';
 import { Card, Table, Button, Badge, Form } from 'react-bootstrap';
 import {formatFirebaseTimestamp} from "../../utils/helper.js";
-import {deleteCashPaymentRequest, updateCashPaymentRequest} from "../../API.js";
+import { updateCashPaymentList, updateCashPaymentRequest} from "../../API.js";
 
-function CashPaymentRequests({ cashPayments, setCashPayments, admin, users }) {
+
+function CashPaymentRequests({ cashPayments, setCashPayments, admin, users, onEditUsers }) {
     const [selectedRequests, setSelectedRequests] = useState([]);
 
     // Handle checkbox selection
     const handleSelectRequest = (requestId) => {
-        if (selectedRequests.includes(requestId)) {
-            setSelectedRequests(selectedRequests.filter(id => id !== requestId));
-        } else {
-            setSelectedRequests([...selectedRequests, requestId]);
-        }
+        setSelectedRequests(prev =>
+            prev.includes(requestId)
+                ? prev.filter(id => id !== requestId)
+                : [...prev, requestId]
+        );
     };
 
     // Handle selects all
     const handleSelectAll = (e) => {
-        if (e.target.checked) {
-            setSelectedRequests(cashPayments.filter(r => !r.paid).map(r => r.id));
-        } else {
-            setSelectedRequests([]);
+        setSelectedRequests(
+            e.target.checked
+                ? cashPayments.filter(r => !r.paid).map(r => r.id)
+                : []
+        );
+    };
+
+    const updateUsersWithPaymentChanges = (paymentIds, isPaid) => {
+        const affectedUserIds = cashPayments
+            .filter(payment => paymentIds.includes(payment.id))
+            .map(payment => payment.id);
+
+
+        if (affectedUserIds.length > 0) {
+            const updatedUsers = users.map(user => {
+                if (affectedUserIds.includes(user.id)) {
+                    return { ...user, paid: isPaid };
+                }
+                return user;
+            });
+            onEditUsers(updatedUsers);
         }
     };
 
-    // Handle batch operations
-    const handleBatchOperation = (operation) => {
+    const handleBatchOperation = async (operation) => {
+        try {
+            const paymentIds = selectedRequests.filter(id =>
+                cashPayments.find(r => r.id === id && !r.paid)
+            );
 
-        setSelectedRequests([]);
+            if (paymentIds.length === 0) return;
+
+            const idToken = await admin.getIdToken();
+            const isPaid = operation === 'approve';
+
+            await updateCashPaymentList(admin.uid, paymentIds, idToken, isPaid);
+
+            setCashPayments(prevCashPayments =>
+                prevCashPayments.map(payment =>
+                    paymentIds.includes(payment.id)
+                        ? { ...payment, paid: isPaid }
+                        : payment
+                )
+            );
+
+            // Pass the payment IDs and isPaid status
+            updateUsersWithPaymentChanges(paymentIds, isPaid);
+
+            setSelectedRequests([]);
+        } catch (error) {
+            console.error("Error during batch operation:", error);
+        }
     };
 
     // Get username by ID
     const getUserName = (userId) => {
         const user = users.find(u => u.id === userId);
-        return user ? user.name+" "+user.surname : 'Utente sconosciuto';
+        return user ? `${user.name} ${user.surname}` : 'Utente sconosciuto';
     };
 
     // Handle a single request operation
     const handleRequestOperation = async (request, operation) => {
         try {
             const idToken = await admin.getIdToken();
-            switch (operation) {
-                case 'approve':
-                    await updateCashPaymentRequest(admin.uid, request.id, idToken, true);
-                    setCashPayments((prevCashPayments) =>
-                        prevCashPayments.map((payment) =>
-                            payment.id === request.id ? { ...payment, paid: true } : payment
-                        )
-                    );
-                    break;
-                case 'revoke':
-                    await updateCashPaymentRequest(admin.uid, request.id, idToken, false);
-                    setCashPayments((prevCashPayments) =>
-                        prevCashPayments.map((payment) =>
-                            payment.id === request.id ? { ...payment, paid: false } : payment
-                        )
-                    );
-                    break;
-                case 'delete':
-                    await deleteCashPaymentRequest(request.id);
-                    setCashPayments((prevCashPayments) =>
-                        prevCashPayments.filter((payment) => payment.id !== request.id)
-                    );
-                    break;
+            const isPaid = operation === 'approve';
+            const response = await updateCashPaymentRequest(admin.uid, request.id, idToken, isPaid);
+
+            if(response.success){
+                setCashPayments(prevCashPayments =>
+                    prevCashPayments.map(payment =>
+                        payment.id === request.id ? { ...payment, paid: isPaid } : payment
+                    )
+                );
+
+                updateUsersWithPaymentChanges([request.id], isPaid);
             }
-        } catch (e) {
-            console.error(e);
+        } catch (error) {
+            console.error("Error handling request operation:", error);
         }
     };
 
@@ -82,14 +112,6 @@ function CashPaymentRequests({ cashPayments, setCashPayments, admin, users }) {
                         onClick={() => handleBatchOperation('approve')}
                     >
                         Approve Selected
-                    </Button>
-                    <Button
-                        variant="danger"
-                        size="sm"
-                        disabled={selectedRequests.length === 0}
-                        onClick={() => handleBatchOperation('reject')}
-                    >
-                        Reject Selected
                     </Button>
                 </div>
             </Card.Header>
@@ -143,13 +165,6 @@ function CashPaymentRequests({ cashPayments, setCashPayments, admin, users }) {
                                                     onClick={() => handleRequestOperation(request, 'approve')}
                                                 >
                                                     Approva
-                                                </Button>
-                                                <Button
-                                                    variant="outline-danger"
-                                                    size="sm"
-                                                    onClick={() => handleRequestOperation(request, 'delete')}
-                                                >
-                                                    Cancella
                                                 </Button>
                                             </>
                                         )}

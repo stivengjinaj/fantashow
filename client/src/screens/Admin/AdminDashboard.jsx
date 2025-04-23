@@ -102,7 +102,13 @@ function AdminDashboard() {
             case 'ranking':
                 return <UserRanking users={users} />;
             case 'cashRequests':
-                return <CashPaymentRequests admin={user} cashPayments={cashPayments} setCashPayments={setCashPayments} users={users} />;
+                return <CashPaymentRequests
+                    admin={user}
+                    onEditUsers={setUsers}
+                    cashPayments={cashPayments}
+                    setCashPayments={setCashPayments}
+                    users={users}
+                />;
             case 'allPayments':
                 return <AllPayments users={users} />;
             case 'support':
@@ -140,7 +146,7 @@ function AdminDashboard() {
         }
     }
 
-    // Main content area needs an offset based on sidebar state
+    // The main content area needs an offset based on the sidebar state
     const contentOffset = sidebarExpanded ?
         (isMobile ? 0 : sidebarWidth) :
         (isMobile ? 0 : collapsedSidebarWidth);
@@ -184,7 +190,7 @@ function AdminDashboard() {
                     className="p-3"
                     style={contentStyle}
                 >
-                    {/* Toggle sidebar button - visible on all screens */}
+                    {/* Toggle the sidebar button-visible on all screens */}
                     <div className="mb-3 d-flex align-items-center">
                         <button
                             className="btn btn-outline-primary me-3"
