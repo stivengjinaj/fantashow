@@ -38,7 +38,7 @@ function SupportSection({ admin, tickets, setTickets }) {
         <>
             <Card>
                 <Card.Header className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
-                    <h5 className="mb-md-0">Support Tickets</h5>
+                    <h5 className="mb-md-0">Ticket di supporto</h5>
                     <Form.Select
                         style={{ width: 'auto' }}
                         value={statusFilter}
