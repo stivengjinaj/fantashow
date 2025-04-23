@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Card, Table, Button, Badge, Form } from 'react-bootstrap';
+import {formatFirebaseTimestamp} from "../../utils/helper.js";
+import {deleteCashPaymentRequest, updateCashPaymentRequest} from "../../API.js";
 
-function CashPaymentRequests({ paymentRequests, users }) {
+function CashPaymentRequests({ cashPayments, setCashPayments, admin, users }) {
     const [selectedRequests, setSelectedRequests] = useState([]);
 
     // Handle checkbox selection
@@ -13,10 +15,10 @@ function CashPaymentRequests({ paymentRequests, users }) {
         }
     };
 
-    // Handle select all
+    // Handle selects all
     const handleSelectAll = (e) => {
         if (e.target.checked) {
-            setSelectedRequests(paymentRequests.filter(r => r.status === 'pending').map(r => r.id));
+            setSelectedRequests(cashPayments.filter(r => !r.paid).map(r => r.id));
         } else {
             setSelectedRequests([]);
         }
@@ -24,22 +26,47 @@ function CashPaymentRequests({ paymentRequests, users }) {
 
     // Handle batch operations
     const handleBatchOperation = (operation) => {
-        // This would call an API in a real app
-        console.log(`${operation} payment requests:`, selectedRequests);
-        // Reset selection after operation
+
         setSelectedRequests([]);
     };
 
     // Get username by ID
     const getUserName = (userId) => {
         const user = users.find(u => u.id === userId);
-        return user ? user.name : 'Unknown User';
+        return user ? user.name+" "+user.surname : 'Utente sconosciuto';
     };
 
-    // Handle single request operation
-    const handleRequestOperation = (requestId, operation) => {
-        // This would call an API in a real app
-        console.log(`${operation} payment request:`, requestId);
+    // Handle a single request operation
+    const handleRequestOperation = async (request, operation) => {
+        try {
+            const idToken = await admin.getIdToken();
+            switch (operation) {
+                case 'approve':
+                    await updateCashPaymentRequest(admin.uid, request.id, idToken, true);
+                    setCashPayments((prevCashPayments) =>
+                        prevCashPayments.map((payment) =>
+                            payment.id === request.id ? { ...payment, paid: true } : payment
+                        )
+                    );
+                    break;
+                case 'revoke':
+                    await updateCashPaymentRequest(admin.uid, request.id, idToken, false);
+                    setCashPayments((prevCashPayments) =>
+                        prevCashPayments.map((payment) =>
+                            payment.id === request.id ? { ...payment, paid: false } : payment
+                        )
+                    );
+                    break;
+                case 'delete':
+                    await deleteCashPaymentRequest(request.id);
+                    setCashPayments((prevCashPayments) =>
+                        prevCashPayments.filter((payment) => payment.id !== request.id)
+                    );
+                    break;
+            }
+        } catch (e) {
+            console.error(e);
+        }
     };
 
     return (
@@ -75,23 +102,21 @@ function CashPaymentRequests({ paymentRequests, users }) {
                                 <Form.Check
                                     type="checkbox"
                                     onChange={handleSelectAll}
-                                    checked={selectedRequests.length === paymentRequests.filter(r => r.status === 'pending').length && paymentRequests.length > 0}
+                                    checked={selectedRequests.length === cashPayments.filter(r => !r.paid).length && cashPayments.length > 0}
                                 />
                             </th>
-                            <th>ID</th>
-                            <th>User</th>
-                            <th>Amount</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th>Utente</th>
+                            <th>Data</th>
+                            <th>Stato</th>
+                            <th>Operazioni</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {paymentRequests.length > 0 ? (
-                            paymentRequests.map(request => (
+                        {cashPayments.length > 0 ? (
+                            cashPayments.map(request => (
                                 <tr key={request.id}>
                                     <td>
-                                        {request.status === 'pending' && (
+                                        {!request.paid && (
                                             <Form.Check
                                                 type="checkbox"
                                                 checked={selectedRequests.includes(request.id)}
@@ -99,53 +124,54 @@ function CashPaymentRequests({ paymentRequests, users }) {
                                             />
                                         )}
                                     </td>
-                                    <td>{request.id}</td>
-                                    <td>{getUserName(request.userId)}</td>
-                                    <td>${request.amount.toFixed(2)}</td>
-                                    <td>{request.date}</td>
+                                    <td>{getUserName(request.id)}</td>
+                                    <td>{formatFirebaseTimestamp(request.requestDate)}</td>
                                     <td>
                                         <Badge bg={
-                                            request.status === 'pending' ? 'warning' :
-                                                request.status === 'approved' ? 'success' : 'danger'
+                                            request.paid ? 'success' : 'danger'
                                         }>
-                                            {request.status}
+                                            {request.paid ? 'Pagato' : 'Non pagato'}
                                         </Badge>
                                     </td>
                                     <td>
-                                        {request.status === 'pending' && (
+                                        {!request.paid && (
                                             <>
                                                 <Button
                                                     variant="outline-success"
                                                     size="sm"
                                                     className="me-1"
-                                                    onClick={() => handleRequestOperation(request.id, 'approve')}
+                                                    onClick={() => handleRequestOperation(request, 'approve')}
                                                 >
-                                                    Approve
+                                                    Approva
                                                 </Button>
                                                 <Button
                                                     variant="outline-danger"
                                                     size="sm"
-                                                    onClick={() => handleRequestOperation(request.id, 'reject')}
+                                                    onClick={() => handleRequestOperation(request, 'delete')}
                                                 >
-                                                    Reject
+                                                    Cancella
                                                 </Button>
                                             </>
                                         )}
-                                        {request.status !== 'pending' && (
-                                            <Button
-                                                variant="outline-secondary"
-                                                size="sm"
-                                                onClick={() => handleRequestOperation(request.id, 'details')}
-                                            >
-                                                Details
-                                            </Button>
+                                        {request.paid && (
+                                            <>
+                                                <Button
+                                                    variant="outline-danger"
+                                                    size="sm"
+                                                    onClick={() => handleRequestOperation(request, 'revoke')}
+                                                >
+                                                    Revoca
+                                                </Button>
+                                            </>
                                         )}
                                     </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="7" className="text-center">No payment requests found</td>
+                                <td colSpan="7" className="text-center">
+                                    Non ci sono richieste di pagamento cash
+                                </td>
                             </tr>
                         )}
                         </tbody>

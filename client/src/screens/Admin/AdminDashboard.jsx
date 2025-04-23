@@ -9,7 +9,7 @@ import AllPayments from './AllPayments';
 import SupportSection from './SupportSection';
 import UserEditModal from './UserEditModal';
 import { List } from 'react-bootstrap-icons';
-import {getAllUsers} from "../../API.js";
+import {getAllCashPaymentRequests, getAllUsers} from "../../API.js";
 import {UserContext} from "../Contexts/UserContext.jsx";
 import { debounce } from 'lodash';
 
@@ -21,6 +21,7 @@ function AdminDashboard() {
     const [currentUser, setCurrentUser] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
     const [users, setUsers] = useState([]);
+    const [cashPayments, setCashPayments] = useState([]);
 
     useEffect(() => {
         const checkMobile = () => {
@@ -53,8 +54,21 @@ function AdminDashboard() {
             }
         };
 
+        const fetchCashPayments = async () => {
+            try {
+                const token = await user.getIdToken();
+                const data = await getAllCashPaymentRequests(user.uid, token);
+                if (data.success) {
+                    setCashPayments(data.message);
+                }
+            }catch (error) {
+                console.error("Error fetching cash payments:", error);
+            }
+        }
+
         if (user) {
             fetchUsers();
+            fetchCashPayments();
         }
     }, [user]);
 
@@ -65,18 +79,6 @@ function AdminDashboard() {
             )
         );
     };
-
-    const paymentRequests = [
-        { id: 101, userId: 2, amount: 150.00, status: 'pending', date: '2024-04-15' },
-        { id: 102, userId: 1, amount: 75.50, status: 'approved', date: '2024-04-12' },
-        { id: 103, userId: 3, amount: 200.00, status: 'rejected', date: '2024-04-10' },
-    ];
-
-    const allPayments = [
-        { id: 501, userId: 1, amount: 99.00, method: 'credit', status: 'completed', date: '2024-04-01' },
-        { id: 502, userId: 2, amount: 150.00, method: 'bank', status: 'completed', date: '2024-03-28' },
-        { id: 503, userId: 3, amount: 49.99, method: 'credit', status: 'refunded', date: '2024-03-15' },
-    ];
 
     const supportTickets = [
         { id: 201, userId: 3, subject: 'Cannot access account', status: 'open', date: '2024-04-16' },
@@ -100,9 +102,9 @@ function AdminDashboard() {
             case 'ranking':
                 return <UserRanking users={users} />;
             case 'cashRequests':
-                return <CashPaymentRequests paymentRequests={paymentRequests} users={users} />;
+                return <CashPaymentRequests admin={user} cashPayments={cashPayments} setCashPayments={setCashPayments} users={users} />;
             case 'allPayments':
-                return <AllPayments payments={allPayments} users={users} />;
+                return <AllPayments users={users} />;
             case 'support':
                 return <SupportSection tickets={supportTickets} users={users} />;
             default:
