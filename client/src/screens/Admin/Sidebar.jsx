@@ -6,7 +6,7 @@ import {
     Award,
     CreditCard2Front,
     CashCoin,
-    Headset
+    Headset, Key
 } from 'react-bootstrap-icons';
 import {logout} from "../../utils/auth.js";
 
@@ -29,42 +29,50 @@ function Sidebar({ activeTab, setActiveTab, toggleSidebar, expanded, isMobile })
                 <Nav.Link
                     className={`d-flex align-items-center ${activeTab === 'users' ? 'active bg-primary text-white' : 'text-white'}`}
                     onClick={() => setActiveTab('users')}
-                    title="Registered Users"
+                    title="Utenti Registrati"
                 >
                     <People className={expanded ? "me-2" : "mx-auto"} size={expanded ? 16 : 20} />
-                    {expanded && <span>Registered Users</span>}
+                    {expanded && <span>Utenti Registrati</span>}
                 </Nav.Link>
                 <Nav.Link
                     className={`d-flex align-items-center ${activeTab === 'ranking' ? 'active bg-primary text-white' : 'text-white'}`}
                     onClick={() => setActiveTab('ranking')}
-                    title="User Ranking"
+                    title="Classifica Utenti"
                 >
                     <Award className={expanded ? "me-2" : "mx-auto"} size={expanded ? 16 : 20} />
-                    {expanded && <span>User Ranking</span>}
+                    {expanded && <span>Classifica Utenti</span>}
                 </Nav.Link>
                 <Nav.Link
                     className={`d-flex align-items-center ${activeTab === 'cashRequests' ? 'active bg-primary text-white' : 'text-white'}`}
                     onClick={() => setActiveTab('cashRequests')}
-                    title="Cash Payment Requests"
+                    title="Richieste Pagamento Cash"
                 >
                     <CashCoin className={expanded ? "me-2" : "mx-auto"} size={expanded ? 16 : 20} />
-                    {expanded && <span>Cash Payment Requests</span>}
+                    {expanded && <span>Richieste Pagamento Cash</span>}
                 </Nav.Link>
                 <Nav.Link
                     className={`d-flex align-items-center ${activeTab === 'allPayments' ? 'active bg-primary text-white' : 'text-white'}`}
                     onClick={() => setActiveTab('allPayments')}
-                    title="All Payments"
+                    title="Tutti i Pagamenti"
                 >
                     <CreditCard2Front className={expanded ? "me-2" : "mx-auto"} size={expanded ? 16 : 20} />
-                    {expanded && <span>All Payments</span>}
+                    {expanded && <span>Tutti i Pagamenti</span>}
                 </Nav.Link>
                 <Nav.Link
                     className={`d-flex align-items-center ${activeTab === 'support' ? 'active bg-primary text-white' : 'text-white'}`}
                     onClick={() => setActiveTab('support')}
-                    title="Support Section"
+                    title="Supporto"
                 >
                     <Headset className={expanded ? "me-2" : "mx-auto"} size={expanded ? 16 : 20} />
-                    {expanded && <span>Support Section</span>}
+                    {expanded && <span>Supporto</span>}
+                </Nav.Link>
+                <Nav.Link
+                    className={`d-flex align-items-center ${activeTab === 'newAdmin' ? 'active bg-primary text-white' : 'text-white'}`}
+                    onClick={() => setActiveTab('newAdmin')}
+                    title="Aggiungi Admin"
+                >
+                    <Key className={expanded ? "me-2" : "mx-auto"} size={expanded ? 16 : 20} />
+                    {expanded && <span>Aggiungi Admin</span>}
                 </Nav.Link>
             </Nav>
 

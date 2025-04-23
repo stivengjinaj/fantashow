@@ -12,6 +12,7 @@ import { List } from 'react-bootstrap-icons';
 import {getAllCashPaymentRequests, getAllUsers, getSupportTickets} from "../../API.js";
 import {UserContext} from "../Contexts/UserContext.jsx";
 import { debounce } from 'lodash';
+import NewAdmin from "./NewAdmin.jsx";
 
 function AdminDashboard() {
     const { user } = useContext(UserContext);
@@ -133,6 +134,8 @@ function AdminDashboard() {
                     setTickets={setSupportTickets}
                     users={users}
                 />;
+            case 'newAdmin':
+                return <NewAdmin admin={user} />
             default:
                 return <div>Seleziona una scheda dal menu a sinistra.</div>;
         }
