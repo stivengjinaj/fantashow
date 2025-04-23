@@ -245,7 +245,7 @@ const registerCashPaymentRequest = async (uid) => {
     }
 }
 
-const updateCashPaymentRequest = async (adminUid, cashId, idToken, paid) => {
+const updateCashPaymentRequest = async (adminUid, paymentIds, idToken, paid) => {
     try {
         const response = await fetch(`${remoteURL}/api/cash-payment/${adminUid}`, {
             method: "PATCH",
@@ -253,13 +253,36 @@ const updateCashPaymentRequest = async (adminUid, cashId, idToken, paid) => {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${idToken}`,
             },
-            body: JSON.stringify({ cashId, paid })
+            body: JSON.stringify({ cashId: paymentIds, paid })
         })
 
         const data = await response.json();
 
         if (!response.ok) {
             throw new Error(data.error || "Failed to update cash payment request");
+        }
+
+        return { success: true, message: data.message };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
+const updateCashPaymentList = async (adminUid, paymentIds, idToken, paid) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/cash-payment/all/${adminUid}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({ paid, paymentIds })
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to update all cash payment requests");
         }
 
         return { success: true, message: data.message };
@@ -434,6 +457,7 @@ export {
     getAllCashPaymentRequests,
     registerCashPaymentRequest,
     updateCashPaymentRequest,
+    updateCashPaymentList,
     deleteCashPaymentRequest,
     sendSupportRequest,
     checkReferral,

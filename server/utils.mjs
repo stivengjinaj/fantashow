@@ -36,6 +36,7 @@ export const verifyToken = async (req, res, next) => {
         req.user = await admin.auth().verifyIdToken(idToken);
         next();
     } catch (error) {
+        console.log(error);
         return res.status(403).json({ error: "Invalid or expired token" });
     }
 };
@@ -119,7 +120,6 @@ export const verifyPayment = async (req, res, next) => {
  */
 export const verifyAdmin = async (req, res, next) => {
     const uid = req.user?.uid;
-
     if (!uid) {
         return res.status(400).json({ error: "UID is required" });
     }
@@ -136,7 +136,6 @@ export const verifyAdmin = async (req, res, next) => {
         if (!userData.isAdmin) {
             return res.status(403).json({ error: "Forbidden. User is not an admin." });
         }
-
         next();
     } catch (error) {
         return res.status(500).json({ error: "Internal Server Error" });

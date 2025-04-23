@@ -175,6 +175,36 @@ paymentRoutes.post("/api/cash-payment", async (req, res) => {
     }
 });
 
+/**
+ * @route PATCH /api/cash-payment/:uid
+ * @description Updates the paid status of a cash payment request for a user.
+ * @param {string} req.body.cashId - The ID of the cash payment request to be updated.
+ * @param {boolean} req.body.paid - The new paid status of the cash payment request.
+ * @returns {object} - JSON response indicating the success or failure of the operation.
+ * @returns {200} - If the cash payment request is updated successfully.
+ * @returns {400} - If the cashId or paid status is missing from the request.
+ * @returns {404} - If the cash payment request is not found.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request:
+ * PATCH /api/cash-payment/12345
+ * Body:
+ * {
+ *   "cashId": "12345",
+ *   "paid": true
+ * }
+ *
+ * Response (Success):
+ * {
+ *   "message": "Cash payment request updated successfully"
+ * }
+ *
+ * Response (Not Found):
+ * {
+ *   "error": "Cash payment request not found"
+ * }
+ */
 paymentRoutes.patch("/api/cash-payment/:uid", verifyToken, verifyAdmin, async (req, res) => {
     try {
         const { cashId, paid } = req.body;
@@ -194,12 +224,79 @@ paymentRoutes.patch("/api/cash-payment/:uid", verifyToken, verifyAdmin, async (r
             return res.status(404).json({ error: "Cash payment request not found" });
         }
 
-        await cashPaymentRef.update({ paid });
+        const cashPaymentData = cashPaymentDoc.data();
 
-        return res.status(200).json({ message: "Cash payment request updated successfully" });
+        const batch = db.batch();
+
+        batch.update(cashPaymentRef, { paid });
+
+        const userRef = db.collection("users").doc(cashId);
+        batch.update(userRef, { paid });
+
+        await batch.commit();
+
+        return res.status(200).json({
+            message: "Cash payment request and user status updated successfully"
+        });
+    } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+/**
+ * @route PATCH /api/cash-payment/all/:uid
+ * @description Updates the paid status of multiple cash payment requests for a user.
+ * @param {string} req.params.uid - The UID of the user whose cash payment requests are to be updated.
+ * @param {boolean} req.body.paid - The new paid status to be applied to the selected cash payment requests.
+ * @param {string[]} req.body.paymentIds - An array of payment IDs to be updated.
+ * @returns {object} - JSON response indicating the success or failure of the operation.
+ * @returns {200} - If the cash payment requests are updated successfully.
+ * @returns {400} - If the UID, paid status, or payment IDs array is missing or invalid.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request:
+ * PATCH /api/cash-payment/all/12345
+ * Body:
+ * {
+ *   "paid": true,
+ *   "paymentIds": ["payment1", "payment2", "payment3"]
+ * }
+ *
+ * Response (Success):
+ * {
+ *   "message": "Selected cash payment requests updated successfully"
+ * }
+ */
+paymentRoutes.patch("/api/cash-payment/all/:uid", verifyToken, verifyAdmin, async (req, res) => {
+    try {
+        const {uid} = req.params;
+        const {paid, paymentIds} = req.body;
+        console.log(paymentIds);
+        if (!uid) {
+            return res.status(400).json({error: "UID is required"});
+        }
+
+        if (paid === undefined) {
+            return res.status(400).json({error: "Paid status is required"});
+        }
+
+        if (!paymentIds || !Array.isArray(paymentIds) || paymentIds.length === 0) {
+            return res.status(400).json({error: "Payment IDs array is required"});
+        }
+
+        const batch = db.batch();
+        paymentIds.forEach((paymentId) => {
+            const cashPaymentRef = db.collection("cash_payments").doc(paymentId);
+            batch.update(cashPaymentRef, {paid});
+        });
+
+        await batch.commit();
+
+        return res.status(200).json({message: "Selected cash payment requests updated successfully"});
     } catch (error) {
         console.error("Error updating cash payment request:", error);
-        return res.status(500).json({ error: "Internal Server Error" });
+        return res.status(500).json({error: "Internal Server Error"});
     }
 })
 
