@@ -1,33 +1,37 @@
-import React, { useState } from 'react';
-import { Card, Table, Form, Button, Badge, Modal } from 'react-bootstrap';
+import React, {useMemo, useState} from 'react';
+import { Card, Table, Form, Button, Badge } from 'react-bootstrap';
+import {capitalizeString, formatFirebaseTimestamp} from "../../utils/helper.js";
+import {updateTicketStatus} from "../../API.js";
 
-function SupportSection({ tickets, users }) {
+function SupportSection({ admin, tickets, setTickets }) {
     const [statusFilter, setStatusFilter] = useState('all');
-    const [showTicketModal, setShowTicketModal] = useState(false);
-    const [selectedTicket, setSelectedTicket] = useState(null);
 
-    // Filter tickets by status
-    const filteredTickets = statusFilter === 'all'
-        ? tickets
-        : tickets.filter(ticket => ticket.status === statusFilter);
+        const filteredTickets = useMemo(() => {
+            return statusFilter === 'all'
+                ? tickets
+                : statusFilter === "open"
+                    ? tickets.filter(ticket => !ticket.solved)
+                    : tickets.filter(ticket => ticket.solved);
+        }, [statusFilter, tickets]);
 
-    // Get username by ID
-    const getUserName = (userId) => {
-        const user = users.find(u => u.id === userId);
-        return user ? user.name : 'Unknown User';
+    const handleStatusChange = async (tickedId, newStatus) => {
+        const idToken = await admin.getIdToken();
+        try {
+            const response = await updateTicketStatus(admin.uid, idToken, tickedId, newStatus);
+            if(response.success){
+                handleTicketUpdates(tickedId, newStatus);
+            }
+        }catch (error) {
+            console.log("Error changing ticket status: ", error);
+        }
     };
 
-    // Handle ticket click for details
-    const handleViewTicket = (ticket) => {
-        setSelectedTicket(ticket);
-        setShowTicketModal(true);
-    };
-
-    // Handle ticket status change
-    const handleStatusChange = (newStatus) => {
-        // This would call an API in a real app
-        console.log(`Change ticket ${selectedTicket.id} status to ${newStatus}`);
-        setShowTicketModal(false);
+    const handleTicketUpdates = (ticketId, newStatus) => {
+        setTickets(prevTickets =>
+            prevTickets.map(ticket =>
+                ticket.id === ticketId ? { ...ticket, solved: newStatus } : ticket
+            )
+        );
     };
 
     return (
@@ -40,10 +44,9 @@ function SupportSection({ tickets, users }) {
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
                     >
-                        <option value="all">All Status</option>
-                        <option value="open">Open</option>
-                        <option value="in progress">In Progress</option>
-                        <option value="closed">Closed</option>
+                        <option value="all">Tutti</option>
+                        <option value="open">Aperto</option>
+                        <option value="responded">Risposto</option>
                     </Form.Select>
                 </Card.Header>
                 <Card.Body>
@@ -51,44 +54,51 @@ function SupportSection({ tickets, users }) {
                         <Table hover>
                             <thead>
                             <tr>
-                                <th>Ticket ID</th>
-                                <th>User</th>
-                                <th>Subject</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Actions</th>
+                                <th>Modalità supporto</th>
+                                <th>Contatto</th>
+                                <th>Stato</th>
+                                <th>Data</th>
+                                <th>Operazioni</th>
                             </tr>
                             </thead>
                             <tbody>
                             {filteredTickets.length > 0 ? (
                                 filteredTickets.map(ticket => (
                                     <tr key={ticket.id}>
-                                        <td>{ticket.id}</td>
-                                        <td>{getUserName(ticket.userId)}</td>
-                                        <td>{ticket.subject}</td>
+                                        <td>{capitalizeString(ticket.supportMode)}</td>
+                                        <td>{
+                                            ticket.supportMode.toString().toLowerCase() === "telegram"
+                                                ? ticket.telegram
+                                                : ticket.supportMode.toString().toLowerCase() === "email"
+                                                    ? `(${ticket.name}): ${ticket.email}`
+                                                    : "Sconosciuto"
+
+                                        }</td>
                                         <td>
                                             <Badge bg={
-                                                ticket.status === 'open' ? 'danger' :
-                                                    ticket.status === 'in progress' ? 'warning' : 'success'
+                                                ticket.solved ? 'success' : 'warning'
                                             }>
-                                                {ticket.status}
+                                                {ticket.solved ? "Risposto" : "Aperto"}
                                             </Badge>
                                         </td>
-                                        <td>{ticket.date}</td>
+                                        <td>{formatFirebaseTimestamp(ticket.createdAt)}</td>
                                         <td>
                                             <Button
-                                                variant="outline-primary"
+                                                variant="outline-success"
                                                 size="sm"
-                                                onClick={() => handleViewTicket(ticket)}
+                                                onClick={() => handleStatusChange(ticket.id, true)}
+                                                disabled={ticket.solved}
                                             >
-                                                View Details
+                                                Risposto
                                             </Button>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="text-center">No tickets found</td>
+                                    <td colSpan="6" className="text-center">
+                                        Nessun ticket trovato.
+                                    </td>
                                 </tr>
                             )}
                             </tbody>
@@ -96,80 +106,6 @@ function SupportSection({ tickets, users }) {
                     </div>
                 </Card.Body>
             </Card>
-
-            {/* Ticket Details Modal */}
-            <Modal show={showTicketModal} onHide={() => setShowTicketModal(false)} size="lg">
-                <Modal.Header closeButton>
-                    <Modal.Title>Support Ticket Details</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {selectedTicket && (
-                        <div>
-                            <div className="d-flex justify-content-between mb-3">
-                                <div>
-                                    <h6>Ticket ID: {selectedTicket.id}</h6>
-                                    <p className="mb-1">
-                                        <strong>User:</strong> {getUserName(selectedTicket.userId)}
-                                    </p>
-                                    <p className="mb-1">
-                                        <strong>Date:</strong> {selectedTicket.date}
-                                    </p>
-                                    <p className="mb-1">
-                                        <strong>Status:</strong> {' '}
-                                        <Badge bg={
-                                            selectedTicket.status === 'open' ? 'danger' :
-                                                selectedTicket.status === 'in progress' ? 'warning' : 'success'
-                                        }>
-                                            {selectedTicket.status}
-                                        </Badge>
-                                    </p>
-                                </div>
-                                <div>
-                                    <Form.Group>
-                                        <Form.Label>Change Status</Form.Label>
-                                        <Form.Select
-                                            defaultValue={selectedTicket.status}
-                                            onChange={(e) => handleStatusChange(e.target.value)}
-                                        >
-                                            <option value="open">Open</option>
-                                            <option value="in progress">In Progress</option>
-                                            <option value="closed">Closed</option>
-                                        </Form.Select>
-                                    </Form.Group>
-                                </div>
-                            </div>
-
-                            <h5>Subject: {selectedTicket.subject}</h5>
-                            <hr />
-
-                            <div className="bg-light p-3 rounded mb-3">
-                                <h6>Ticket Message:</h6>
-                                <p>
-                                    {/* This would be the ticket message content */}
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vitae enim vitae erat aliquam commodo.
-                                    Fusce at lorem nibh. Nullam tempus velit id velit euismod, ac volutpat est fringilla.
-                                </p>
-                            </div>
-
-                            {/* Reply section */}
-                            <h6>Reply to Ticket</h6>
-                            <Form>
-                                <Form.Group className="mb-3">
-                                    <Form.Control as="textarea" rows={3} placeholder="Type your response here..." />
-                                </Form.Group>
-                                <Button variant="primary">
-                                    Send Reply
-                                </Button>
-                            </Form>
-                        </div>
-                    )}
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowTicketModal(false)}>
-                        Close
-                    </Button>
-                </Modal.Footer>
-            </Modal>
         </>
     );
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { Row, Col, Card } from 'react-bootstrap';
 import { PeopleFill, PersonCheckFill, ClockFill, ExclamationCircleFill } from 'react-bootstrap-icons';
 
-function DashboardSummary({ totalUsers, paidUsers, pendingUsers, openTickets }) {
+function DashboardSummary({ totalUsers, paidUsers, notPaidUsers, openTickets }) {
     return (
         <Row className="g-3 mb-4">
             <Col sm={6} md={3}>
@@ -41,7 +41,7 @@ function DashboardSummary({ totalUsers, paidUsers, pendingUsers, openTickets }) 
                         </div>
                         <div>
                             <h6 className="mb-0">Non pagato</h6>
-                            <h3 className="mb-0">{pendingUsers}</h3>
+                            <h3 className="mb-0">{notPaidUsers}</h3>
                         </div>
                     </Card.Body>
                 </Card>

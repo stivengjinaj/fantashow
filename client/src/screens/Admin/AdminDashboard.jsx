@@ -9,7 +9,7 @@ import AllPayments from './AllPayments';
 import SupportSection from './SupportSection';
 import UserEditModal from './UserEditModal';
 import { List } from 'react-bootstrap-icons';
-import {getAllCashPaymentRequests, getAllUsers} from "../../API.js";
+import {getAllCashPaymentRequests, getAllUsers, getSupportTickets} from "../../API.js";
 import {UserContext} from "../Contexts/UserContext.jsx";
 import { debounce } from 'lodash';
 
@@ -22,6 +22,7 @@ function AdminDashboard() {
     const [isMobile, setIsMobile] = useState(false);
     const [users, setUsers] = useState([]);
     const [cashPayments, setCashPayments] = useState([]);
+    const [supportTickets, setSupportTickets] = useState([]);
 
     useEffect(() => {
         const checkMobile = () => {
@@ -66,9 +67,22 @@ function AdminDashboard() {
             }
         }
 
+        const fetchSupportTickets = async () => {
+            try {
+                const token = await user.getIdToken();
+                const data = await getSupportTickets(user.uid, token);
+                if (data.success) {
+                    setSupportTickets(data.message);
+                }
+            } catch (error) {
+                console.error("Error fetching support tickets:", error);
+            }
+        }
+
         if (user) {
             fetchUsers();
             fetchCashPayments();
+            fetchSupportTickets();
         }
     }, [user]);
 
@@ -79,12 +93,6 @@ function AdminDashboard() {
             )
         );
     };
-
-    const supportTickets = [
-        { id: 201, userId: 3, subject: 'Cannot access account', status: 'open', date: '2024-04-16' },
-        { id: 202, userId: 1, subject: 'Payment not showing up', status: 'in progress', date: '2024-04-14' },
-        { id: 203, userId: 2, subject: 'How to withdraw funds', status: 'closed', date: '2024-04-10' },
-    ];
 
     const handleEditUser = (user) => {
         setCurrentUser(user);
@@ -98,9 +106,14 @@ function AdminDashboard() {
     const renderContent = () => {
         switch(activeTab) {
             case 'users':
-                return <RegisteredUsers users={users} onEditUser={handleEditUser} />;
+                return <RegisteredUsers
+                    users={users}
+                    onEditUser={handleEditUser}
+                />;
             case 'ranking':
-                return <UserRanking users={users} />;
+                return <UserRanking
+                    users={users}
+                />;
             case 'cashRequests':
                 return <CashPaymentRequests
                     admin={user}
@@ -110,11 +123,18 @@ function AdminDashboard() {
                     users={users}
                 />;
             case 'allPayments':
-                return <AllPayments users={users} />;
+                return <AllPayments
+                    users={users}
+                />;
             case 'support':
-                return <SupportSection tickets={supportTickets} users={users} />;
+                return <SupportSection
+                    admin={user}
+                    tickets={supportTickets}
+                    setTickets={setSupportTickets}
+                    users={users}
+                />;
             default:
-                return <div>Select a section from the sidebar</div>;
+                return <div>Seleziona una scheda dal menu a sinistra.</div>;
         }
     };
 
@@ -205,8 +225,8 @@ function AdminDashboard() {
                     <DashboardSummary
                         totalUsers={users.length}
                         paidUsers={users.filter(u => u.paid).length}
-                        pendingUsers={users.filter(p => !p.paid).length}
-                        openTickets={supportTickets.filter(t => t.status === 'open').length}
+                        notPaidUsers={users.filter(p => !p.paid).length}
+                        openTickets={supportTickets.filter(t => !t.solved).length}
                     />
 
                     {/* Main Content Based on Active Tab */}
