@@ -224,8 +224,6 @@ paymentRoutes.patch("/api/cash-payment/:uid", verifyToken, verifyAdmin, async (r
             return res.status(404).json({ error: "Cash payment request not found" });
         }
 
-        const cashPaymentData = cashPaymentDoc.data();
-
         const batch = db.batch();
 
         batch.update(cashPaymentRef, { paid });
