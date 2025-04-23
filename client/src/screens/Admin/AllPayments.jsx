@@ -143,7 +143,6 @@ function AllPayments({ users }) {
                             <th>Utente</th>
                             <th>Stato</th>
                             <th>Data</th>
-                            <th>Operazioni</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -158,15 +157,6 @@ function AllPayments({ users }) {
                                         </Badge>
                                     </td>
                                     <td>{formatFirebaseTimestamp(user.paymentDate)}</td>
-                                    <td>
-                                        <Button
-                                            variant="outline-secondary"
-                                            size="sm"
-                                            onClick={() => console.log(`View user details: ${user.id}`)}
-                                        >
-                                            Details
-                                        </Button>
-                                    </td>
                                 </tr>
                             ))
                         ) : (
