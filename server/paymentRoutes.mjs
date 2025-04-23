@@ -1,7 +1,7 @@
 import express from "express";
 import admin from "firebase-admin";
 import dotenv from "dotenv";
-import {verifyToken} from "./utils.mjs";
+import {verifyAdmin, verifyToken} from "./utils.mjs";
 
 dotenv.config();
 
@@ -174,6 +174,34 @@ paymentRoutes.post("/api/cash-payment", async (req, res) => {
         return res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+paymentRoutes.patch("/api/cash-payment/:uid", verifyToken, verifyAdmin, async (req, res) => {
+    try {
+        const { cashId, paid } = req.body;
+
+        if (!cashId) {
+            return res.status(400).json({ error: "UID is required" });
+        }
+
+        if (paid === undefined) {
+            return res.status(400).json({ error: "Paid status is required" });
+        }
+
+        const cashPaymentRef = db.collection("cash_payments").doc(cashId);
+        const cashPaymentDoc = await cashPaymentRef.get();
+
+        if (!cashPaymentDoc.exists) {
+            return res.status(404).json({ error: "Cash payment request not found" });
+        }
+
+        await cashPaymentRef.update({ paid });
+
+        return res.status(200).json({ message: "Cash payment request updated successfully" });
+    } catch (error) {
+        console.error("Error updating cash payment request:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+})
 
 
 /**

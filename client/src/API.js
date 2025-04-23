@@ -201,6 +201,28 @@ const checkCashPaymentRequest = async (uid, idToken) => {
     }
 }
 
+const getAllCashPaymentRequests = async (uid, idToken) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/admin/cash-payments/${uid}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            }
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to get all cash payment requests");
+        }
+
+        return { success: true, message: data.cashPayments };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
 const registerCashPaymentRequest = async (uid) => {
     try {
         const response = await fetch(`${remoteURL}/api/cash-payment/`, {
@@ -215,6 +237,29 @@ const registerCashPaymentRequest = async (uid) => {
 
         if (!response.ok) {
             throw new Error(data.error || "Failed to register cash payment request");
+        }
+
+        return { success: true, message: data.message };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
+const updateCashPaymentRequest = async (adminUid, cashId, idToken, paid) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/cash-payment/${adminUid}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({ cashId, paid })
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to update cash payment request");
         }
 
         return { success: true, message: data.message };
@@ -386,7 +431,9 @@ export {
     getLastLogin,
     updateLastLogin,
     insertTransactionId,
+    getAllCashPaymentRequests,
     registerCashPaymentRequest,
+    updateCashPaymentRequest,
     deleteCashPaymentRequest,
     sendSupportRequest,
     checkReferral,

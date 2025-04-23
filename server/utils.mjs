@@ -98,7 +98,6 @@ export const verifyPayment = async (req, res, next) => {
  * @param {function} next - The next middleware function to call if the user is an admin.
  * @returns {object} - JSON response with an error message if the user is not an admin or if an error occurs.
  * @returns {400} - If the UUID is missing from the request parameters.
- * @returns {404} - If the user is not found in the database.
  * @returns {403} - If the user is not an admin.
  * @returns {500} - If an internal server error occurs.
  * @async
@@ -129,7 +128,7 @@ export const verifyAdmin = async (req, res, next) => {
         const userDoc = await db.collection("users").doc(uid).get();
 
         if (!userDoc.exists) {
-            return res.status(404).json({ error: "No admin found" });
+            return res.status(403).json({ error: "Forbidden. User is not an admin." });
         }
 
         const userData = userDoc.data();

@@ -291,5 +291,61 @@ adminRoutes.patch("/api/admin/edit-user/:uid", verifyToken, verifyAdmin, async (
 });
 
 
+/**
+ * @route GET /api/addmin/cash-payments/:uid
+ * @description Retrieves all cash payment requests from the database.
+ * @access Protected - Requires valid token and admin privileges.
+ * @returns {object} - JSON response containing a list of cash payment requests.
+ * @returns {200} - If cash payment requests are retrieved successfully.
+ * @returns {400} - If the UID is missing from the request parameters.
+ * @returns {403} - If the user is not an admin.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Response (Success with data):
+ * {
+ *   "message": "Cash payment requests retrieved successfully",
+ *   "cashPayments": [
+ *     {
+ *       "id": "payment1",
+ *       "uid": "user1",
+ *       "amount": 100,
+ *       "paid": false
+ *     },
+ *     {
+ *       "id": "payment2",
+ *       "uid": "user2",
+ *       "amount": 200,
+ *       "paid": true
+ *     }
+ *   ]
+ * }
+ *
+ * Response (Success with no data):
+ * {
+ *   "cashPayments": []
+ * }
+ */
+adminRoutes.get("/api/admin/cash-payments/:uid", verifyToken, verifyAdmin, async (req, res) => {
+    try {
+        const cashPaymentsRef = db.collection("cash_payments");
+        const snapshot = await cashPaymentsRef.get();
+
+        if (snapshot.empty) {
+            return res.status(200).json({ cashPayments: []});
+        }
+
+        const cashPayments = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        return res.status(200).json({ message: "Cash payment requests retrieved successfully", cashPayments });
+    } catch (error) {
+        console.error("Error retrieving cash payment requests:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+
 
 export default adminRoutes;
