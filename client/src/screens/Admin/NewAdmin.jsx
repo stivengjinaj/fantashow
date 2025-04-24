@@ -31,7 +31,7 @@ function NewAdmin({ admin }) {
 
         try {
             if (formData.password !== formData.confirmPassword) {
-                throw new Error('Passwords do not match');
+                throw new Error('Le password non coincidono.');
             }
 
             const idToken = await admin.getIdToken();
@@ -77,7 +77,7 @@ function NewAdmin({ admin }) {
 
                             <Form onSubmit={handleSubmit}>
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Nome</Form.Label>
+                                    <Form.Label column={"sm"}>Nome</Form.Label>
                                     <Form.Control
                                         type="text"
                                         name="name"
@@ -89,7 +89,7 @@ function NewAdmin({ admin }) {
                                 </Form.Group>
 
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Cognome</Form.Label>
+                                    <Form.Label column={"sm"}>Cognome</Form.Label>
                                     <Form.Control
                                         type="text"
                                         name="surname"
@@ -101,7 +101,7 @@ function NewAdmin({ admin }) {
                                 </Form.Group>
 
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Username</Form.Label>
+                                    <Form.Label column={"sm"}>Username</Form.Label>
                                     <Form.Control
                                         type="text"
                                         name="username"
@@ -113,7 +113,7 @@ function NewAdmin({ admin }) {
                                 </Form.Group>
 
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Email</Form.Label>
+                                    <Form.Label column={"sm"}>Email</Form.Label>
                                     <Form.Control
                                         type="email"
                                         name="email"
@@ -125,7 +125,7 @@ function NewAdmin({ admin }) {
                                 </Form.Group>
 
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Password</Form.Label>
+                                    <Form.Label column={"sm"}>Password</Form.Label>
                                     <Form.Control
                                         type="password"
                                         name="password"
@@ -137,7 +137,7 @@ function NewAdmin({ admin }) {
                                 </Form.Group>
 
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Conferma Password</Form.Label>
+                                    <Form.Label column={"sm"}>Conferma Password</Form.Label>
                                     <Form.Control
                                         type="password"
                                         name="confirmPassword"

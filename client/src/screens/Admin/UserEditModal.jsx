@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useContext} from 'react';
 import {UserContext} from "../Contexts/UserContext.jsx";
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
-import {formatFirebaseTimestamp} from "../../utils/helper.js";
+import {formatFirebaseTimestamp, mapStatus} from "../../utils/helper.js";
 import {adminEditUser} from "../../API.js";
 
 function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
@@ -10,6 +10,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
     const [formData, setFormData] = useState({
         id: '',
         name: '',
+        surname: '',
         email: '',
         cap: '',
         birthYear: '',
@@ -20,6 +21,8 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
         team: '',
         isAdmin: false,
         points: 0,
+        coins: 0,
+        status: 0,
         paid: false,
         createdAt: '',
     });
@@ -29,6 +32,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
             setFormData({
                 id: edittingUser.id || '',
                 name: edittingUser.name || '',
+                surname: edittingUser.surname || '',
                 email: edittingUser.email || '',
                 cap: edittingUser.cap || '',
                 birthYear: edittingUser.birthYear || '',
@@ -39,6 +43,8 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                 telegram: edittingUser.telegram || '',
                 isAdmin: edittingUser.isAdmin || false,
                 points: edittingUser.points || 0,
+                coins: edittingUser.coins || 0,
+                status: edittingUser.status || 0,
                 paid: edittingUser.paid || false,
                 createdAt: formatFirebaseTimestamp(edittingUser.createdAt),
             });
@@ -48,13 +54,12 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // Handle boolean values from select elements
         if (name === "admin") {
             setFormData(prev => ({
                 ...prev,
                 isAdmin: value === "true"
             }));
-        } else if (name === "status") {
+        } else if (name === "paid") {
             setFormData(prev => ({
                 ...prev,
                 paid: value === "true"
@@ -75,7 +80,9 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
             const updateData = {
                 id: formData.id,
                 name: formData.name,
-                points: parseInt(formData.points, 10) || 0,
+                points: parseInt(formData.points, 10) || formData.points,
+                coins: parseInt(formData.coins, 10) || formData.coins,
+                status: parseInt(formData.status, 10) || 0,
                 isAdmin: formData.isAdmin,
                 paid: formData.paid
             };
@@ -117,7 +124,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label column={2}>ID</Form.Label>
+                                        <Form.Label column={"sm"}>ID</Form.Label>
                                         <Form.Control
                                             type="text"
                                             value={formData.id}
@@ -127,11 +134,13 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label column={3}>Data registrazione</Form.Label>
+                                        <Form.Label column={"sm"}>Nome</Form.Label>
                                         <Form.Control
                                             type="text"
-                                            value={formData.createdAt}
-                                            disabled
+                                            name="name"
+                                            value={formData.name+" "+formData.surname}
+                                            onChange={handleChange}
+                                            required
                                         />
                                     </Form.Group>
                                 </Col>
@@ -139,19 +148,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label column={3}>Nome</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="name"
-                                            value={formData.name}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label column={3}>Email</Form.Label>
+                                        <Form.Label column={"sm"}>Email</Form.Label>
                                         <Form.Control
                                             type="email"
                                             name="email"
@@ -161,24 +158,11 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                         />
                                     </Form.Group>
                                 </Col>
-                            </Row>
-                            <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label column={3}>Punti</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            name="points"
-                                            value={formData.points}
-                                            onChange={handleChange}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label column={3}>Pagamento</Form.Label>
+                                        <Form.Label column={"sm"}>Pagamento</Form.Label>
                                         <Form.Select
-                                            name="status"
+                                            name="paid"
                                             value={formData.paid.toString()}
                                             onChange={handleChange}
                                         >
@@ -191,7 +175,31 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label column={3}>CAP</Form.Label>
+                                        <Form.Label column={"sm"}>Punti</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            name="points"
+                                            value={formData.points}
+                                            onChange={handleChange}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label column={"sm"}>Coin</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            name="coins"
+                                            value={formData.coins}
+                                            onChange={handleChange}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label column={"sm"}>CAP</Form.Label>
                                         <Form.Control
                                             name="cap"
                                             value={formData.cap}
@@ -202,7 +210,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label column={3}>Anno Nascita</Form.Label>
+                                        <Form.Label column={"sm"}>Anno Nascita</Form.Label>
                                         <Form.Control
                                             name="birthYear"
                                             value={formData.birthYear}
@@ -215,7 +223,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label column={3}>Telefono</Form.Label>
+                                        <Form.Label column={"sm"}>Telefono</Form.Label>
                                         <Form.Control
                                             name="phone"
                                             value={formData.phone}
@@ -226,7 +234,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label column={3}>Telegram</Form.Label>
+                                        <Form.Label column={"sm"}>Telegram</Form.Label>
                                         <Form.Control
                                             name="telegram"
                                             value={formData.telegram}
@@ -239,7 +247,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label column={3}>Referral</Form.Label>
+                                        <Form.Label column={"sm"}>Referral</Form.Label>
                                         <Form.Control
                                             name="referral"
                                             value={formData.referralCode}
@@ -250,7 +258,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label column={3}>Referred By</Form.Label>
+                                        <Form.Label column={"sm"}>Riferito da</Form.Label>
                                         <Form.Control
                                             name="referredBy"
                                             value={formData.referredBy}
@@ -263,7 +271,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label column={3}>Squadra</Form.Label>
+                                        <Form.Label column={"sm"}>Squadra</Form.Label>
                                         <Form.Control
                                             name="team"
                                             value={formData.team}
@@ -274,7 +282,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label column={3}>Admin</Form.Label>
+                                        <Form.Label column={"sm"}>Admin</Form.Label>
                                         <Form.Select
                                             name="admin"
                                             value={formData.isAdmin.toString()}
@@ -283,6 +291,35 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                             <option value="true">Si</option>
                                             <option value="false">No</option>
                                         </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label column={"sm"}>Data Registrazione</Form.Label>
+                                        <Form.Control
+                                            name="createdAt"
+                                            value={formData.createdAt}
+                                            onChange={handleChange}
+                                            disabled
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Group className="mb-3">
+                                            <Form.Label column={"sm"}>Status</Form.Label>
+                                            <Form.Select
+                                                name="status"
+                                                value={formData.status}
+                                                onChange={handleChange}
+                                            >
+                                                <option value="0">BASE</option>
+                                                <option value="1">AVANZATO</option>
+                                                <option value="2">PRO</option>
+                                            </Form.Select>
+                                        </Form.Group>
                                     </Form.Group>
                                 </Col>
                             </Row>

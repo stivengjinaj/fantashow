@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Table, Form, Button, Badge, InputGroup } from 'react-bootstrap';
 import { Search, PencilSquare, Trash, ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
-import {formatFirebaseTimestamp} from "../../utils/helper.js";
+import {formatFirebaseTimestamp, mapStatus} from "../../utils/helper.js";
 
 function RegisteredUsers({ users, onEditUser }) {
     const [searchTerm, setSearchTerm] = useState('');
@@ -63,7 +63,9 @@ function RegisteredUsers({ users, onEditUser }) {
                             <th>Utente</th>
                             <th>Email</th>
                             <th>Punti</th>
+                            <th>Coin</th>
                             <th>Stato</th>
+                            <th>Pagamento</th>
                             <th>Data Registrazione</th>
                             <th>Operazioni</th>
                         </tr>
@@ -75,6 +77,12 @@ function RegisteredUsers({ users, onEditUser }) {
                                     <td>{user.name+" "+user.surname}</td>
                                     <td>{user.email}</td>
                                     <td>{user.points}</td>
+                                    <td>{user.coins}</td>
+                                    <td>
+                                        <Badge bg={user.status === 0 ? 'secondary' : user.status === 1 ? 'info' : 'warning'}>
+                                            {mapStatus(user.status)}
+                                        </Badge>
+                                    </td>
                                     <td>
                                         <Badge bg={user.paid ? 'success' : 'danger'}>
                                             {user.paid ? "Pagato" : "Non pagato"}
