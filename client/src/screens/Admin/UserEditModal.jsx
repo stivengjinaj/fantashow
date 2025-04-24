@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useContext} from 'react';
 import {UserContext} from "../Contexts/UserContext.jsx";
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
-import {formatFirebaseTimestamp, mapStatus} from "../../utils/helper.js";
+import {formatFirebaseTimestamp} from "../../utils/helper.js";
 import {adminEditUser} from "../../API.js";
 
 function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
