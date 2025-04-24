@@ -45,3 +45,17 @@ export function capitalizeString(str) {
     if (!str) return str;
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export const mapStatus = (status) => {
+    const statusNumber = parseInt(status);
+    switch (statusNumber) {
+        case 0:
+            return "BASE"
+        case 1:
+            return "AVANZATO"
+        case 2:
+            return "PRO"
+        default:
+            return "BASE"
+    }
+}
