@@ -244,6 +244,7 @@ authenticationRoutes.post("/api/register", async (req, res) => {
             paid: false,
             points: 0,
             coins: 0,
+            status: 0,  // 0 -> base, 1 -> avanzato, 2 -> pro
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
         };
 
