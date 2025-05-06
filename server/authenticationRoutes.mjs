@@ -172,100 +172,111 @@ authenticationRoutes.post("/api/register", async (req, res) => {
 
         const annoNascitaNum = parseInt(annoNascita, 10);
 
-        // Checking if the request is being sent by a user who recently registered on firebase.
         if (!uid) {
             return res.status(403).json({ error: "Unauthorized request" });
         }
 
-        // Checking data validity.
         const existingUser = await db.collection("users").doc(uid).get();
         if (existingUser.exists) {
             return res.status(402).json({ error: "User already registered" });
         }
+
         if (!username || !email || !password || !nome || !cognome || !squadraDelCuore || !cellulare || !telegram) {
             return res.status(400).json({ error: "Missing required fields" });
         }
+
         if (annoNascita && (isNaN(annoNascitaNum) || annoNascitaNum < 1900 || annoNascitaNum > new Date().getFullYear())) {
             return res.status(400).json({ error: "Invalid birth year value" });
         }
+
         if (cap && (!/^\d{4,5}$/.test(cap))) {
             return res.status(400).json({ error: "Invalid postal code" });
         }
+
         if (cellulare && !/^\d{10,15}$/.test(cellulare.trim())) {
             return res.status(400).json({ error: "Invalid phone number format" });
         }
-
 
         const existingEmails = await db.collection("users").where("email", "==", email).get();
         if (!existingEmails.empty) {
             return res.status(400).json({ error: "Email already registered" });
         }
 
-        // Generate referral code
-        const referralCode = await generateReferralCode(nome);
+        await db.runTransaction(async (transaction) => {
+            let referrerId = null;
 
-        // Validate referral code
-        let referrerId = null;
-        if (referredBy) {
-            const referrerSnapshot = await db.collection("users")
-                .where("referralCode", "==", referredBy)
-                .limit(1)
-                .get();
+            if (referredBy) {
+                const referrerSnapshot = await db.collection("users")
+                    .where("referralCode", "==", referredBy)
+                    .limit(1)
+                    .get();
 
-            if (!referrerSnapshot.empty) {
+                if (referrerSnapshot.empty) {
+                    throw new Error("Invalid referral code");
+                }
+
                 const referrerDoc = referrerSnapshot.docs[0];
                 referrerId = referredBy;
-
-                // Reward referral points
-                await referrerDoc.ref.update({
-                    points: admin.firestore.FieldValue.increment(1),
+                const referrerData = referrerDoc.data();
+                const pointsToReferrer = referrerData.status === 0
+                    ? 50
+                    : referrerData.status === 1
+                        ? 75
+                        : 100
+                transaction.update(referrerDoc.ref, {
+                    points: admin.firestore.FieldValue.increment(pointsToReferrer),
                 });
             } else {
-                return res.status(401).json({ error: "Invalid referral code" });
+                throw new Error("Invalid referral code");
             }
-        }else {
-            return res.status(401).json({ error: "Invalid referral code" });
-        }
 
-        const newUser = {
-            username: username,
-            email: email,
-            name: nome,
-            surname: cognome,
-            birthYear: annoNascita,
-            cap: cap,
-            team: squadraDelCuore,
-            phone: cellulare,
-            telegram: telegram,
-            isAdmin: false,
-            referralCode: referralCode,
-            referredBy: referrerId,
-            verified: false,
-            paid: false,
-            points: 0,
-            coins: 0,
-            status: 0,  // 0 -> base, 1 -> avanzato, 2 -> pro
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        };
+            const referralCode = await generateReferralCode(nome);
 
-        const last_login = {
-            last_login: admin.firestore.FieldValue.serverTimestamp(),
-            last_streak_update: admin.firestore.FieldValue.serverTimestamp(),
-            streak: 1
-        };
+            const newUser = {
+                username,
+                email,
+                name: nome,
+                surname: cognome,
+                birthYear: annoNascitaNum,
+                cap,
+                favouriteTeam: squadraDelCuore,
+                team: "",
+                phone: cellulare,
+                telegram,
+                isAdmin: false,
+                referralCode,
+                referredBy: referrerId,
+                verified: false,
+                paid: false,
+                points: 0,
+                coins: 20,
+                status: 0, // 0 -> base, 1 -> avanzato, 2 -> pro
+                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            };
 
-        // Save user to Firestore
-        await db.collection("users").doc(uid).set(newUser);
-        await db.collection("last_login").doc(uid).set(last_login);
+            const last_login = {
+                last_login: admin.firestore.FieldValue.serverTimestamp(),
+                last_streak_update: admin.firestore.FieldValue.serverTimestamp(),
+                streak: 1,
+            };
+
+            const userRef = db.collection("users").doc(uid);
+            const loginRef = db.collection("last_login").doc(uid);
+
+            transaction.set(userRef, newUser);
+            transaction.set(loginRef, last_login);
+        });
 
         res.status(201).json({
             message: "User registered successfully",
             userId: uid,
-            referralCode: referralCode,
+            referralCode: referredBy,
         });
-
     } catch (error) {
         console.error("Error registering user:", error);
+        if (error.message === "Invalid referral code") {
+            return res.status(401).json({ error: "Invalid referral code" });
+        }
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
