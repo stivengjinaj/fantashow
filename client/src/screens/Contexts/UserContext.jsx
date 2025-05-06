@@ -25,11 +25,16 @@ export const UserProvider = ({ children }) => {
                         try {
                             const idToken = await currentUser.getIdToken();
                             const adminData = await getAdminData(currentUser.uid, idToken);
-                            setIsAdmin(adminData.message.isAdmin);
-                        } catch (error) {
-                            console.error("Error fetching admin status:", error);
+
+                            if (adminData.success) {
+                                setIsAdmin(adminData.message.isAdmin);
+                            } else {
+                                setIsAdmin(false);
+                            }
+                        } catch {
                             setIsAdmin(false);
                         }
+
                     } else {
                         await logout();
                         setUser(null);
