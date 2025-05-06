@@ -12,10 +12,14 @@ class ErrorBoundary extends React.Component {
         return { hasError: true };
     }
 
-    /*componentDidCatch(error, errorInfo) {
-        // You can also log the error to an error reporting service
-        logErrorToMyService(error, errorInfo);
-    }*/
+    /*
+    componentDidCatch(error, errorInfo) {
+        // Suppress console.error during error boundary fallback rendering
+        if (import.meta.env.MODE === 'production') {
+            console.error = () => {};
+        }
+    }
+    */
 
     render() {
         if (this.state.hasError) {
