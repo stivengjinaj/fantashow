@@ -214,18 +214,7 @@ authenticationRoutes.post("/api/register", async (req, res) => {
                 if (referrerSnapshot.empty) {
                     throw new Error("Invalid referral code");
                 }
-
-                const referrerDoc = referrerSnapshot.docs[0];
-                referrerId = referredBy;
-                const referrerData = referrerDoc.data();
-                const pointsToReferrer = referrerData.status === 0
-                    ? 50
-                    : referrerData.status === 1
-                        ? 75
-                        : 100
-                transaction.update(referrerDoc.ref, {
-                    points: admin.firestore.FieldValue.increment(pointsToReferrer),
-                });
+                referrerId = referrerSnapshot.docs[0].data().referralCode;
             } else {
                 throw new Error("Invalid referral code");
             }
@@ -249,7 +238,7 @@ authenticationRoutes.post("/api/register", async (req, res) => {
                 verified: false,
                 paid: false,
                 points: 0,
-                coins: 20,
+                coins: 0,
                 status: 0, // 0 -> base, 1 -> avanzato, 2 -> pro
                 createdAt: admin.firestore.FieldValue.serverTimestamp(),
             };
