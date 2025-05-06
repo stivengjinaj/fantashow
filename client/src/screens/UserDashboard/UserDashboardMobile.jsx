@@ -37,7 +37,8 @@ function UserDashboardMobile({ userData }) {
                     <Row className="w-100 mb-2" style={{ height: "100%" }}>
                         <Col xs={6} className="d-flex flex-column justify-content-evenly">
                             <h4 className="text-center fw-bold mb-2" style={{color: "#ed8101"}}>Fantashow</h4>
-                            <h3 className="text-light text-center fw-bold mb-2">{userData.name}</h3>
+                            <h3 className="text-light text-center fw-bold mb-1">{userData.name}</h3>
+                            <h4 className="text-light text-center fw-bold mb-1">{userData.favouriteTeam}</h4>
                             <div className="text-center">
                                 <Button
                                     onClick={handleCopy}
