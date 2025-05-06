@@ -41,7 +41,7 @@ const verifyPayment = async (onErrorNavigate, onVerificationTrue, paymentIntentI
         } else {
             onErrorNavigate();
         }
-    } catch (error) {
+    } catch {
         onErrorNavigate();
     }
 };
