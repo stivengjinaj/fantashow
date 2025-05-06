@@ -40,9 +40,13 @@ function Homepage() {
             {/*Guide Button*/}
             <Guide/>
 
+            <Container fluid className="d-flex justify-content-center">
+                <img src="/favicon.png" width={400} height={250} alt="Fantashow logo"/>
+            </Container>
+
             {/*Main Title*/}
-            <Container fluid className="d-flex justify-content-center mt-5">
-                <h1 className="mt-5 main-title-margin text-light text-center">
+            <Container fluid className="d-flex justify-content-center">
+                <h1 className="main-title-margin text-light text-center">
                     Non sei ancora iscritto?
                 </h1>
             </Container>
