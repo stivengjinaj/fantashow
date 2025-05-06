@@ -14,7 +14,7 @@ const fetchClientSecret = async () => {
 
         return data.clientSecret;
     } catch (error) {
-        console.error("Error fetching client secret:", error);
+        return {success: false, error: error.message || "Error fetching client secret"}
     }
 }
 
@@ -42,7 +42,6 @@ const verifyPayment = async (onErrorNavigate, onVerificationTrue, paymentIntentI
             onErrorNavigate();
         }
     } catch (error) {
-        console.error("Error verifying payment:", error);
         onErrorNavigate();
     }
 };
@@ -410,18 +409,19 @@ const getAdminData = async (uuid, idToken) => {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${idToken}`,
             }
-        })
+        });
 
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || "Failed to get admin data");
+            return { success: false, error: data.error || "Failed to get admin data" };
         }
+
         return { success: true, message: data.user };
-    }catch (error) {
-        return { success: false, error: error };
+    } catch (error) {
+        return { success: false, error: error.message || "Request error" };
     }
-}
+};
 
 const getAllUsers = async (uid, idToken) => {
     try {
