@@ -128,6 +128,12 @@ generalRoutes.get("/api/referral/:referralCode", async (req, res) => {
             return res.status(401).json({ error: "Referral code does not exist" });
         }
 
+        const referrerData = referralUser.docs[0].data();
+
+        if(!referrerData.paid){
+            return res.status(401).json({ error: "Referral code does not exist" });
+        }
+
         return res.status(200).json({ referralUser: referralUser.docs[0].get("name")});
     }catch (error){
         return res.status(500).json({ error: "Internal Server Error" });
