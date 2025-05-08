@@ -513,6 +513,28 @@ const updateTicketStatus = async (uid, idToken, ticketId, status) => {
     }
 }
 
+const getUserSubscriptions = async (uid, idToken) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/user-subscriptions/${uid}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            }
+        })
+
+        const data = await response.json();
+
+        if (!response.ok){
+            throw new Error(data.error || "Failed to get user subscription statistics");
+        }
+
+        return { success: true, message: data }
+    }catch (e){
+        return {success: false, error: e.message || "Error fetching user subscriptions"}
+    }
+}
+
 export {
     fetchClientSecret,
     verifyPayment,
@@ -537,4 +559,5 @@ export {
     getSupportTickets,
     updateTicketStatus,
     registerAdmin,
+    getUserSubscriptions,
 };
