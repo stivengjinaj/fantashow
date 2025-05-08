@@ -1,6 +1,5 @@
 import {v4 as uuidv4} from "uuid";
 import admin from "firebase-admin";
-const db = admin.firestore();
 /**
  * @description Generates a unique referral code. It searches in the database if the referral code already exists. If it does, it generates a new one.
  * @param name - Username used to generate the referral code.
@@ -8,6 +7,7 @@ const db = admin.firestore();
  * @async
  * */
 export async function generateReferralCode(name) {
+    const db = admin.firestore();
     let referralCode;
     let isUnique = false;
     while (!isUnique) {
@@ -70,6 +70,7 @@ export const verifyToken = async (req, res, next) => {
  * }
  */
 export const verifyPayment = async (req, res, next) => {
+    const db = admin.firestore();
     const { uuid } = req.params;
     if (!uuid) {
         return res.status(400).json({ error: "UUID is required" });
@@ -119,6 +120,7 @@ export const verifyPayment = async (req, res, next) => {
  * }
  */
 export const verifyAdmin = async (req, res, next) => {
+    const db = admin.firestore();
     const uid = req.user?.uid;
     if (!uid) {
         return res.status(400).json({ error: "UID is required" });
