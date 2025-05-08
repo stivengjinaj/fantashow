@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import admin from "firebase-admin";
+import {verifyPayment, verifyToken} from "./utils.mjs";
 
 dotenv.config();
 
@@ -139,5 +140,69 @@ generalRoutes.get("/api/referral/:referralCode", async (req, res) => {
         return res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+/**
+ * @route GET /api/user-subscriptions/:uuid
+ * @description Retrieves the count of users created per month for specified months.
+ * @param {string} req.params.uuid - The UUID of the user (used for token and payment validation).
+ * @returns {object} - JSON response with counts of users created per month.
+ * @returns {200} - If the data is successfully retrieved.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request:
+ * GET /api/user-subscriptions/123e4567-e89b-12d3-a456-426614174000
+ *
+ * Response:
+ * {
+ *   "monthlyCounts": {
+ *     "May": 10,
+ *     "June": 5,
+ *     "July": 8,
+ *     "August": 12,
+ *     "September": 6
+ *   }
+ * }
+ */
+generalRoutes.get("/api/user-subscriptions/:uuid", verifyPayment, verifyToken, async (req, res) => {
+    try {
+        const months_dictionary = {
+            4: ["April"],
+            5: ["May"],
+            6: ["June"],
+            7: ["July"],
+            8: ["August"],
+            9: ["September"]
+        };
+
+        const monthlyCounts = {};
+        Object.keys(months_dictionary).forEach((month) => {
+            monthlyCounts[months_dictionary[month][0]] = 0;
+        });
+
+        const userCollection = await db
+            .collection("users")
+            .get();
+
+        userCollection.docs.forEach((user) => {
+            const userCreationDate = user.get("createdAt");
+
+            if (userCreationDate && typeof userCreationDate.toDate === "function") {
+                const userCreationMonth = userCreationDate.toDate().getMonth() + 1;
+                const monthName = months_dictionary[userCreationMonth]?.[0];
+
+                if (monthName) {
+                    monthlyCounts[monthName] += 1;
+                }
+            }
+        });
+
+        return res.status(200).json({ monthlyCounts });
+    } catch (error) {
+        console.error("Error processing user subscriptions:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 
 export default generalRoutes;
