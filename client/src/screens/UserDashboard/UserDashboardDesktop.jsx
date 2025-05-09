@@ -8,15 +8,7 @@ import telegramIcon from '../../assets/icons/telegram.svg';
 import {CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import {logout} from "../../utils/auth.js";
 
-const UserDashboardDesktop = ({ userData }) => {
-    const data = [
-        { month: "Aprile", value: 4 },
-        { month: "Maggio", value: 7 },
-        { month: "Giugno", value: 5 },
-        { month: "Luglio", value: 9 },
-        { month: "Agosto", value: 6 },
-    ];
-
+const UserDashboardDesktop = ({ userData, userStatistics }) => {
     const handleCopy = () => {
         navigator.clipboard.writeText(`http://localhost:5173/referral/${userData.referralCode}`);
     };
@@ -82,10 +74,10 @@ const UserDashboardDesktop = ({ userData }) => {
                     <div className="text-center dashboard-container-background rounded-4 py-3 h-100">
                         <h3 className="text-light text-center fw-bold">Partecipanti</h3>
                         <ResponsiveContainer width="100%" height={300}>
-                            <LineChart data={data} margin={{ top: 20, right: 20, left: -20, bottom: 5 }}>
+                            <LineChart data={userStatistics} margin={{ top: 20, right: 20, left: -20, bottom: 5 }}>
                                 <CartesianGrid stroke="rgba(255, 255, 255, 0.2)" />
                                 <XAxis dataKey="month" tick={{ fill: "white" }} tickMargin={10}/>
-                                <YAxis domain={[1, 10]} tick={{ fill: "white" }} tickMargin={10}/>
+                                <YAxis domain={[1, 50]} tick={{ fill: "white" }} tickMargin={10}/>
                                 <Tooltip contentStyle={{ backgroundColor: "black", color: "white", border: "none" }}/>
                                 <Line type="monotone" dataKey="value" stroke="white" strokeWidth={3} dot={{ r: 5 }} />
                             </LineChart>

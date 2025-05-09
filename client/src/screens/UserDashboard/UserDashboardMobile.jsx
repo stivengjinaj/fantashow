@@ -10,14 +10,7 @@ import telegramIcon from "../../assets/icons/telegram.svg";
 import coin from "../../assets/icons/coin.svg";
 import {logout} from "../../utils/auth.js";
 
-function UserDashboardMobile({ userData }) {
-    const data = [
-        { month: "Aprile", value: 4 },
-        { month: "Maggio", value: 7 },
-        { month: "Giugno", value: 5 },
-        { month: "Luglio", value: 9 },
-        { month: "Agosto", value: 6 },
-    ];
+function UserDashboardMobile({ userData, userStatistics }) {
 
     const handleCopy = () => {
         navigator.clipboard.writeText(`http://localhost:5173/referral/${userData.referralCode}`);
@@ -70,10 +63,10 @@ function UserDashboardMobile({ userData }) {
                             <h3 className="text-light text-center fw-bold" style={{fontSize: "1rem"}}>Partecipanti</h3>
                             <div style={{ width: "100%", height: "120px" }}>
                                 <ResponsiveContainer width="99%" height="100%" aspect={undefined}>
-                                    <LineChart data={data} margin={{ top: 5, right: 15, left: -25, bottom: 5 }}>
+                                    <LineChart data={userStatistics} margin={{ top: 5, right: 15, left: -25, bottom: 5 }}>
                                         <CartesianGrid stroke="rgba(255, 255, 255, 0.2)" />
                                         <XAxis dataKey="month" tick={{ fill: "white", fontSize: 10 }} tickMargin={5} />
-                                        <YAxis domain={[0, 10]} tick={{ fill: "white", fontSize: 10 }} tickMargin={5} />
+                                        <YAxis domain={[0, 50]} tick={{ fill: "white", fontSize: 10 }} tickMargin={5} />
                                         <Tooltip contentStyle={{ backgroundColor: "black", color: "white", border: "none" }} />
                                         <Line type="monotone" dataKey="value" stroke="white" strokeWidth={2} dot={{ r: 3, fill: "white" }} />
                                     </LineChart>

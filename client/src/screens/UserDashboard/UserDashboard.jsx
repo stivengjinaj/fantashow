@@ -3,7 +3,7 @@ import { Container, Spinner } from "react-bootstrap";
 import UserDashboardDesktop from "./UserDashboardDesktop.jsx";
 import UserDashboardMobile from "./UserDashboardMobile.jsx";
 import { UserContext } from "../Contexts/UserContext.jsx";
-import { getUserData } from "../../API.js";
+import {getUserData, getUserSubscriptions} from "../../API.js";
 import DashboardPayment from "./DashboardPayment.jsx";
 import Error from "../misc/Error.jsx";
 
@@ -14,11 +14,26 @@ function UserDashboard() {
     const [loading, setLoading] = useState(true);
     const [hasPaid, setHasPaid] = useState(false);
     const [error, setError] = useState(false);
+    const [userStatistics, setUserStatistics] = useState({})
 
     useEffect(() => {
         const handleResize = () => setScreenWidth(window.innerWidth);
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    useEffect(() => {
+        const getStatistics = async () => {
+            const idToken = await user.getIdToken();
+            try {
+                const data = await getUserSubscriptions(user.uid, idToken);
+                setUserStatistics(data.message);
+            } catch (e) {
+                console.log(e.error);
+            }
+        }
+
+        getStatistics();
     }, []);
 
     useEffect(() => {
@@ -57,8 +72,8 @@ function UserDashboard() {
 
     return hasPaid
         ? screenWidth > 500
-            ? <UserDashboardDesktop userData={userData}/>
-            : <UserDashboardMobile userData={userData}/>
+            ? <UserDashboardDesktop userData={userData} userStatistics={userStatistics}/>
+            : <UserDashboardMobile userData={userData} userStatistics={userStatistics}/>
         :  !error
             ? <DashboardPayment title={"Il tuo account non è attivo perché non hai ancora effettuato il pagamento.\n" +
                 "Puoi aggiornare il metodo di pagamento per attivarlo."}/>
