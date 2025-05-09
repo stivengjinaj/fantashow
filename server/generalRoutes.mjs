@@ -167,29 +167,29 @@ generalRoutes.get("/api/referral/:referralCode", async (req, res) => {
 generalRoutes.get("/api/user-subscriptions/:uuid", verifyPayment, verifyToken, async (req, res) => {
     try {
         const months_dictionary = {
-            4: ["April"],
-            5: ["May"],
-            6: ["June"],
-            7: ["July"],
-            8: ["August"],
-            9: ["September"]
+            4: "April",
+            5: "May",
+            6: "June",
+            7: "July",
+            8: "August",
+            9: "September"
         };
 
+        const monthNames = Object.values(months_dictionary);
         const monthlyCounts = {};
-        Object.keys(months_dictionary).forEach((month) => {
-            monthlyCounts[months_dictionary[month][0]] = 0;
+
+        monthNames.forEach((month) => {
+            monthlyCounts[month] = 0;
         });
 
-        const userCollection = await db
-            .collection("users")
-            .get();
+        const userCollection = await db.collection("users").get();
 
         userCollection.docs.forEach((user) => {
             const userCreationDate = user.get("createdAt");
 
             if (userCreationDate && typeof userCreationDate.toDate === "function") {
                 const userCreationMonth = userCreationDate.toDate().getMonth() + 1;
-                const monthName = months_dictionary[userCreationMonth]?.[0];
+                const monthName = months_dictionary[userCreationMonth];
 
                 if (monthName) {
                     monthlyCounts[monthName] += 1;
@@ -197,7 +197,21 @@ generalRoutes.get("/api/user-subscriptions/:uuid", verifyPayment, verifyToken, a
             }
         });
 
-        return res.status(200).json({ monthlyCounts });
+        const formattedData = [];
+        let lastValue = 0;
+
+        for (const month of monthNames) {
+            const currentValue = monthlyCounts[month];
+            if (currentValue < lastValue) {
+                monthlyCounts[month] = lastValue+1;
+            } else {
+                lastValue = currentValue;
+            }
+
+            formattedData.push({ month, value: monthlyCounts[month] });
+        }
+        console.log(formattedData);
+        return res.status(200).json(formattedData);
     } catch (error) {
         console.error("Error processing user subscriptions:", error);
         return res.status(500).json({ error: "Internal Server Error" });
