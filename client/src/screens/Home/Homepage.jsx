@@ -1,4 +1,4 @@
-import {Button, Container} from "react-bootstrap";
+import {Button, Container, Image} from "react-bootstrap";
 import {useNavigate, useParams} from "react-router";
 import gsap from "gsap";
 import {useGSAP} from "@gsap/react";
@@ -36,12 +36,12 @@ function Homepage() {
     })
 
     return (
-        <Container fluid className="animated-bg">
+        <Container fluid className="animated-bg p-0">
             {/*Guide Button*/}
             <Guide/>
 
             <Container fluid className="d-flex justify-content-center">
-                <img src="/favicon.png" width={400} height={250} alt="Fantashow logo"/>
+                <Image fluid src="/favicon.png" width={400} height={250} alt="Fantashow logo"/>
             </Container>
 
             {/*Main Title*/}
@@ -61,8 +61,8 @@ function Homepage() {
                             <Button onClick={() => setContactUs(true)} className="outlined-orange-button mt-5 px-5 py-2">
                                 Contattaci
                             </Button>
-                            <p className="mt-4 text-light fw-bold">O</p>
-                            <Button onClick={() => navigate('/login')} className="outlined-orange-button mt-4 px-5 py-2">
+                            <p className="mt-3 text-light fw-bold">O</p>
+                            <Button onClick={() => navigate('/login')} className="outlined-orange-button mt-3 mb-5 px-5 py-2">
                                 Accedi
                             </Button>
                         </>

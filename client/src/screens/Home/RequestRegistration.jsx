@@ -122,7 +122,7 @@ function RequestRegistration(props) {
                     </Form.Text>
                 )}
             </Form.Group>
-            <Button type={"submit"} className="mt-5 p-3 sendIcon" onClick={handleSubmit}>
+            <Button type={"submit"} className="my-5 p-3 sendIcon" onClick={handleSubmit}>
                 {
                     (email.length > 0 || telegram.length > 0)
                         ? (<Image src={sendIcon} width={30} height={30}/>)
