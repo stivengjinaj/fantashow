@@ -535,6 +535,29 @@ const getUserSubscriptions = async (uid, idToken) => {
     }
 }
 
+const updateTeam = async (uid, idToken, team) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/team/${uid}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({team})
+        })
+
+        const data = await response.json();
+
+        if (!response.ok){
+            new Error(data.error || "Failed to update team");
+        }
+
+        return { success: true, message: data }
+    }catch (e){
+        return {success: false, error: e.message || "Error updating team"}
+    }
+}
+
 export {
     fetchClientSecret,
     verifyPayment,
@@ -560,4 +583,5 @@ export {
     updateTicketStatus,
     registerAdmin,
     getUserSubscriptions,
+    updateTeam,
 };

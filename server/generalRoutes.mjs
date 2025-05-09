@@ -164,7 +164,7 @@ generalRoutes.get("/api/referral/:referralCode", async (req, res) => {
  *   }
  * }
  */
-generalRoutes.get("/api/user-subscriptions/:uuid", verifyPayment, verifyToken, async (req, res) => {
+generalRoutes.get("/api/user-subscriptions/:uuid", verifyToken, verifyPayment, async (req, res) => {
     try {
         const months_dictionary = {
             4: "April",
@@ -210,13 +210,72 @@ generalRoutes.get("/api/user-subscriptions/:uuid", verifyPayment, verifyToken, a
 
             formattedData.push({ month, value: monthlyCounts[month] });
         }
-        console.log(formattedData);
         return res.status(200).json(formattedData);
     } catch (error) {
         console.error("Error processing user subscriptions:", error);
         return res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+/**
+ * @route PATCH /api/team/:uuid
+ * @description Updates the team information for a specific user in the database.
+ * @access private - Requires valid token and payment verification.
+ * @param {object} req - The HTTP request object.
+ * @param {string} req.params.uuid - The UUID of the user whose team is being updated.
+ * @param {object} req.body - The request body containing the team information.
+ * @param {string} req.body.team - The new team information to update (required).
+ * @param {object} res - The HTTP response object.
+ * @returns {object} - JSON response with a success message or an error message.
+ * @returns {200} - If the team is updated successfully.
+ * @returns {400} - If the UUID or team is missing from the request.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request:
+ * PATCH /api/team/123e4567-e89b-12d3-a456-426614174000
+ * Body:
+ * {
+ *   "team": "Development"
+ * }
+ *
+ * Successful Response:
+ * {
+ *   "message": "Team updated successfully"
+ * }
+ *
+ * Error Response (Missing Fields):
+ * {
+ *   "error": "UUID and team are required"
+ * }
+ *
+ * Error Response (Internal Server Error):
+ * {
+ *   "error": "Internal Server Error"
+ * }
+ */
+generalRoutes.patch("/api/team/:uuid", verifyToken, verifyPayment, async (req, res) => {
+    try {
+        const { uuid } = req.params;
+        const { team } = req.body;
+
+        if (!uuid || !team) {
+            return res.status(400).json({ error: "UUID and team are required" });
+        }
+
+        const formattedTeam = team.includes(' ')
+            ? team.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+            : team.toUpperCase();
+
+        const userRef = db.collection("users").doc(uuid);
+        await userRef.update({team: formattedTeam});
+
+        return res.status(200).json({ message: "Team updated successfully" });
+    } catch (error) {
+        console.error("Error updating team:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+})
 
 
 export default generalRoutes;
