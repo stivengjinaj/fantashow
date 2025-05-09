@@ -72,8 +72,8 @@ function UserDashboard() {
 
     return hasPaid
         ? screenWidth > 500
-            ? <UserDashboardDesktop userData={userData} userStatistics={userStatistics}/>
-            : <UserDashboardMobile userData={userData} userStatistics={userStatistics}/>
+            ? <UserDashboardDesktop user={ user } userData={userData} setUserData={setUserData} userStatistics={userStatistics}/>
+            : <UserDashboardMobile user={ user } userData={userData} setUserData={setUserData} userStatistics={userStatistics}/>
         :  !error
             ? <DashboardPayment title={"Il tuo account non è attivo perché non hai ancora effettuato il pagamento.\n" +
                 "Puoi aggiornare il metodo di pagamento per attivarlo."}/>

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Container, Row, Col, Button, Image } from 'react-bootstrap';
+import React, {useState} from 'react';
+import {Container, Row, Col, Button, Image, Form, FormControl} from 'react-bootstrap';
 import profilePicture from '../../assets/icons/profilepicture.png';
 import logoutIcon from '../../assets/icons/logout.svg';
 import whatsappIcon from '../../assets/icons/whatsapp.svg';
@@ -7,16 +7,45 @@ import emailIcon from '../../assets/icons/email.svg';
 import telegramIcon from '../../assets/icons/telegram.svg';
 import {CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import {logout} from "../../utils/auth.js";
+import {CheckCircleFill, Pencil, XCircleFill} from "react-bootstrap-icons";
+import {updateTeam} from "../../API.js";
 
-const UserDashboardDesktop = ({ userData, userStatistics }) => {
+const UserDashboardDesktop = ({ user, userData, setUserData, userStatistics }) => {
+    const [ editTeam, setEditTeam ] = useState(false);
+    const [ team, setTeam ] = useState("");
+
     const handleCopy = () => {
         navigator.clipboard.writeText(`http://localhost:5173/referral/${userData.referralCode}`);
     };
 
+    const handleTeamChange = (e) => {
+        setTeam(e.target.value);
+    }
+
+    const handleTeamSubmit = async (e) => {
+        e.preventDefault();
+        if (team === "") {
+            setEditTeam(false);
+        } else {
+            try {
+                const idToken = await user.getIdToken();
+                const result = await updateTeam(user.uid, idToken, team);
+                if(!result.success) {
+                    alert("Errore durante l'aggiornamento della squadra");
+                }else {
+                    setUserData(prev => ({ ...prev, team }));
+                }
+            } catch (e) {
+                alert("Errore durante l'aggiornamento della squadra");
+            }
+        }
+        setEditTeam(false);
+    }
+
     return (
         <Container fluid className="dashboard-bg p-0 d-flex flex-column min-vh-100">
             {/* Header section with profile */}
-            <Row className="mx-0 mb-5">
+            <Row className="mx-0 mb-3">
                 <Col className="p-0">
                     <div className="dashboard-container-background py-3 px-2 px-md-4 rounded-bottom-4 d-flex flex-row flex-wrap justify-content-between align-items-center">
                         <div className="d-flex flex-column align-items-center">
@@ -30,6 +59,44 @@ const UserDashboardDesktop = ({ userData, userStatistics }) => {
                         <Image src={logoutIcon} alt="edit" width={50} height={50} className="image-button" onClick={logout}/>
                     </div>
                 </Col>
+            </Row>
+
+            <Row className="mx-2 mx-md-4">
+                {
+                    editTeam
+                        ? (
+                            <Form onSubmit={handleTeamSubmit} className="d-flex justify-content-center align-items-center">
+                                <Form.Group className="d-flex flex-row">
+                                    <FormControl
+                                        className="outlined-orange-input"
+                                        placeholder="Squadra..."
+                                        onChange={handleTeamChange}
+                                    />
+                                    <Button type="submit" className="rounded-5 transparent-button">
+                                        {
+                                            team === ""
+                                                ? <XCircleFill style={{color: "red", scale: "1.4"}} />
+                                                : <CheckCircleFill style={{color: "white", scale: "1.4"}}/>
+                                        }
+                                    </Button>
+                                </Form.Group>
+                            </Form>
+                        )
+                        : (
+                            <div className="d-flex flex-row justify-content-center align-items-center px-3">
+                                <h3 className="text-light text-center fw-bold mb-1">{userData.team ? userData.team : userData.favouriteTeam}</h3>
+                                {!userData.team && <Button
+                                    onClick={() => {
+                                        setEditTeam(true)
+                                    }}
+                                    className="transparent-button rounded-5 mb-1"
+                                >
+                                    <Pencil style={{scale: "1.4"}}/>
+                                </Button>}
+                            </div>
+
+                        )
+                }
             </Row>
 
             {/* Invite title */}
