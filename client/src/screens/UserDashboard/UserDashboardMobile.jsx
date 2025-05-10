@@ -1,8 +1,8 @@
-import {Badge, Button, Col, Container, Form, FormControl, Image, Row} from "react-bootstrap";
+import {Badge, Button, Col, Container, Form, FormControl, Image, Modal, Row} from "react-bootstrap";
 import profilePicture from "../../assets/icons/profilepicture.png";
 import status from "../../assets/icons/status.svg";
 import logoutIcon from "../../assets/icons/logout.svg";
-import React, {useCallback} from "react";
+import React, {useCallback, useState} from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import whatsappIcon from "../../assets/icons/whatsapp.svg";
 import emailIcon from "../../assets/icons/email.svg";
@@ -12,6 +12,11 @@ import {logout} from "../../utils/auth.js";
 import {CheckCircleFill, Pencil, XCircleFill} from "react-bootstrap-icons";
 
 function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, editTeam, setEditTeam, handleTeamChange, handleTeamSubmit }) {
+    const [showPremiModal, setShowPremiModal] = useState(false);
+
+    const handlePremiModalOpen = () => setShowPremiModal(true);
+    const handlePremiModalClose = () => setShowPremiModal(false);
+
     const handleCopy = () => {
         navigator.clipboard.writeText(`http://localhost:5173/referral/${userData.referralCode}`);
     };
@@ -141,7 +146,11 @@ function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, 
                         </Button>
                     </div>
                     <div className="d-flex flex-row justify-content-between mt-3">
-                        <Button style={{width: "45%"}} className="dashboard-container-background border-0 rounded-5 px-3 px-lg-5 fw-bold">
+                        <Button
+                            style={{width: "45%"}}
+                            className="dashboard-container-background border-0 rounded-5 px-3 px-lg-5 fw-bold"
+                            onClick={handlePremiModalOpen}
+                        >
                             Premi
                         </Button>
                         <Button style={{width: "45%"}} className="dashboard-container-background border-0 rounded-5 px-3 px-lg-5 fw-bold">
@@ -208,6 +217,93 @@ function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, 
                     </div>
                 </div>
             </Row>
+            {/* Premi Modal */}
+            <Modal
+                show={showPremiModal}
+                onHide={handlePremiModalClose}
+                centered
+                className="text-light"
+            >
+                <Modal.Header closeButton className="dashboard-container-background border-0">
+                    <Modal.Title className="text-light fw-bold">Premi Disponibili</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="dashboard-container-background">
+                    <div className="p-3">
+                        <div className="text-center mb-4">
+                            <h5>I tuoi punti</h5>
+                            <div className="d-inline-block">
+                                <h3 className="m-0 fw-bold">{userData.points || 0}</h3>
+                            </div>
+                        </div>
+
+                        <div className={`mb-4 p-3 border rounded ${userData.points >= 150 ? 'border-success' : 'border-light'}`}>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <h6 className="fw-bold">Buono da 10€</h6>
+                                <Badge bg={userData.points >= 150 ? 'success' : 'secondary'} className="py-2 px-3">
+                                    150 punti
+                                </Badge>
+                            </div>
+                            <div className="progress mt-2 mb-2" style={{height: "10px"}}>
+                                <div
+                                    className="progress-bar bg-success"
+                                    role="progressbar"
+                                    style={{width: `${Math.min(100, (userData.points / 150) * 100)}%`}}
+                                    aria-valuenow={Math.min(100, (userData.points / 150) * 100)}
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                ></div>
+                            </div>
+                        </div>
+
+                        <div className={`mb-4 p-3 border rounded ${userData.points >= 600 ? 'border-success' : 'border-light'}`}>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <h6 className="fw-bold">Buono da 30€</h6>
+                                <Badge bg={userData.points >= 600 ? 'success' : 'secondary'} className="py-2 px-3">
+                                    600 punti
+                                </Badge>
+                            </div>
+                            <div className="progress mt-2 mb-2" style={{height: "10px"}}>
+                                <div
+                                    className="progress-bar bg-success"
+                                    role="progressbar"
+                                    style={{width: `${Math.min(100, (userData.points / 600) * 100)}%`}}
+                                    aria-valuenow={Math.min(100, (userData.points / 600) * 100)}
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                ></div>
+                            </div>
+                        </div>
+
+                        <div className={`p-3 border rounded ${userData.points >= 1200 ? 'border-success' : 'border-light'}`}>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <h6 className="fw-bold">Buono da 60€</h6>
+                                <Badge bg={userData.points >= 1200 ? 'success' : 'secondary'} className="py-2 px-3">
+                                    1200 punti
+                                </Badge>
+                            </div>
+                            <div className="progress mt-2 mb-2" style={{height: "10px"}}>
+                                <div
+                                    className="progress-bar bg-success"
+                                    role="progressbar"
+                                    style={{width: `${Math.min(100, (userData.points / 1200) * 100)}%`}}
+                                    aria-valuenow={Math.min(100, (userData.points / 1200) * 100)}
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer className="dashboard-container-background border-0 d-flex justify-content-end">
+                    <Button
+                        variant="outline-light"
+                        className="rounded-5"
+                        onClick={handlePremiModalClose}
+                    >
+                        Chiudi
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 }
