@@ -2,7 +2,7 @@ import {Button, Col, Container, Form, FormControl, Image, Row} from "react-boots
 import profilePicture from "../../assets/icons/profilepicture.png";
 import status from "../../assets/icons/status.svg";
 import logoutIcon from "../../assets/icons/logout.svg";
-import React, {useState} from "react";
+import React from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import whatsappIcon from "../../assets/icons/whatsapp.svg";
 import emailIcon from "../../assets/icons/email.svg";
@@ -10,39 +10,11 @@ import telegramIcon from "../../assets/icons/telegram.svg";
 import coin from "../../assets/icons/coin.svg";
 import {logout} from "../../utils/auth.js";
 import {CheckCircleFill, Pencil, XCircleFill} from "react-bootstrap-icons";
-import {updateTeam} from "../../API.js";
 
-function UserDashboardMobile({ user, userData, setUserData, userStatistics }) {
-    const [ editTeam, setEditTeam ] = useState(false);
-    const [ team, setTeam ] = useState("");
-
+function UserDashboardMobile({ userData, userStatistics, team, editTeam, setEditTeam, handleTeamChange, handleTeamSubmit }) {
     const handleCopy = () => {
         navigator.clipboard.writeText(`http://localhost:5173/referral/${userData.referralCode}`);
     };
-
-    const handleTeamChange = (e) => {
-        setTeam(e.target.value);
-    }
-
-    const handleTeamSubmit = async (e) => {
-        e.preventDefault();
-        if (team === "") {
-            setEditTeam(false);
-        } else {
-            try {
-                const idToken = await user.getIdToken();
-                const result = await updateTeam(user.uid, idToken, team);
-                if(!result.success) {
-                    alert("Errore durante l'aggiornamento della squadra");
-                }else {
-                    setUserData(prev => ({ ...prev, team }));
-                }
-            } catch (e) {
-                alert("Errore durante l'aggiornamento della squadra");
-            }
-        }
-        setEditTeam(false);
-    }
 
     return (
         <Container fluid className="dashboard-bg pt-2 px-3 d-flex flex-column min-vh-100">

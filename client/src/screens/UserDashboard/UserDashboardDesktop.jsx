@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Container, Row, Col, Button, Image, Form, FormControl} from 'react-bootstrap';
 import profilePicture from '../../assets/icons/profilepicture.png';
 import logoutIcon from '../../assets/icons/logout.svg';
@@ -8,39 +8,12 @@ import telegramIcon from '../../assets/icons/telegram.svg';
 import {CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import {logout} from "../../utils/auth.js";
 import {CheckCircleFill, Pencil, XCircleFill} from "react-bootstrap-icons";
-import {updateTeam} from "../../API.js";
 
-const UserDashboardDesktop = ({ user, userData, setUserData, userStatistics }) => {
-    const [ editTeam, setEditTeam ] = useState(false);
-    const [ team, setTeam ] = useState("");
 
+const UserDashboardDesktop = ({ userData, userStatistics, team, editTeam, setEditTeam, handleTeamChange, handleTeamSubmit }) => {
     const handleCopy = () => {
         navigator.clipboard.writeText(`http://localhost:5173/referral/${userData.referralCode}`);
     };
-
-    const handleTeamChange = (e) => {
-        setTeam(e.target.value);
-    }
-
-    const handleTeamSubmit = async (e) => {
-        e.preventDefault();
-        if (team === "") {
-            setEditTeam(false);
-        } else {
-            try {
-                const idToken = await user.getIdToken();
-                const result = await updateTeam(user.uid, idToken, team);
-                if(!result.success) {
-                    alert("Errore durante l'aggiornamento della squadra");
-                }else {
-                    setUserData(prev => ({ ...prev, team }));
-                }
-            } catch (e) {
-                alert("Errore durante l'aggiornamento della squadra");
-            }
-        }
-        setEditTeam(false);
-    }
 
     return (
         <Container fluid className="dashboard-bg p-0 d-flex flex-column min-vh-100">
