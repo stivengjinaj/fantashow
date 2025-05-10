@@ -2,7 +2,7 @@ import express from "express";
 import admin from "firebase-admin";
 import dotenv from "dotenv";
 import sendVerificationEmail from "./verificationEmail.mjs";
-import {generateReferralCode, verifyPayment, verifyToken} from "./utils.mjs";
+import {generateReferralCode, verifyPayment, verifyToken, capitalize} from "./utils.mjs";
 
 dotenv.config();
 
@@ -224,11 +224,11 @@ authenticationRoutes.post("/api/register", async (req, res) => {
             const newUser = {
                 username,
                 email,
-                name: nome,
-                surname: cognome,
+                name: capitalize(nome),
+                surname: capitalize(cognome),
                 birthYear: annoNascitaNum,
                 cap,
-                favouriteTeam: squadraDelCuore,
+                favouriteTeam: capitalize(squadraDelCuore),
                 team: "",
                 phone: cellulare,
                 telegram,
