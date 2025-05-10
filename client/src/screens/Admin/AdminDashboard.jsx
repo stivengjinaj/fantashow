@@ -95,6 +95,10 @@ function AdminDashboard() {
         );
     };
 
+    const handleUserDelete = (deletedUser) => {
+        setUsers(prevUsers => prevUsers.filter(user => user.id !== deletedUser.id));
+    };
+
     const handleEditUser = (user) => {
         setCurrentUser(user);
         setShowUserModal(true);
@@ -108,8 +112,10 @@ function AdminDashboard() {
         switch(activeTab) {
             case 'users':
                 return <RegisteredUsers
+                    admin={user}
                     users={users}
                     onEditUser={handleEditUser}
+                    onDeleteUser={handleUserDelete}
                 />;
             case 'ranking':
                 return <UserRanking
