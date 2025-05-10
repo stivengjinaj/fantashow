@@ -301,6 +301,26 @@ adminRoutes.patch("/api/admin/edit-user/:uid", verifyToken, verifyAdmin, async (
     }
 });
 
+adminRoutes.delete("/api/admin/delete-user/:userId", verifyToken, verifyAdmin, async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!userId) {
+            return res.status(400).json({ error: "User UID is required" });
+        }
+
+        const userRef = db.collection("users").doc(userId);
+        await userRef.delete();
+
+        await admin.auth().deleteUser(userId);
+
+        return res.status(200).json({ message: "User deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+
 
 /**
  * @route GET /api/addmin/cash-payments/:uid
