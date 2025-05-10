@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import admin from "firebase-admin";
 import {verifyPayment, verifyToken} from "./utils.mjs";
+import {query, orderBy, limit} from "firebase/firestore";
 
 dotenv.config();
 
@@ -273,6 +274,42 @@ generalRoutes.patch("/api/team/:uuid", verifyToken, verifyPayment, async (req, r
         return res.status(200).json({ message: "Team updated successfully" });
     } catch (error) {
         console.error("Error updating team:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+
+generalRoutes.get("/api/user/statistics/:uuid", verifyToken, verifyPayment, async (req, res) => {
+    try {
+        const { uuid } = req.params;
+
+        if (!uuid) {
+            return res.status(400).json({ error: "UUID is required" });
+        }
+
+        const userCollection = db.collection("users");
+
+        const userQuery = userCollection
+            .where("isAdmin", "==", false)
+            .orderBy("points", "desc")
+            .limit(5)
+            .select("name", "points", "team", "favouriteTeam")
+
+        const userSnapshot = await userQuery.get();
+
+        if (userSnapshot.empty) {
+            return res.status(404).json({ error: "No users found" });
+        }
+
+        const userStatistics = userSnapshot.docs.map((doc) => ({
+            name: doc.get("name"),
+            points: doc.get("points"),
+            team: doc.get("team"),
+            favouriteTeam: doc.get("favouriteTeam"),
+        }));
+
+        return res.status(200).json({ message: userStatistics });
+    } catch (error) {
+        console.error("Error retrieving user statistics:", error.message, error.stack); // Improved logging
         return res.status(500).json({ error: "Internal Server Error" });
     }
 })

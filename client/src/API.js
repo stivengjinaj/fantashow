@@ -558,6 +558,28 @@ const updateTeam = async (uid, idToken, team) => {
     }
 }
 
+const getStatistics = async (uid, idToken) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/user/statistics/${uid}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            }
+        })
+
+        const data = await response.json()
+
+        if (!response.ok){
+            new Error(data.error || "Failed to get statistics")
+        }
+
+        return { success: true, message: data.message }
+    }catch (e) {
+        return { success: false, error: e.message || "Failed to get statistics"}
+    }
+}
+
 export {
     fetchClientSecret,
     verifyPayment,
@@ -584,4 +606,5 @@ export {
     registerAdmin,
     getUserSubscriptions,
     updateTeam,
+    getStatistics,
 };
