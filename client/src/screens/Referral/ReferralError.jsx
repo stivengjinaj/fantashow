@@ -5,11 +5,11 @@ import Guide from "../misc/Guide.jsx";
 function ReferralError() {
     const navigate = useNavigate();
     return (
-        <Container fluid className="animated-error-bg">
+        <Container fluid className="animated-error-bg py-4">
             <Guide/>
 
             {/*Error Title*/}
-            <Container fluid className="d-flex flex-column align-items-center justify-content-center mt-5 pt-5">
+            <Container fluid className="d-flex flex-column align-items-center justify-content-center pt-5">
                 <h2 className="mt-5 main-title-margin text-light text-center pt-5">
                     Il link di referral non è valido
                 </h2>

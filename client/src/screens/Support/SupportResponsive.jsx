@@ -119,9 +119,8 @@ const SupportResponsive = () => {
                     }}
                 >
                     <Container className="form-container email-support py-4 px-0">
-                        <Form onSubmit={submitSupport}>
+                        <Form onSubmit={submitSupport} className="pt-3">
                             <h3 className="text-center">Contatto email</h3>
-                            <span>Risponderemo il prima possibile via email</span>
                             <Form.Control type="text" placeholder="Nome" value={name} onChange={e => {
                                 setError("");
                                 setName(e.target.value);

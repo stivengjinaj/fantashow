@@ -1,4 +1,4 @@
-import {Button, Container, Spinner} from "react-bootstrap";
+import {Button, Container, Image, Spinner} from "react-bootstrap";
 import {useNavigate, useParams} from "react-router";
 import ReferralError from "./ReferralError.jsx";
 import Guide from "../misc/Guide.jsx";
@@ -54,14 +54,15 @@ function ReferralLink() {
                 wrongReferral
                     ? (<ReferralError/>)
                     : (
-                        <Container fluid className="animated-bg">
+                        <Container fluid className="animated-bg pb-4">
 
                             <Guide/>
 
                             {/*Main Title*/}
-                            <Container fluid className="d-flex justify-content-center mt-5 pt-5">
-                                <h2 className="mt-5 main-title-margin text-light text-center pt-5 lh-base">
-                                    {referrer} ti ha invitato a partecipare al prossimo fantashow, <br/> guadagna subito 20 coin
+                            <Container fluid className="d-flex flex-column align-items-center justify-content-center pt-5">
+                                <Image fluid src="/favicon.png" width={400} height={250} alt="Fantashow logo"/>
+                                <h2 className="mt-5 main-title-margin text-light text-center lh-base">
+                                    {referrer} ti ha invitato a partecipare al prossimo fantashow, <br/> guadagna subito 20 coin.
                                 </h2>
                             </Container>
 
