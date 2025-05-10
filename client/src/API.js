@@ -467,6 +467,28 @@ const adminEditUser = async (adminUid, idToken, edittedUser) => {
     }
 }
 
+const adminDeleteUser = async (idToken, userId) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/admin/delete-user/${userId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            }
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            new Error(data.error || "Failed to delete user");
+        }
+
+        return { success: true, message: data.message };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
 const getSupportTickets = async (uid, idToken) => {
     try {
         const response = await fetch(`${remoteURL}/api/admin/support/${uid}`, {
@@ -599,6 +621,7 @@ export {
     checkCashPaymentRequest,
     getAllUsers,
     adminEditUser,
+    adminDeleteUser,
     sendSupportRequest,
     getSupportTickets,
     updateTicketStatus,
