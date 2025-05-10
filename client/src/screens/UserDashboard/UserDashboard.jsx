@@ -112,6 +112,7 @@ function UserDashboard() {
             ? <UserDashboardDesktop
                 userData={userData}
                 userStatistics={userStatistics}
+                pointStatistics={pointStatistics}
                 team={team}
                 editTeam={editTeam}
                 setEditTeam={setEditTeam}
@@ -119,10 +120,9 @@ function UserDashboard() {
                 handleTeamSubmit={handleTeamSubmit}
             />
             : <UserDashboardMobile
-                user={ user }
                 userData={userData}
-                setUserData={setUserData}
                 userStatistics={userStatistics}
+                pointStatistics={pointStatistics}
                 team={team}
                 editTeam={editTeam}
                 setEditTeam={setEditTeam}

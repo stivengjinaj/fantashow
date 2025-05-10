@@ -1,8 +1,8 @@
-import {Button, Col, Container, Form, FormControl, Image, Row} from "react-bootstrap";
+import {Badge, Button, Col, Container, Form, FormControl, Image, Row} from "react-bootstrap";
 import profilePicture from "../../assets/icons/profilepicture.png";
 import status from "../../assets/icons/status.svg";
 import logoutIcon from "../../assets/icons/logout.svg";
-import React from "react";
+import React, {useCallback} from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import whatsappIcon from "../../assets/icons/whatsapp.svg";
 import emailIcon from "../../assets/icons/email.svg";
@@ -11,10 +11,19 @@ import coin from "../../assets/icons/coin.svg";
 import {logout} from "../../utils/auth.js";
 import {CheckCircleFill, Pencil, XCircleFill} from "react-bootstrap-icons";
 
-function UserDashboardMobile({ userData, userStatistics, team, editTeam, setEditTeam, handleTeamChange, handleTeamSubmit }) {
+function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, editTeam, setEditTeam, handleTeamChange, handleTeamSubmit }) {
     const handleCopy = () => {
         navigator.clipboard.writeText(`http://localhost:5173/referral/${userData.referralCode}`);
     };
+
+    const getRankColor = useCallback((index) => {
+        switch(index) {
+            case 0: return 'warning'; // Gold
+            case 1: return 'secondary'; // Silver
+            case 2: return 'danger'; // Bronze
+            default: return 'light';
+        }
+    }, []);
 
     return (
         <Container fluid className="dashboard-bg pt-2 px-3 d-flex flex-column min-vh-100">
@@ -144,17 +153,42 @@ function UserDashboardMobile({ userData, userStatistics, team, editTeam, setEdit
             {/* Statistics */}
             <Row className="px-2 mt-2">
                 <div className="dashboard-container-background rounded-4 py-3 mt-3">
-                    <h3 className="text-light text-center fw-bold">Statistiche</h3>
+                    <h3 className="text-light text-center fw-bold">Classifica</h3>
                     <div className="p-3">
-                        <p className="text-light">Amici invitati: 12</p>
-                        <p className="text-light">Premi vinti: 3</p>
-                        <p className="text-light">Posizione in classifica: 5</p>
-                        <div className="mt-4">
-                            <h5 className="text-light">Prossimi obiettivi</h5>
-                            <div className="progress mt-2">
-                                <div className="progress-bar" role="progressbar" style={{width: "75%"}} aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
-                            </div>
-                        </div>
+                        {
+                            pointStatistics
+                                ? <div className="table-responsive text-center">
+                                    <table className="table table-borderless classification-table">
+                                        <thead>
+                                        <tr className="border-bottom">
+                                            <th scope="col"></th>
+                                            <th scope="col">Utente</th>
+                                            <th scope="col">Punti</th>
+                                            <th scope="col">Squadra</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {pointStatistics.map((user, index) => (
+                                            <tr key={index} className="border-bottom">
+                                                <td>
+                                                    <Badge
+                                                        bg={getRankColor(index)}
+                                                        className="py-2 px-3"
+                                                        style={{width: '40px'}}
+                                                    >
+                                                        {index + 1}
+                                                    </Badge>
+                                                </td>
+                                                <td>{user.name} {user.surname}</td>
+                                                <td>{user.points}</td>
+                                                <td>{user.team || user.favouriteTeam}</td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                : <div className="text-center"><h4>Classifica non ancora disponibile</h4></div>
+                        }
                     </div>
                 </div>
             </Row>

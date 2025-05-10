@@ -1,5 +1,5 @@
-import React from 'react';
-import {Container, Row, Col, Button, Image, Form, FormControl} from 'react-bootstrap';
+import React, {useCallback} from 'react';
+import {Container, Row, Col, Button, Image, Form, FormControl, Badge} from 'react-bootstrap';
 import profilePicture from '../../assets/icons/profilepicture.png';
 import logoutIcon from '../../assets/icons/logout.svg';
 import whatsappIcon from '../../assets/icons/whatsapp.svg';
@@ -10,10 +10,19 @@ import {logout} from "../../utils/auth.js";
 import {CheckCircleFill, Pencil, XCircleFill} from "react-bootstrap-icons";
 
 
-const UserDashboardDesktop = ({ userData, userStatistics, team, editTeam, setEditTeam, handleTeamChange, handleTeamSubmit }) => {
+const UserDashboardDesktop = ({ userData, userStatistics, pointStatistics, team, editTeam, setEditTeam, handleTeamChange, handleTeamSubmit }) => {
     const handleCopy = () => {
         navigator.clipboard.writeText(`http://localhost:5173/referral/${userData.referralCode}`);
     };
+
+    const getRankColor = useCallback((index) => {
+        switch(index) {
+            case 0: return 'warning'; // Gold
+            case 1: return 'secondary'; // Silver
+            case 2: return 'danger'; // Bronze
+            default: return 'light';
+        }
+    }, []);
 
     return (
         <Container fluid className="dashboard-bg p-0 d-flex flex-column min-vh-100">
@@ -57,7 +66,7 @@ const UserDashboardDesktop = ({ userData, userStatistics, team, editTeam, setEdi
                         )
                         : (
                             <div className="d-flex flex-row justify-content-center align-items-center px-3">
-                                <h3 className="text-light text-center fw-bold mb-1">{userData.team ? userData.team : userData.favouriteTeam}</h3>
+                                <h3 className="text-light text-center text-decoration-underline fw-bold mb-1">{userData.team ? userData.team : userData.favouriteTeam}</h3>
                                 {!userData.team && <Button
                                     onClick={() => {
                                         setEditTeam(true)
@@ -128,19 +137,43 @@ const UserDashboardDesktop = ({ userData, userStatistics, team, editTeam, setEdi
                 {/* Third column */}
                 <Col xs={12} md={4} className="mb-4">
                     <div className="dashboard-container-background rounded-4 py-3 h-100">
-                        <h3 className="text-light text-center fw-bold">Statistiche</h3>
-                        {/* Add your content for the third column here */}
-                        <div className="p-3">
-                            <p className="text-light">Amici invitati: 12</p>
-                            <p className="text-light">Premi vinti: 3</p>
-                            <p className="text-light">Posizione in classifica: 5</p>
-                            {/* Add more content to fill the space */}
-                            <div className="mt-4">
-                                <h5 className="text-light">Prossimi obiettivi</h5>
-                                <div className="progress mt-2">
-                                    <div className="progress-bar" role="progressbar" style={{width: "75%"}} aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
-                                </div>
-                            </div>
+                        <h3 className="text-light text-center fw-bold">Classifica</h3>
+                        {/* User Classification Table */}
+                        <div className="mt-4">
+                            {
+                                pointStatistics
+                                ? <div className="table-responsive text-center overflow-container" style={{maxHeight: "300px" }}>
+                                        <table className="table table-borderless classification-table">
+                                            <thead>
+                                            <tr className="border-bottom">
+                                                <th scope="col"></th>
+                                                <th scope="col">Utente</th>
+                                                <th scope="col">Punti</th>
+                                                <th scope="col">Squadra</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {pointStatistics.map((user, index) => (
+                                                <tr key={index} className="border-bottom">
+                                                    <td>
+                                                        <Badge
+                                                            bg={getRankColor(index)}
+                                                            className="py-2 px-3"
+                                                            style={{width: '40px'}}
+                                                        >
+                                                            {index + 1}
+                                                        </Badge>
+                                                    </td>
+                                                    <td>{user.name} {user.surname}</td>
+                                                    <td>{user.points}</td>
+                                                    <td>{user.team || user.favouriteTeam}</td>
+                                                </tr>
+                                            ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    : <div className="text-center"><h4>Classifica non ancora disponibile</h4></div>
+                            }
                         </div>
                     </div>
                 </Col>
