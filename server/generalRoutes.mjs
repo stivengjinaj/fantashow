@@ -1,14 +1,23 @@
 import express from "express";
 import dotenv from "dotenv";
 import admin from "firebase-admin";
+import rateLimit from "express-rate-limit"
 import {verifyPayment, verifyToken} from "./utils.mjs";
 
 dotenv.config();
 
 const generalRoutes = express.Router();
 
-generalRoutes.use(express.json());
-generalRoutes.use(express.urlencoded({ extended: true }));
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later.',
+});
+
+generalRoutes.use(express.json({ limit: '10kb' }));
+generalRoutes.use(express.urlencoded({ extended: true, limit: '10kb' }));
+generalRoutes.use(limiter);
+
 
 const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
 
