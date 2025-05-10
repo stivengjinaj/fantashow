@@ -3,7 +3,7 @@ import { Container, Spinner } from "react-bootstrap";
 import UserDashboardDesktop from "./UserDashboardDesktop.jsx";
 import UserDashboardMobile from "./UserDashboardMobile.jsx";
 import { UserContext } from "../Contexts/UserContext.jsx";
-import {getUserData, getUserSubscriptions, updateTeam} from "../../API.js";
+import {getStatistics, getUserData, getUserSubscriptions, updateTeam} from "../../API.js";
 import DashboardPayment from "./DashboardPayment.jsx";
 import Error from "../misc/Error.jsx";
 
@@ -17,6 +17,7 @@ function UserDashboard() {
     const [userStatistics, setUserStatistics] = useState({})
     const [ editTeam, setEditTeam ] = useState(false);
     const [ team, setTeam ] = useState("");
+    const [ pointStatistics, setPointStatistics ] = useState([]);
 
     const handleTeamChange = (e) => {
         setTeam(e.target.value);
@@ -49,18 +50,28 @@ function UserDashboard() {
     }, []);
 
     useEffect(() => {
-        const getStatistics = async () => {
-            const idToken = await user.getIdToken();
+        const getSubscriptions = async () => {
             try {
+                const idToken = await user.getIdToken();
                 const data = await getUserSubscriptions(user.uid, idToken);
                 setUserStatistics(data.message);
             } catch (e) {
                 console.log(e.error);
             }
         }
+        const getPointsStatistics = async () => {
+            try {
+                const idToken = await user.getIdToken();
+                const data = await getStatistics(user.uid, idToken);
+                setPointStatistics(data.message);
+            }catch (e){
+                console.log(e.error);
+            }
+        }
 
-        getStatistics();
-    }, []);
+        getSubscriptions();
+        getPointsStatistics();
+    }, [user]);
 
     useEffect(() => {
         const fetchData = async () => {
