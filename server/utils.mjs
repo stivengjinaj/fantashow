@@ -143,3 +143,23 @@ export const verifyAdmin = async (req, res, next) => {
         return res.status(500).json({ error: "Internal Server Error" });
     }
 };
+
+/**
+ * @description Capitalizes the first letter of each word in a string.
+ * @param input {string} - The input string to be capitalized.
+ * @returns {string} - The input string with the first letter of each word capitalized.
+ * @example
+ *
+ * // Example usage:
+ * const input = "hello world";
+ * const capitalized = capitalizeWords(input);
+ * console.log(capitalized); // Output: "Hello World"
+ */
+export function capitalize(input) {
+    return input
+        .toLowerCase()
+        .split(' ')
+        .filter(word => word.trim() !== '')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
