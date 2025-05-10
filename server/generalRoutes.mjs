@@ -131,7 +131,7 @@ generalRoutes.get("/api/referral/:referralCode", async (req, res) => {
 
         const referrerData = referralUser.docs[0].data();
 
-        if(!referrerData.paid){
+        if(!referrerData.paid && !referrerData.isAdmin){
             return res.status(401).json({ error: "Referral code does not exist" });
         }
 
