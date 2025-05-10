@@ -245,6 +245,19 @@
     background-color: transparent !important;
 }
 
+.classification-table, .classification-table>thead>tr>th, .classification-table>tbody>tr>td {
+    background: transparent !important;
+    color: white;
+}
+
+.overflow-container {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.overflow-container::-webkit-scrollbar {
+    display: none;
+}
+
 @media (max-width: 768px) {
     .login-form-width {
         width: 80%;
