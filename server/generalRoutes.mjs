@@ -2,7 +2,6 @@ import express from "express";
 import dotenv from "dotenv";
 import admin from "firebase-admin";
 import {verifyPayment, verifyToken} from "./utils.mjs";
-import {query, orderBy, limit} from "firebase/firestore";
 
 dotenv.config();
 
@@ -292,7 +291,7 @@ generalRoutes.get("/api/user/statistics/:uuid", verifyToken, verifyPayment, asyn
             .where("isAdmin", "==", false)
             .orderBy("points", "desc")
             .limit(5)
-            .select("name", "points", "team", "favouriteTeam")
+            .select("name", "surname","points", "team", "favouriteTeam")
 
         const userSnapshot = await userQuery.get();
 
@@ -302,10 +301,13 @@ generalRoutes.get("/api/user/statistics/:uuid", verifyToken, verifyPayment, asyn
 
         const userStatistics = userSnapshot.docs.map((doc) => ({
             name: doc.get("name"),
+            surname: doc.get("surname"),
             points: doc.get("points"),
             team: doc.get("team"),
             favouriteTeam: doc.get("favouriteTeam"),
         }));
+
+        console.log(userStatistics);
 
         return res.status(200).json({ message: userStatistics });
     } catch (error) {
