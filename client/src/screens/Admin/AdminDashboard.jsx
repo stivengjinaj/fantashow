@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import {Container, Row, Col, Button} from 'react-bootstrap';
 import Sidebar from './Sidebar';
 import DashboardSummary from './DashboardSummary';
 import RegisteredUsers from './RegisteredUsers';
@@ -9,13 +9,14 @@ import AllPayments from './AllPayments';
 import SupportSection from './SupportSection';
 import UserEditModal from './UserEditModal';
 import { List } from 'react-bootstrap-icons';
-import {getAllCashPaymentRequests, getAllUsers, getSupportTickets} from "../../API.js";
+import {getAdminData, getAllCashPaymentRequests, getAllUsers, getSupportTickets} from "../../API.js";
 import {UserContext} from "../Contexts/UserContext.jsx";
 import { debounce } from 'lodash';
 import NewAdmin from "./NewAdmin.jsx";
 
 function AdminDashboard() {
     const { user } = useContext(UserContext);
+    const [ adminData, setAdminData ] = useState(null);
     const [activeTab, setActiveTab] = useState('users');
     const [sidebarExpanded, setSidebarExpanded] = useState(true);
     const [showUserModal, setShowUserModal] = useState(false);
@@ -80,7 +81,20 @@ function AdminDashboard() {
             }
         }
 
+        const fetchAdminData = async () => {
+            try {
+                const token = await user.getIdToken();
+                const data = await getAdminData(user.uid, token);
+                if (data.success) {
+                    setAdminData(data.message);
+                }
+            }catch (error) {
+                console.error("Error fetching admin data:", error);
+            }
+        }
+
         if (user) {
+            fetchAdminData();
             fetchUsers();
             fetchCashPayments();
             fetchSupportTickets();
@@ -192,6 +206,16 @@ function AdminDashboard() {
         contentStyle.visibility = 'hidden';
     }
 
+    const handleCopyReferral = () => {
+        navigator.clipboard.writeText(`https://fantashow.onrender.com/referral/${adminData.referralCode}`)
+            .then(() => {
+                alert("Codice referral copiato!");
+            })
+            .catch((err) => {
+                console.error("Failed to copy referral code: ", err);
+            });
+    }
+
     return (
         <Container fluid className="p-0">
             <Row className="g-0">
@@ -228,6 +252,7 @@ function AdminDashboard() {
                             <List size={20} />
                         </button>
                         <h4 className="m-0">Admin Dashboard</h4>
+                        {adminData && <Button className="mx-5 blue-button" onClick={handleCopyReferral}>Copia referral</Button>}
                     </div>
 
                     {/* Dashboard Summary Cards */}
