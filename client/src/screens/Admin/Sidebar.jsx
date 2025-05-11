@@ -6,7 +6,7 @@ import {
     Award,
     CreditCard2Front,
     CashCoin,
-    Headset, Key
+    Headset, Key, Person
 } from 'react-bootstrap-icons';
 import {logout} from "../../utils/auth.js";
 
@@ -73,6 +73,14 @@ function Sidebar({ activeTab, setActiveTab, toggleSidebar, expanded, isMobile })
                 >
                     <Key className={expanded ? "me-2" : "mx-auto"} size={expanded ? 16 : 20} />
                     {expanded && <span>Aggiungi Admin</span>}
+                </Nav.Link>
+                <Nav.Link
+                    className={`d-flex align-items-center ${activeTab === 'newUser' ? 'active bg-primary text-white' : 'text-white'}`}
+                    onClick={() => setActiveTab('newUser')}
+                    title="Aggiungi Utente"
+                >
+                    <Person className={expanded ? "me-2" : "mx-auto"} size={expanded ? 16 : 20} />
+                    {expanded && <span>Aggiungi Utente</span>}
                 </Nav.Link>
             </Nav>
 
