@@ -13,6 +13,7 @@ import {getAdminData, getAllCashPaymentRequests, getAllUsers, getSupportTickets}
 import {UserContext} from "../Contexts/UserContext.jsx";
 import { debounce } from 'lodash';
 import NewAdmin from "./NewAdmin.jsx";
+import NewUser from "./NewUser.jsx";
 
 function AdminDashboard() {
     const { user } = useContext(UserContext);
@@ -156,6 +157,8 @@ function AdminDashboard() {
                 />;
             case 'newAdmin':
                 return <NewAdmin admin={user} />
+            case 'newUser':
+                return <NewUser />
             default:
                 return <div>Seleziona una scheda dal menu a sinistra.</div>;
         }
