@@ -55,8 +55,6 @@ adminRoutes.post("/api/register/admin/:uid", verifyToken, verifyAdmin, async (re
             return res.status(400).json({ error: "Missing data." });
         }
 
-        console.log(email);
-
         const userRecord = await admin.auth().createUser({
             email,
             password,
@@ -69,6 +67,8 @@ adminRoutes.post("/api/register/admin/:uid", verifyToken, verifyAdmin, async (re
         const referralCode = await generateReferralCode(name);
 
         const newAdmin = {
+            name,
+            surname,
             username,
             email,
             isAdmin: true,
