@@ -31,8 +31,7 @@ function NewUser() {
     }
 
     const validate = () => {
-        if (
-            !formData.nome  ||
+        return !(!formData.nome ||
             !formData.cognome ||
             !formData.password ||
             !formData.confirmPassword ||
@@ -43,11 +42,8 @@ function NewUser() {
             !formData.referredBy ||
             !formData.squadraDelCuore ||
             !formData.cellulare ||
-            !formData.telegram
-        ){
-            return false;
-        }
-        return true;
+            !formData.telegram);
+
     }
 
     const handleSubmit = async (e) => {
