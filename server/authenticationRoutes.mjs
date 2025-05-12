@@ -300,7 +300,7 @@ authenticationRoutes.post("/api/register", async (req, res) => {
  */
 authenticationRoutes.post("/api/delete-user", async (req, res) => {
     const { uid } = req.body;
-    console.log(uid);
+
     if (!uid) {
         return res.status(400).json({ success: false, error: "Missing uid" });
     }

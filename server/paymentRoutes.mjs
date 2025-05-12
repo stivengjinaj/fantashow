@@ -307,7 +307,7 @@ paymentRoutes.patch("/api/cash-payment/all/:uid", verifyToken, verifyAdmin, asyn
     try {
         const {uid} = req.params;
         const {paid, paymentIds} = req.body;
-        console.log(paymentIds);
+
         if (!uid) {
             return res.status(400).json({error: "UID is required"});
         }
