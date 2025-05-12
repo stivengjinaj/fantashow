@@ -12,7 +12,7 @@ function PersonalData({ nextStep, dispatch, state }) {
         let newErrors = {};
         if (!state.nome.trim()) newErrors.nome = "Il campo è obbligatorio.";
         if (!state.cognome.trim()) newErrors.cognome = "Il campo è obbligatorio.";
-        if (!state.annoNascita || state.annoNascita < 1970 || state.annoNascita > new Date().getFullYear()) newErrors.annoNascita = "Anno di nascita non valido.";
+        if (!state.annoNascita || state.annoNascita < 1900 || state.annoNascita > new Date().getFullYear()) newErrors.annoNascita = "Anno di nascita non valido.";
         if (!state.cap) newErrors.cap = "Il campo è obbligatorio.";
         if (!state.squadraDelCuore) newErrors.squadraDelCuore = "Il campo è obbligatorio.";
 
