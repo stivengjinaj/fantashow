@@ -182,6 +182,14 @@ authenticationRoutes.post("/api/register", async (req, res) => {
         }
 
         if (!username || !email || !password || !nome || !cognome || !squadraDelCuore || !cellulare || !telegram) {
+            console.log(username);
+            console.log(email);
+            console.log(password);
+            console.log(nome);
+            console.log(cognome);
+            console.log(squadraDelCuore);
+            console.log(cellulare);
+            console.log(telegram);
             return res.status(400).json({ error: "Missing required fields" });
         }
 
