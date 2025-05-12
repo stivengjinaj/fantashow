@@ -16,6 +16,7 @@ const corsOptions = {
     credentials: true,
 };
 
+app.set('trust proxy', true);
 app.use(cors(corsOptions));
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
