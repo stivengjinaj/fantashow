@@ -79,7 +79,7 @@ function PersonalData({ nextStep, dispatch, state }) {
                         type="number"
                         placeholder="Anno di nascita*"
                         className="outlined-orange-input"
-                        min={16} max={70}
+                        min={1900} max={2020}
                         name="annoNascita"
                         value={state.annoNascita || ""}
                         onChange={handleChange}
