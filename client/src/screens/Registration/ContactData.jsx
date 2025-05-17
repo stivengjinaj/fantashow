@@ -36,16 +36,6 @@ function ContactData({dispatch, state, nextStep, prevStep}) {
                         {state.cellulare.length > 0 ? `Numero di telefono non valido` : `Il campo cellulare è obbligatorio`}
                     </p>}
                 </Form.Group>
-                <Form.Group className="mb-5">
-                    <Form.Control
-                        type="text"
-                        placeholder="ID Telegram"
-                        className="outlined-orange-input"
-                        name="telegram"
-                        value={state.telegram || ""}
-                        onChange={handleChange}
-                    />
-                </Form.Group>
             </Form>
             <Container fluid className="d-flex justify-content-center mt-3">
                 <Button onClick={prevStep} className="sendIcon p-3 mt-3 mx-5">
