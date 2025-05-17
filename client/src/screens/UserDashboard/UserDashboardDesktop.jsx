@@ -9,9 +9,11 @@ import {CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAx
 import {logout} from "../../utils/auth.js";
 import {CheckCircleFill, Pencil, XCircleFill} from "react-bootstrap-icons";
 import {mapStatus} from "../../utils/helper.js";
+import {useNavigate} from "react-router-dom";
 
 
 const UserDashboardDesktop = ({ userData, userStatistics, pointStatistics, team, editTeam, setEditTeam, handleTeamChange, handleTeamSubmit }) => {
+    const navigate = useNavigate();
     const [showPremiModal, setShowPremiModal] = useState(false);
 
     const handlePremiModalOpen = () => setShowPremiModal(true);
@@ -38,7 +40,10 @@ const UserDashboardDesktop = ({ userData, userStatistics, pointStatistics, team,
                     <div className="dashboard-container-background py-3 px-2 px-md-4 rounded-bottom-4 d-flex flex-row flex-wrap justify-content-between align-items-center">
                         <div className="d-flex flex-column align-items-center">
                             <Image src={profilePicture} alt="profile picture" width={80} height={80} roundedCircle/>
-                            <h3 className="text-light fw-bold mt-2">{userData.name}</h3>
+                            <div className="d-flex flex-row align-items-center justify-content-center" onClick={() => navigate("/profile")}>
+                                <h3 className="text-light fw-bold mt-2 mx-2">{userData.name}</h3>
+                                <Pencil style={{color: "white"}}/>
+                            </div>
                         </div>
                         <div className="d-flex flex-column align-items-center">
                             <h2 className="text-light text-center fw-bold user-name">Fantashow</h2>
