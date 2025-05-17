@@ -40,7 +40,7 @@ function AppRoutes() {
             <Route path="/reset" element={user ? <Navigate to="/dashboard" /> : <ResetPassword />} />
             <Route path="/referral/:referralCode" element={user ? <Navigate to="/dashboard" /> : <ReferralLink />} />
             <Route path="/support" element={<Support />} />
-            <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
+            <Route path="/profile" element={user ? <Profile user={user}/> : <Navigate to="/login" />} />
             <Route path="/register/:referralCode" element={user ? <Navigate to="/dashboard" /> : <Register />} />
             <Route path="/dashboard" element={
                 user
