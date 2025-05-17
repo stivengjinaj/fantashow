@@ -1,7 +1,7 @@
 import {Button, Container, Form, Image, Spinner} from "react-bootstrap";
 import next from "../../assets/icons/next.svg";
 import {useState} from "react";
-import {registerFirebaseUser, registerUser} from "../../API.js";
+import {registerUser} from "../../API.js";
 import {deleteUnregisteredUser, registerUserWithFirebase} from "../../utils/auth.js";
 
 function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
