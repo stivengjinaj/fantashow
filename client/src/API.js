@@ -1,4 +1,4 @@
-const remoteURL = "https://fantashow-backend.onrender.com";
+const remoteURL = "http://localhost:3000"; // Replace with your remote server URL
 
 const fetchClientSecret = async () => {
     try {
@@ -400,6 +400,29 @@ const getUserData = async (uuid, idToken) => {
     }
 }
 
+const editUserData = async (uuid, idToken, userData) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/user/${uuid}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
+            body: JSON.stringify(userData)
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to edit user data");
+        }
+
+        return { success: true, message: data.message };
+    }catch (error) {
+        return { success: false, error: error };
+    }
+}
+
 const getAdminData = async (uuid, idToken) => {
     try {
         const response = await fetch(`${remoteURL}/api/admin/${uuid}`, {
@@ -617,6 +640,7 @@ export {
     deleteCashPaymentRequest,
     checkReferral,
     getUserData,
+    editUserData,
     getAdminData,
     checkCashPaymentRequest,
     getAllUsers,

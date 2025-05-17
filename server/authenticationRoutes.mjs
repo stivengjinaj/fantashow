@@ -554,4 +554,37 @@ authenticationRoutes.get("/api/user/:uuid", verifyToken, verifyPayment, async (r
     }
 });
 
+authenticationRoutes.patch("/api/user/:uuid", verifyToken, async (req, res) => {
+    try {
+        const { uuid } = req.params;
+        const { name, surname, birthYear, cap, favouriteTeam, phone, telegram } = req.body;
+
+        if (!uuid) {
+            return res.status(400).json({ error: "UUID is required" });
+        }
+
+        const userRef = db.collection("users").doc(uuid);
+        const userDoc = await userRef.get();
+
+        if (!userDoc.exists) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        await userRef.update({
+            name,
+            surname,
+            birthYear,
+            cap,
+            favouriteTeam,
+            phone,
+            telegram
+        });
+
+        res.status(200).json({ message: "User data updated successfully" });
+    } catch (error) {
+        console.error("Error updating user data:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+
 export default authenticationRoutes;
