@@ -96,7 +96,7 @@ function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
                     />
                     {errors.username && <p className="mx-2 text-danger">{errors.username}</p>}
                 </Form.Group>
-                <Form.Group className="mb-md-5 mb-4">
+                <Form.Group className="mb-md-4 mb-3">
                     <Form.Control
                         type="password"
                         placeholder="Password*"
@@ -105,6 +105,7 @@ function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
                         value={state.password || ""}
                         onChange={handleChange}
                     />
+                    {!errors.password && <p className="mx-2 text-warning">6 caratteri minimo</p> }
                     {errors.password && <p className="mx-2 text-danger">{errors.password}</p>}
                 </Form.Group>
                 <Form.Group className="mb-md-5 mb-4">
