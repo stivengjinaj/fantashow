@@ -59,3 +59,10 @@ export const mapStatus = (status) => {
             return "BASE"
     }
 }
+
+export const clearRegistrationFlag = () => {
+    const registrationInProgress = localStorage.getItem("registrationInProgress");
+    if (registrationInProgress) {
+        localStorage.removeItem("registrationInProgress");
+    }
+}
