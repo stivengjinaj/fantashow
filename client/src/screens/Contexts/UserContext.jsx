@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import {createContext, useCallback, useEffect, useState} from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../utils/firebase.mjs";
 import { logout } from "../../utils/auth.js";
@@ -16,31 +16,39 @@ export const UserProvider = ({ children }) => {
             setLoading(true);
 
             try {
+                const registrationInProgress = localStorage.getItem("registrationInProgress") === "true";
+
                 if (currentUser) {
-                    //await currentUser.reload();
+                    if (registrationInProgress) {
+                        setLoading(false);
+                        return;
+                    }
 
-                    if (currentUser.emailVerified) {
-                        setUser(currentUser);
-
-                        try {
-                            const idToken = await currentUser.getIdToken();
-                            const adminData = await getAdminData(currentUser.uid, idToken);
-
-                            if (adminData.success) {
-                                setIsAdmin(adminData.message.isAdmin);
-                            } else {
-                                setIsAdmin(false);
-                            }
-                        } catch {
-                            setIsAdmin(false);
-                        }
-
-                    } else {
+                    if (!currentUser.emailVerified) {
                         await logout();
                         setUser(null);
                         setIsAdmin(false);
+                        setLoading(false);
+                        return;
+                    }
+
+                    setUser(currentUser);
+
+                    try {
+                        const idToken = await currentUser.getIdToken();
+                        const adminData = await getAdminData(currentUser.uid, idToken);
+
+                        if (adminData.success) {
+                            setIsAdmin(adminData.message.isAdmin);
+                        } else {
+                            setIsAdmin(false);
+                        }
+                    } catch (error) {
+                        console.error("Error fetching admin status:", error);
+                        setIsAdmin(false);
                     }
                 } else {
+                    // No user is logged in
                     setUser(null);
                     setIsAdmin(false);
                 }

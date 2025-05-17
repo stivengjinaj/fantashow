@@ -56,7 +56,7 @@ function Register() {
                             {step === 0 && <PersonalData dispatch={dispatch} state={state} nextStep={nextStep}/>}
                             {step === 1 && <ContactData dispatch={dispatch} state={state} nextStep={nextStep} prevStep={prevStep}/>}
                             {step === 2 && <LoginData dispatch={dispatch} state={state} nextStep={nextStep} prevStep={prevStep} saveUid={saveUid}/>}
-                            {step === 4 && <Checkout dispatch={dispatch} state={state} prevStep={prevStep}/> }
+                            {step === 4 && <Checkout dispatch={dispatch} state={state} prevStep={prevStep} uid={uid}/> }
 
 
                             <Container fluid className="d-flex justify-content-center mt-3 py-5">

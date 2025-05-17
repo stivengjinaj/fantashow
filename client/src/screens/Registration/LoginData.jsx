@@ -2,7 +2,7 @@ import {Button, Container, Form, Image, Spinner} from "react-bootstrap";
 import next from "../../assets/icons/next.svg";
 import {useState} from "react";
 import {registerFirebaseUser, registerUser} from "../../API.js";
-import {deleteUnregisteredUser} from "../../utils/auth.js";
+import {deleteUnregisteredUser, registerUserWithFirebase} from "../../utils/auth.js";
 
 function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
     const [errors, setErrors] = useState({});
@@ -18,28 +18,39 @@ function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
     const register = async (e) => {
         e.preventDefault();
         setLoading(true);
-        if (validate()) {
-            let newErrors = {};
-            const { success, uid, error } = await registerFirebaseUser(state.email, state.password);
+        let newErrors = {};
 
-            if(success){
-                saveUid(uid);
-                const { success: apiSuccess, error: apiError } = await registerUser(state, uid);
+        try {
+            if (validate()) {
+                localStorage.setItem("registrationInProgress", "true");
 
-                if (apiSuccess) {
-                    handleNext();
+                const { success, uid, error } = await registerUserWithFirebase(state.email, state.password);
+
+                if (success) {
+                    saveUid(uid);
+                    const { success: apiSuccess, error: apiError } = await registerUser(state, uid);
+
+                    if (apiSuccess) {
+                        handleNext();
+                    } else {
+                        await deleteUnregisteredUser(uid);
+                        newErrors.passwordConfirm = apiError;
+                        localStorage.removeItem("registrationInProgress");
+                    }
                 } else {
-                    setLoading(false);
-                    await deleteUnregisteredUser(uid);
-                    newErrors.passwordConfirm = apiError;
+                    if (uid) await deleteUnregisteredUser(uid);
+                    newErrors.passwordConfirm = error;
+                    localStorage.removeItem("registrationInProgress");
                 }
-            } else {
-                await deleteUnregisteredUser(uid);
-                newErrors.passwordConfirm = error;
             }
+        } catch (error) {
+            console.error("Registration error:", error);
+            newErrors.passwordConfirm = "An unexpected error occurred. Please try again.";
+            localStorage.removeItem("registrationInProgress");
+        } finally {
             setErrors(newErrors);
+            setLoading(false);
         }
-        setLoading(false);
     }
 
 
