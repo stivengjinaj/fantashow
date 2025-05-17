@@ -1,11 +1,12 @@
 import {Button, Container, Form, Image, InputGroup, Spinner} from "react-bootstrap";
 import person from "../../assets/icons/person.svg";
 import lock from "../../assets/icons/lock.svg";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
 import {resendEmailVerification, updateLastLogin} from "../../API.js";
 import {loginWithEmail} from "../../utils/auth.js";
+import {clearRegistrationFlag} from "../../utils/helper.js";
 
 
 function Login(){
@@ -22,6 +23,10 @@ function Login(){
                 x: 0
         });
     }
+
+    useEffect(() => {
+        clearRegistrationFlag();
+    }, []);
 
     useGSAP(() => {
         if(error){

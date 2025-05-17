@@ -5,6 +5,7 @@ import {useGSAP} from "@gsap/react";
 import {useEffect, useState} from "react";
 import RequestRegistration from "./RequestRegistration.jsx";
 import Guide from "../misc/Guide.jsx";
+import {clearRegistrationFlag} from "../../utils/helper.js";
 
 gsap.registerPlugin(useGSAP);
 
@@ -15,6 +16,7 @@ function Homepage() {
 
     useEffect(() => {
         params.contact !== "contact" && navigate("/");
+        clearRegistrationFlag();
     }, []);
 
     useGSAP(() => {
