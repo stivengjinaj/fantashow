@@ -12,7 +12,7 @@ function PersonalData({ nextStep, dispatch, state }) {
         let newErrors = {};
         if (!state.nome.trim()) newErrors.nome = "Il campo è obbligatorio.";
         if (!state.cognome.trim()) newErrors.cognome = "Il campo è obbligatorio.";
-        if (!state.annoNascita || state.annoNascita < 1900 || state.annoNascita > new Date().getFullYear()) newErrors.annoNascita = "Anno di nascita non valido.";
+        if (!state.annoNascita || state.annoNascita < 1900 || state.annoNascita > new Date().getFullYear()) newErrors.annoNascita = "Scrivi solo anno di nascita";
         if (!state.cap) newErrors.cap = "Il campo è obbligatorio.";
         if (!state.squadraDelCuore) newErrors.squadraDelCuore = "Il campo è obbligatorio.";
 
@@ -42,13 +42,13 @@ function PersonalData({ nextStep, dispatch, state }) {
                 <Modal.Header closeButton>
                     <Modal.Title>Perchè devi specificare il CAP?</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>Woohoo, you are reading this text in a modal!</Modal.Body>
+                <Modal.Body>Servirá ai nostro admin per la creazione dei tornei locali.</Modal.Body>
             </Modal>
             <Modal show={squadraInfo} onHide={handleSquadra}>
                 <Modal.Header closeButton>
                     <Modal.Title>Perchè devi specificare la squadra del cuore?</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>Woohoo, you are reading this text in a modal!</Modal.Body>
+                <Modal.Body>Servirá ai nostro admin per la creazione dei tornei speciali.</Modal.Body>
             </Modal>
             <h2 className="text-light text-center mt-5">Dati Personali</h2>
             <Form className="mt-5 login-form-width">
