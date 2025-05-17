@@ -8,6 +8,7 @@ import telegramIcon from '../../assets/icons/telegram.svg';
 import {CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import {logout} from "../../utils/auth.js";
 import {CheckCircleFill, Pencil, XCircleFill} from "react-bootstrap-icons";
+import {mapStatus} from "../../utils/helper.js";
 
 
 const UserDashboardDesktop = ({ userData, userStatistics, pointStatistics, team, editTeam, setEditTeam, handleTeamChange, handleTeamSubmit }) => {
@@ -17,15 +18,15 @@ const UserDashboardDesktop = ({ userData, userStatistics, pointStatistics, team,
     const handlePremiModalClose = () => setShowPremiModal(false);
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(`http://localhost:5173/referral/${userData.referralCode}`);
+        navigator.clipboard.writeText(`https://fantashow.onrender.com/referral/${userData.referralCode}`);
     };
 
     const getRankColor = useCallback((index) => {
         switch(index) {
-            case 0: return 'warning'; // Gold
-            case 1: return 'secondary'; // Silver
-            case 2: return 'danger'; // Bronze
-            default: return 'light';
+            case 0: return 'warning';
+            case 1: return 'secondary';
+            case 2: return 'info';
+            default: return 'danger';
         }
     }, []);
 
@@ -42,6 +43,7 @@ const UserDashboardDesktop = ({ userData, userStatistics, pointStatistics, team,
                         <div className="d-flex flex-column align-items-center">
                             <h2 className="text-light text-center fw-bold user-name">Fantashow</h2>
                             <Button onClick={handleCopy} className="glowing-border-blue rounded-5">Copia referral</Button>
+                            <h5 className="text-center text-light fw-bold mt-2">{mapStatus(userData.status)}</h5>
                         </div>
                         <Image src={logoutIcon} alt="edit" width={50} height={50} className="image-button" onClick={logout}/>
                     </div>
@@ -173,7 +175,7 @@ const UserDashboardDesktop = ({ userData, userStatistics, pointStatistics, team,
                                                             {index + 1}
                                                         </Badge>
                                                     </td>
-                                                    <td>{user.name} {user.surname}</td>
+                                                    <td>{user.username}</td>
                                                     <td>{user.points}</td>
                                                     <td>{user.team || user.favouriteTeam}</td>
                                                 </tr>

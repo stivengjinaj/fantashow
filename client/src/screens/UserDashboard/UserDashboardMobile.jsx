@@ -10,6 +10,7 @@ import telegramIcon from "../../assets/icons/telegram.svg";
 import coin from "../../assets/icons/coin.svg";
 import {logout} from "../../utils/auth.js";
 import {CheckCircleFill, Pencil, XCircleFill} from "react-bootstrap-icons";
+import {mapStatus} from "../../utils/helper.js";
 
 function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, editTeam, setEditTeam, handleTeamChange, handleTeamSubmit }) {
     const [showPremiModal, setShowPremiModal] = useState(false);
@@ -18,15 +19,15 @@ function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, 
     const handlePremiModalClose = () => setShowPremiModal(false);
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(`http://localhost:5173/referral/${userData.referralCode}`);
+        navigator.clipboard.writeText(`https://fantashow.onrender.com/referral/${userData.referralCode}`);
     };
 
     const getRankColor = useCallback((index) => {
         switch(index) {
-            case 0: return 'warning'; // Gold
-            case 1: return 'secondary'; // Silver
-            case 2: return 'danger'; // Bronze
-            default: return 'light';
+            case 0: return 'warning';
+            case 1: return 'secondary';
+            case 2: return 'info';
+            default: return 'danger';
         }
     }, []);
 
@@ -36,7 +37,10 @@ function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, 
                 {/* Profile section */}
                 <Col xs={3} className="d-flex flex-column dashboard-container-background rounded-4 py-3 justify-content-between align-items-center rounded-3">
                     <Image src={profilePicture} alt="profile picture" width={50} height={50} roundedCircle className="mb-auto" />
-                    <Image src={status} width={40} height={40} roundedCircle className="my-4" />
+                    <div className="d-flex flex-column justify-content-center align-items-center">
+                        <Image src={status} width={40} height={40} roundedCircle/>
+                        <small className="text-light text- text-center fw-bold">{mapStatus(userData.status)}</small>
+                    </div>
                     <Image src={logoutIcon} alt="edit" width={30} height={30} onClick={logout} className="mt-auto image-button" />
                 </Col>
                 {/* User information section */}
@@ -161,7 +165,7 @@ function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, 
             </Row>
             {/* Statistics */}
             <Row className="px-2 mt-2">
-                <div className="dashboard-container-background rounded-4 py-3 mt-3">
+                <div className="dashboard-container-background rounded-4 py-3 mt-3 w-100">
                     <h3 className="text-light text-center fw-bold">Classifica</h3>
                     <div className="p-3">
                         {
@@ -188,7 +192,7 @@ function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, 
                                                         {index + 1}
                                                     </Badge>
                                                 </td>
-                                                <td>{user.name} {user.surname}</td>
+                                                <td>{user.username}</td>
                                                 <td>{user.points}</td>
                                                 <td>{user.team || user.favouriteTeam}</td>
                                             </tr>
