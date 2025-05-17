@@ -47,7 +47,7 @@ function AppRoutes() {
                     ? isAdmin ? <AdminDashboard /> : <UserDashboard />
                     : <Navigate to="/login" />
             } />
-            <Route path="/checkout/success/" element={<PaymentSuccess />} />
+            <Route path="/checkout/success" element={<PaymentSuccess />} />
             <Route path="/checkout/error" element={<PaymentError />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
