@@ -554,6 +554,56 @@ authenticationRoutes.get("/api/user/:uuid", verifyToken, verifyPayment, async (r
     }
 });
 
+/**
+ * @route PATCH /api/user/:uuid
+ * @description Updates user data in the database based on the provided UUID.
+ * @access Protected - Requires a valid token.
+ * @param {object} req - The HTTP request object.
+ * @param {string} req.params.uuid - The UUID of the user to update.
+ * @param {object} req.body - The request body containing the user data to update.
+ * @param {string} [req.body.name] - The updated first name of the user.
+ * @param {string} [req.body.surname] - The updated surname of the user.
+ * @param {number} [req.body.birthYear] - The updated birth year of the user.
+ * @param {string} [req.body.cap] - The updated postal code of the user.
+ * @param {string} [req.body.favouriteTeam] - The updated favorite team of the user.
+ * @param {string} [req.body.phone] - The updated phone number of the user.
+ * @param {string} [req.body.telegram] - The updated Telegram handle of the user.
+ * @param {object} res - The HTTP response object.
+ * @returns {object} - JSON response with a success message or an error message.
+ * @returns {200} - If the user data is updated successfully.
+ * @returns {400} - If the UUID is missing from the request.
+ * @returns {404} - If the user is not found in the database.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request:
+ * PATCH /api/user/123e4567-e89b-12d3-a456-426614174000
+ * Body:
+ * {
+ *   "name": "John",
+ *   "surname": "Doe",
+ *   "birthYear": 1990,
+ *   "cap": "12345",
+ *   "favouriteTeam": "Team A",
+ *   "phone": "1234567890",
+ *   "telegram": "@johndoe"
+ * }
+ *
+ * Successful Response:
+ * {
+ *   "message": "User data updated successfully"
+ * }
+ *
+ * Error Response (User Not Found):
+ * {
+ *   "error": "User not found"
+ * }
+ *
+ * Error Response (Missing UUID):
+ * {
+ *   "error": "UUID is required"
+ * }
+ */
 authenticationRoutes.patch("/api/user/:uuid", verifyToken, async (req, res) => {
     try {
         const { uuid } = req.params;
