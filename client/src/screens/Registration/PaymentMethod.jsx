@@ -57,7 +57,7 @@ function PaymentMethod({nextStep, uid, title}) {
                             <Button className="p-5 rounded-5 text-dark border-0 payment-method-button" onClick={nextStep}>
                                 <Image width={150} height={150} src={creditCardIcon} alt="creditCard"/>
                             </Button>
-                            <h3 className="my-3 mt-md-4 mt-sm-2 text-light fw-bold">Contactless</h3>
+                            <h3 className="my-3 mt-md-4 mt-sm-2 text-light fw-bold">Carte di pagamento</h3>
                         </Col>
                     </Row>
                 </Container>
