@@ -9,7 +9,6 @@ const Checkout = (props) => {
     const [clientSecret, setClientSecret] = useState("");
 
     useEffect(() => {
-        console.log("Checkout component mounted");
         fetchClientSecret(clientSecret).then(r => setClientSecret(r));
     }, []);
 

@@ -1,5 +1,5 @@
 import { PaymentElement } from "@stripe/react-stripe-js";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { useStripe, useElements } from "@stripe/react-stripe-js";
 import { useNavigate } from "react-router-dom";
 import {Button, Form} from "react-bootstrap";
@@ -10,52 +10,111 @@ function CheckoutForm(props) {
     const navigate = useNavigate();
 
     const [isProcessing, setIsProcessing] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(null);
+
+    // Store payment data in localStorage for retrieval after redirect
+    const storePaymentData = (uid, paymentIntentId) => {
+        localStorage.setItem('stripe_payment_uid', uid);
+        localStorage.setItem('stripe_payment_intent_id', paymentIntentId);
+    };
+
+    useEffect(() => {
+        // If we have uid from props, store it immediately
+        // This ensures it's available in case of redirects
+        if (props.uid) {
+            localStorage.setItem('stripe_payment_uid', props.uid);
+        }
+    }, [props.uid]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setErrorMessage(null);
 
-        if (!stripe || !elements) {
-            // Stripe.js has not yet loaded.
-            // Make sure to disable form submission until Stripe.js has loaded.
-            return;
-        }
+        if (!stripe || !elements) return;
 
         setIsProcessing(true);
 
-        const { paymentIntent, error } = await stripe.confirmPayment({
-            elements,
-            redirect: "if_required"
-        });
+        try {
+            // ✅ Validate PaymentElement fields first
+            const { error: validationError } = await elements.submit();
 
-        if (!error && paymentIntent?.status === "succeeded") {
-            navigate("/checkout/success", {
-                state: {
-                    fromCheckout: true,
-                    paymentIntentId: paymentIntent.id,
-                    uid: props.uid
-                }
+            if (validationError) {
+                setErrorMessage(validationError.message);
+                setIsProcessing(false);
+                return; // 🔒 Prevent submission
+            }
+
+            // Proceed only if validation passed
+            if (props.uid) {
+                storePaymentData(props.uid, '');
+            }
+
+            const { paymentIntent, error } = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    return_url: `${window.location.origin}/checkout/success`,
+                },
+                redirect: "if_required",
             });
-        } else {
-            navigate("/checkout/error", {
-                state: {
-                    fromCheckout: true,
-                    uid: props.uid,
-                    errorMessage: error?.message || "Unknown error during payment.",
-                    errorCode: error?.code || null,
-                    paymentIntentId: paymentIntent?.id || null
-                }
-            });
+
+            if (error) {
+                console.error("Payment error:", error);
+                setErrorMessage(error.message || "An error occurred during payment processing.");
+
+                navigate("/checkout/error", {
+                    state: {
+                        fromCheckout: true,
+                        uid: props.uid,
+                        errorMessage: error.message || "Unknown error during payment.",
+                        errorCode: error.code || null
+                    }
+                });
+            } else if (paymentIntent?.status === "succeeded") {
+                storePaymentData(props.uid, paymentIntent.id);
+                navigate("/checkout/success", {
+                    state: {
+                        fromCheckout: true,
+                        paymentIntentId: paymentIntent.id,
+                        uid: props.uid
+                    }
+                });
+            }
+        } catch (err) {
+            console.error("Exception during payment processing:", err);
+            setErrorMessage("A system error occurred. Please try again later.");
+        } finally {
+            setIsProcessing(false);
         }
-
-
-        setIsProcessing(false);
     };
+
 
     return (
         <Form id="payment-form" onSubmit={handleSubmit}>
             <PaymentElement id="payment-element" />
-            <Button type="submit" variant={"dark"} disabled={isProcessing || !stripe || !elements} id="submit" className="mt-3">
-                <span id="button-text">{isProcessing ? "Processing ... " : "Pay now"}</span>
+
+            {errorMessage && (
+                <div className="alert alert-danger mt-3">
+                    {errorMessage}
+                </div>
+            )}
+
+            <Button
+                type="submit"
+                variant="dark"
+                disabled={isProcessing || !stripe || !elements}
+                id="submit"
+                className="mt-3"
+            >
+                <span id="button-text">
+                    {isProcessing ? (
+                        <>
+                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Processing...
+                        </>
+                    ) : (
+                        "Paga"
+                    )}
+                </span>
             </Button>
         </Form>
     );
