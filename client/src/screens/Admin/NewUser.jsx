@@ -1,7 +1,7 @@
 import {Alert, Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import React, {useState} from "react";
-import {registerFirebaseUser, registerUser} from "../../API.js";
-import {deleteUnregisteredUser} from "../../utils/auth.js";
+import {registerUser} from "../../API.js";
+import {deleteUnregisteredUser, registerUserWithFirebase, registerUserWithFirebaseAdmin} from "../../utils/auth.js";
 
 function NewUser() {
     const [formData, setFormData] = useState({
@@ -62,7 +62,7 @@ function NewUser() {
                 throw new Error('Le password non coincidono.');
             }
 
-            const { success, uid, error } = await registerFirebaseUser(formData.email, formData.password);
+            const { success, uid, error } = await registerUserWithFirebaseAdmin(formData.email, formData.password);
 
             if(success){
                 const { success: apiSuccess, error: apiError } = await registerUser(formData, uid);
@@ -230,7 +230,6 @@ function NewUser() {
                                                 name="telegram"
                                                 value={formData.telegram}
                                                 onChange={handleChange}
-                                                required
                                             />
                                         </Form.Group>
                                     </Col>

@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { Form, Button, Card, Alert, Container, Row, Col } from 'react-bootstrap';
-import { registerAdmin } from "../../API.js";
+import {adminDeleteUser, registerAdmin} from "../../API.js";
+import {
+    adminRegisterWithoutLogout,
+    deleteUnregisteredUser,
+    logoutFromAdmin,
+    registerUserWithFirebaseAdmin
+} from "../../utils/auth.js";
 
 function NewAdmin({ admin }) {
     const [formData, setFormData] = useState({
@@ -35,6 +41,10 @@ function NewAdmin({ admin }) {
             }
 
             const idToken = await admin.getIdToken();
+            const { success, newAdminToken, newAdminUid, error } = await adminRegisterWithoutLogout(formData.email, formData.password);
+            if (!success) {
+                new Error('Errore durante la registrazione dell\'amministratore.');
+            }
             const response = await registerAdmin(
                 admin.uid,
                 idToken,
@@ -42,7 +52,8 @@ function NewAdmin({ admin }) {
                 formData.surname,
                 formData.username,
                 formData.email,
-                formData.password
+                formData.password,
+                newAdminUid
             );
 
             if(response.success){
@@ -55,10 +66,14 @@ function NewAdmin({ admin }) {
                     password: '',
                     confirmPassword: ''
                 });
+            }else {
+                await adminDeleteUser(idToken, newAdminUid);
+                new Error('Errore durante la registrazione dell\'amministratore.');
             }
         } catch (error) {
             setError(error.message);
         } finally {
+            await logoutFromAdmin();
             setIsLoading(false);
         }
     };
