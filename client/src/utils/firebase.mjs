@@ -16,6 +16,10 @@ const firebaseConfig = {
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
+
+const secondaryApp = initializeApp(firebaseConfig, "secondary");
+const adminAuth = getAuth(secondaryApp);
+
 const analytics = getAnalytics(firebaseApp);
 
-export { auth };
+export { auth, adminAuth };
