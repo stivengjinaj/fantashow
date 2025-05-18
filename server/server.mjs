@@ -10,7 +10,7 @@ import adminRoutes from "./adminRoutes.mjs";
 const app = express();
 
 const corsOptions = {
-    origin: ['https://fantashow.onrender.com'],
+    origin: '*',
     methods: '*',
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
