@@ -1,4 +1,4 @@
-const remoteURL = "https://fantashow-backend.onrender.com";
+const remoteURL = "http://localhost:3000";
 
 const fetchClientSecret = async () => {
     try {
@@ -45,28 +45,28 @@ const verifyPayment = async (onErrorNavigate, onVerificationTrue, paymentIntentI
     }
 };
 
-const registerAdmin = async (uid, idToken, name, surname, username, email, password) => {
-         try {
-             const response = await fetch(`${remoteURL}/api/register/admin/${uid}`, {
-                 method: "POST",
-                 headers: {
-                     "Content-Type": "application/json",
-                     "Authorization": `Bearer ${idToken}`,
-                 },
-                 body: JSON.stringify({ name, surname, username, email, password }),
-             });
+const registerAdmin = async (uid, idToken, name, surname, username, email, password, newAdminUid) => {
+    try {
+        const response = await fetch(`${remoteURL}/api/register/admin/${uid}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({ name, surname, username, email, password, newAdminUid }),
+        });
 
-             const data = await response.json();
+        const data = await response.json();
 
-             if (!response.ok) {
-                 throw new Error(data.error || "Failed to register admin");
-             }
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to register admin");
+        }
 
-             return { success: true, message: data.message };
-         } catch (error) {
-             return { success: false, error: error.message || "Error registering admin" };
-         }
-     }
+        return { success: true, message: data.message };
+    } catch (error) {
+        return { success: false, error: error.message || "Error registering admin" };
+    }
+}
 
 const registerFirebaseUser = async (email, password) => {
     try {

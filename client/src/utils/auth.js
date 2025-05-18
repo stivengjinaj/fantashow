@@ -8,10 +8,10 @@ import {
     setPersistence,
     signInWithEmailAndPassword
 } from "firebase/auth";
-import {auth} from "./firebase.mjs";
+import {adminAuth, auth} from "./firebase.mjs";
 import getError from "./errorHandler.js";
 
-const remoteURL = "https://fantashow-backend.onrender.com";
+const remoteURL = "http://localhost:3000";
 
 export const loginWithEmail = async (email, password, rememberMe = false) => {
     try {
@@ -56,6 +56,15 @@ export const logout = async () => {
     }
 };
 
+export const logoutFromAdmin = async () => {
+    try {
+        await adminAuth.signOut();
+        return { success: true };
+    } catch (error) {
+        return { success: false, message: getError(error.code) };
+    }
+}
+
 export async function registerUserWithFirebase(email, password) {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -69,6 +78,40 @@ export async function registerUserWithFirebase(email, password) {
         await logout();
 
         return { success: true, idToken, uid: user.uid };
+    } catch (error) {
+        return { success: false, error: error };
+    }
+}
+
+export async function registerUserWithFirebaseAdmin(email, password) {
+    try {
+        const userCredential = await createUserWithEmailAndPassword(adminAuth, email, password);
+
+        await sendEmailVerification(userCredential.user);
+
+        const user = userCredential.user;
+
+        const idToken = await getIdToken(user);
+
+        await logoutFromAdmin();
+
+        return { success: true, idToken, uid: user.uid };
+    } catch (error) {
+        return { success: false, error: error };
+    }
+}
+
+export async function adminRegisterWithoutLogout(email, password) {
+    try {
+        const userCredential = await createUserWithEmailAndPassword(adminAuth, email, password);
+
+        await sendEmailVerification(userCredential.user);
+
+        const user = userCredential.user;
+
+        const idToken = await getIdToken(user);
+
+        return { success: true, newAdminToken: idToken, newAdminUid: user.uid };
     } catch (error) {
         return { success: false, error: error };
     }

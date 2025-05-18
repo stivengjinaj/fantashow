@@ -49,18 +49,13 @@ const db = admin.firestore();
  * */
 adminRoutes.post("/api/register/admin/:uid", verifyToken, verifyAdmin, async (req, res) => {
     try {
-        const { name, surname, username, email, password } = req.body;
+        const { name, surname, username, email, password, newAdminUid } = req.body;
 
         if (!username || !email || !name || !surname || !password) {
             return res.status(400).json({ error: "Missing data." });
         }
 
-        const userRecord = await admin.auth().createUser({
-            email,
-            password,
-        });
-
-        if (!userRecord.uid) {
+        if (!newAdminUid) {
             return res.status(400).json({ error: "Failed to create user" });
         }
 
@@ -81,20 +76,16 @@ adminRoutes.post("/api/register/admin/:uid", verifyToken, verifyAdmin, async (re
 
         let adminRef;
         try {
-            adminRef = await db.collection("users").doc(userRecord.uid).set(newAdmin);
+            adminRef = await db.collection("users").doc(newAdminUid).set(newAdmin);
         } catch (dbError) {
-            await admin.auth().deleteUser(userRecord.uid);
+            await admin.auth().deleteUser(newAdminUid);
             console.error("Firestore failed, user rolled back:", dbError);
             return res.status(500).json({ error: "Failed to store user data" });
         }
 
-        const verificationLink = await admin.auth().generateEmailVerificationLink(email);
-
-        await sendVerificationEmail(email, verificationLink);
-
         res.status(201).json({
             message: "Admin registered successfully",
-            adminId: userRecord.uid,
+            adminId: newAdminUid,
             referralCode: referralCode,
         });
     } catch (error) {
