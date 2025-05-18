@@ -1,4 +1,4 @@
-const remoteURL = "http://localhost:3000";
+const remoteURL = "https://fantashow-server.onrender.com";
 
 const fetchClientSecret = async () => {
     try {

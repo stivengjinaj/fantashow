@@ -11,7 +11,7 @@ import {
 import {adminAuth, auth} from "./firebase.mjs";
 import getError from "./errorHandler.js";
 
-const remoteURL = "http://localhost:3000";
+const remoteURL = "https://fantashow-server.onrender.com";
 
 export const loginWithEmail = async (email, password, rememberMe = false) => {
     try {
