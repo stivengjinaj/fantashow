@@ -176,12 +176,12 @@ generalRoutes.get("/api/referral/:referralCode", async (req, res) => {
 generalRoutes.get("/api/user-subscriptions/:uuid", verifyToken, verifyPayment, async (req, res) => {
     try {
         const months_dictionary = {
-            4: "April",
-            5: "May",
-            6: "June",
-            7: "July",
-            8: "August",
-            9: "September"
+            4: "Aprile",
+            5: "Maggio",
+            6: "Giugno",
+            7: "Luglio",
+            8: "Agosto",
+            9: "Settembre"
         };
 
         const monthNames = Object.values(months_dictionary);
