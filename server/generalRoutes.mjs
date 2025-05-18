@@ -286,6 +286,56 @@ generalRoutes.patch("/api/team/:uuid", verifyToken, verifyPayment, async (req, r
     }
 })
 
+/**
+ * @route GET /api/user/statistics/:uuid
+ * @description Retrieves the top 5 non-admin users with the highest points, along with their statistics.
+ * @access Protected - Requires valid token and payment verification.
+ * @param {object} req - The HTTP request object.
+ * @param {string} req.params.uuid - The UUID of the user (used for token and payment validation).
+ * @param {object} res - The HTTP response object.
+ * @returns {object} - JSON response containing an array of user statistics or an error message.
+ * @returns {200} - If the user statistics are successfully retrieved.
+ * @returns {400} - If the UUID is missing from the request.
+ * @returns {404} - If no users are found in the database.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request:
+ * GET /api/user/statistics/123e4567-e89b-12d3-a456-426614174000
+ *
+ * Successful Response:
+ * {
+ *   "message": [
+ *     {
+ *       "username": "user1",
+ *       "points": 100,
+ *       "team": "Team A",
+ *       "favouriteTeam": "Team B"
+ *     },
+ *     {
+ *       "username": "user2",
+ *       "points": 90,
+ *       "team": "Team C",
+ *       "favouriteTeam": "Team D"
+ *     }
+ *   ]
+ * }
+ *
+ * Error Response (Missing UUID):
+ * {
+ *   "error": "UUID is required"
+ * }
+ *
+ * Error Response (No Users Found):
+ * {
+ *   "error": "No users found"
+ * }
+ *
+ * Error Response (Internal Server Error):
+ * {
+ *   "error": "Internal Server Error"
+ * }
+ */
 generalRoutes.get("/api/user/statistics/:uuid", verifyToken, verifyPayment, async (req, res) => {
     try {
         const { uuid } = req.params;
@@ -322,5 +372,37 @@ generalRoutes.get("/api/user/statistics/:uuid", verifyToken, verifyPayment, asyn
     }
 })
 
+/**
+ * @route GET /api/healthy
+ * @description Checks the health status of the server.
+ * @access Public
+ * @param {object} req - The HTTP request object.
+ * @param {object} res - The HTTP response object.
+ * @returns {object} - JSON response with a health status message.
+ * @returns {200} - If the server is healthy.
+ * @returns {500} - If an internal server error occurs.
+ * @async
+ * @example
+ * Request:
+ * GET /api/healthy
+ *
+ * Successful Response:
+ * {
+ *   "message": "Server is healthy"
+ * }
+ *
+ * Error Response:
+ * {
+ *   "error": "Internal Server Error"
+ * }
+ */
+generalRoutes.get("/api/healthy", async (req, res) => {
+    try {
+        return res.status(200).json({ message: "Server is healthy" });
+    } catch (error) {
+        console.error("Error checking server health:", error.message, error.stack);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+})
 
 export default generalRoutes;
