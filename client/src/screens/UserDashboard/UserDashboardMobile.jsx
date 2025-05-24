@@ -9,14 +9,17 @@ import emailIcon from "../../assets/icons/email.svg";
 import telegramIcon from "../../assets/icons/telegram.svg";
 import coin from "../../assets/icons/coin.svg";
 import {logout} from "../../utils/auth.js";
-import {CheckCircleFill, Pencil, XCircleFill} from "react-bootstrap-icons";
+import {CheckCircleFill, Pencil, XCircleFill, ChevronDown} from "react-bootstrap-icons";
 import {mapStatus} from "../../utils/helper.js";
 
 function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, editTeam, setEditTeam, handleTeamChange, handleTeamSubmit }) {
     const [showPremiModal, setShowPremiModal] = useState(false);
+    const [showFullRankingModal, setShowFullRankingModal] = useState(false);
 
     const handlePremiModalOpen = () => setShowPremiModal(true);
     const handlePremiModalClose = () => setShowPremiModal(false);
+    const handleFullRankingModalOpen = () => setShowFullRankingModal(true);
+    const handleFullRankingModalClose = () => setShowFullRankingModal(false);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(`https://fantashow.onrender.com/referral/${userData.referralCode}`);
@@ -30,6 +33,32 @@ function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, 
             default: return 'danger';
         }
     }, []);
+
+    // Find current user's position in the ranking
+    const getCurrentUserRank = () => {
+        if (!pointStatistics || !userData) return null;
+        const userIndex = pointStatistics.findIndex(user => user.username === userData.name);
+        return userIndex !== -1 ? userIndex + 1 : null;
+    };
+
+    const getCurrentUserData = () => {
+        if (!pointStatistics || !userData) return null;
+        return pointStatistics.find(user => user.username === userData.name);
+    };
+
+    const getTopThreePlusUser = () => {
+        if (!pointStatistics) return [];
+
+        const topThree = pointStatistics.slice(0, 3);
+        const currentUserRank = getCurrentUserRank();
+        const currentUserData = getCurrentUserData();
+
+        if (!currentUserRank || currentUserRank <= 3) {
+            return topThree;
+        }
+
+        return [...topThree, { ...currentUserData, rank: currentUserRank }];
+    };
 
     return (
         <Container fluid className="dashboard-bg pt-2 px-3 d-flex flex-column min-vh-100">
@@ -163,46 +192,60 @@ function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, 
                     </div>
                 </div>
             </Row>
-            {/* Statistics */}
+            {/* Updated Statistics Section */}
             <Row className="px-2 mt-2">
                 <div className="dashboard-container-background rounded-4 py-3 mt-3 w-100">
-                    <h3 className="text-light text-center fw-bold">Classifica</h3>
-                    <div className="p-3">
-                        {
-                            pointStatistics
-                                ? <div className="table-responsive text-center">
-                                    <table className="table table-borderless classification-table">
-                                        <thead>
-                                        <tr className="border-bottom">
-                                            <th scope="col"></th>
-                                            <th scope="col">Utente</th>
-                                            <th scope="col">Punti</th>
-                                            <th scope="col">Squadra</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {pointStatistics.map((user, index) => (
-                                            <tr key={index} className="border-bottom">
-                                                <td>
-                                                    <Badge
-                                                        bg={getRankColor(index)}
-                                                        className="py-2 px-3"
-                                                        style={{width: '40px'}}
-                                                    >
-                                                        {index + 1}
-                                                    </Badge>
-                                                </td>
-                                                <td>{user.username}</td>
-                                                <td>{user.points}</td>
-                                                <td>{user.team || user.favouriteTeam}</td>
-                                            </tr>
-                                        ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                : <div className="text-center"><h4>Classifica non ancora disponibile</h4></div>
-                        }
+                    <div className="d-flex justify-content-between align-items-center px-3 mb-3">
+                        <h3 className="text-light fw-bold m-0">Classifica</h3>
+                        <Button
+                            className="bg-transparent border-0 p-0"
+                            onClick={handleFullRankingModalOpen}
+                        >
+                            <ChevronDown style={{color: "white", scale: "1.5"}} />
+                        </Button>
                     </div>
+
+                    {pointStatistics ? (
+                        <div className="px-3 overflow-y-scroll overflow-container" style={{maxHeight: "250px"}}>
+                            {getTopThreePlusUser().map((user, index) => {
+                                const actualRank = user.rank || index + 1;
+                                const isCurrentUser = user.username === userData.name && actualRank > 3;
+
+                                return (
+                                    <div key={`${user.username}-${actualRank}`} className="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                        <div className="d-flex align-items-center">
+                                            <Badge
+                                                bg={actualRank <= 3 ? getRankColor(actualRank - 1) : 'danger'}
+                                                className="py-2 px-3 me-3"
+                                                style={{width: '35px', fontSize: '0.8rem'}}
+                                            >
+                                                {actualRank}
+                                            </Badge>
+                                            <span className={`text-light ${isCurrentUser ? 'fw-bold' : ''}`} style={{fontSize: '0.9rem'}}>
+                                                {user.username}
+                                            </span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            <div key={`${userData.username}`} className="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                <div className="d-flex align-items-center">
+                                    <Badge
+                                        bg='light'
+                                        className="py-2 px-3 me-3"
+                                        style={{width: '40px'}}
+                                    >
+                                        ...
+                                    </Badge>
+                                    <span className={`text-light fw-bold`}>{userData.username}</span>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="text-center px-3">
+                            <h4 className="text-light">Classifica non ancora disponibile</h4>
+                        </div>
+                    )}
                 </div>
             </Row>
             {/* Footer */}
@@ -303,6 +346,65 @@ function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, 
                         variant="outline-light"
                         className="rounded-5"
                         onClick={handlePremiModalClose}
+                    >
+                        Chiudi
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Full Ranking Modal */}
+            <Modal
+                show={showFullRankingModal}
+                onHide={handleFullRankingModalClose}
+                centered
+                size="lg"
+                className="text-light"
+            >
+                <Modal.Header closeButton className="dashboard-container-background border-0">
+                    <Modal.Title className="text-light fw-bold">Classifica Completa</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="dashboard-container-background">
+                    <div className="table-responsive text-center" style={{maxHeight: "400px", overflowY: "auto"}}>
+                        <table className="table table-borderless classification-table">
+                            <thead className="sticky-top" style={{backgroundColor: "inherit"}}>
+                            <tr className="border-bottom">
+                                <th scope="col" style={{fontSize: '0.9rem'}}>Pos.</th>
+                                <th scope="col" style={{fontSize: '0.9rem'}}>Utente</th>
+                                <th scope="col" style={{fontSize: '0.9rem'}}>Punti</th>
+                                <th scope="col" style={{fontSize: '0.9rem'}}>Squadra</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {pointStatistics && pointStatistics.map((user, index) => (
+                                <tr
+                                    key={index}
+                                    className={`border-bottom ${user.username === userData.name ? 'bg-primary bg-opacity-25' : ''}`}
+                                >
+                                    <td>
+                                        <Badge
+                                            bg={getRankColor(index)}
+                                            className="py-1 px-2"
+                                            style={{width: '35px', fontSize: '0.75rem'}}
+                                        >
+                                            {index + 1}
+                                        </Badge>
+                                    </td>
+                                    <td className={user.username === userData.name ? 'fw-bold' : ''} style={{fontSize: '0.85rem'}}>
+                                        {user.username}
+                                    </td>
+                                    <td style={{fontSize: '0.85rem'}}>{user.points}</td>
+                                    <td style={{fontSize: '0.85rem'}}>{user.team || user.favouriteTeam}</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer className="dashboard-container-background border-0 d-flex justify-content-end">
+                    <Button
+                        variant="outline-light"
+                        className="rounded-5"
+                        onClick={handleFullRankingModalClose}
                     >
                         Chiudi
                     </Button>

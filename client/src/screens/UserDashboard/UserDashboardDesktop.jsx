@@ -8,7 +8,7 @@ import telegramIcon from '../../assets/icons/telegram.svg';
 import coin from '../../assets/icons/coin.svg';
 import {CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import {logout} from "../../utils/auth.js";
-import {CheckCircleFill, Pencil, XCircleFill} from "react-bootstrap-icons";
+import {CheckCircleFill, Pencil, XCircleFill, ChevronDown} from "react-bootstrap-icons";
 import {mapStatus} from "../../utils/helper.js";
 import {useNavigate} from "react-router-dom";
 
@@ -16,9 +16,12 @@ import {useNavigate} from "react-router-dom";
 const UserDashboardDesktop = ({ userData, userStatistics, pointStatistics, team, editTeam, setEditTeam, handleTeamChange, handleTeamSubmit }) => {
     const navigate = useNavigate();
     const [showPremiModal, setShowPremiModal] = useState(false);
+    const [showFullRankingModal, setShowFullRankingModal] = useState(false);
 
     const handlePremiModalOpen = () => setShowPremiModal(true);
     const handlePremiModalClose = () => setShowPremiModal(false);
+    const handleFullRankingModalOpen = () => setShowFullRankingModal(true);
+    const handleFullRankingModalClose = () => setShowFullRankingModal(false);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(`https://fantashow.onrender.com/referral/${userData.referralCode}`);
@@ -32,6 +35,32 @@ const UserDashboardDesktop = ({ userData, userStatistics, pointStatistics, team,
             default: return 'danger';
         }
     }, []);
+
+    // Find current user's position in the ranking
+    const getCurrentUserRank = () => {
+        if (!pointStatistics || !userData) return null;
+        const userIndex = pointStatistics.findIndex(user => user.username === userData.name);
+        return userIndex !== -1 ? userIndex + 1 : null;
+    };
+
+    const getCurrentUserData = () => {
+        if (!pointStatistics || !userData) return null;
+        return pointStatistics.find(user => user.username === userData.name);
+    };
+
+    const getTopThreePlusUser = () => {
+        if (!pointStatistics) return [];
+
+        const topThree = pointStatistics.slice(0, 3);
+        const currentUserRank = getCurrentUserRank();
+        const currentUserData = getCurrentUserData();
+
+        if (!currentUserRank || currentUserRank <= 3) {
+            return topThree;
+        }
+
+        return [...topThree, { ...currentUserData, rank: currentUserRank }];
+    };
 
     return (
         <Container fluid className="dashboard-bg p-0 d-flex flex-column min-vh-100">
@@ -160,50 +189,64 @@ const UserDashboardDesktop = ({ userData, userStatistics, pointStatistics, team,
                     </div>
                 </Col>
 
-                {/* Third column */}
+                {/* Third column - Updated Ranking */}
                 <Col xs={12} md={4} className="mb-4">
                     <div className="dashboard-container-background rounded-4 py-3 h-100">
-                        <h3 className="text-light text-center fw-bold">Classifica</h3>
-                        {/* User Classification Table */}
-                        <div className="mt-4">
-                            {
-                                pointStatistics
-                                    ? <div className="table-responsive text-center overflow-container" style={{maxHeight: "300px" }}>
-                                        <table className="table table-borderless classification-table">
-                                            <thead>
-                                            <tr className="border-bottom">
-                                                <th scope="col"></th>
-                                                <th scope="col">Utente</th>
-                                                <th scope="col">Punti</th>
-                                                <th scope="col">Squadra</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {pointStatistics.map((user, index) => (
-                                                <tr key={index} className="border-bottom">
-                                                    <td>
-                                                        <Badge
-                                                            bg={getRankColor(index)}
-                                                            className="py-2 px-3"
-                                                            style={{width: '40px'}}
-                                                        >
-                                                            {index + 1}
-                                                        </Badge>
-                                                    </td>
-                                                    <td>{user.username}</td>
-                                                    <td>{user.points}</td>
-                                                    <td>{user.team || user.favouriteTeam}</td>
-                                                </tr>
-                                            ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    : <div className="text-center"><h4>Classifica non ancora disponibile</h4></div>
-                            }
+                        <div className="d-flex justify-content-between align-items-center px-3 mb-3">
+                            <h3 className="text-light fw-bold m-0">Classifica</h3>
+                            <Button
+                                className="bg-transparent border-0 p-0"
+                                onClick={handleFullRankingModalOpen}
+                            >
+                                <ChevronDown style={{color: "white", scale: "1.5"}} />
+                            </Button>
                         </div>
+
+                        {pointStatistics ? (
+                            <div className="px-3 overflow-y-scroll overflow-container" style={{maxHeight: "300px"}}>
+                                {getTopThreePlusUser().map((user, index) => {
+                                    const actualRank = user.rank || index + 1;
+                                    const isCurrentUser = user.username === userData.name && actualRank > 3;
+
+                                    return (
+                                        <div key={`${user.username}-${actualRank}`} className="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                            <div className="d-flex align-items-center">
+                                                <Badge
+                                                    bg={actualRank <= 3 ? getRankColor(actualRank - 1) : 'danger'}
+                                                    className="py-2 px-3 me-3"
+                                                    style={{width: '40px'}}
+                                                >
+                                                    {actualRank}
+                                                </Badge>
+                                                <span className={`text-light ${isCurrentUser ? 'fw-bold' : ''}`}>
+                                                    {user.username}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                                <div key={`${userData.username}`} className="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                    <div className="d-flex align-items-center">
+                                        <Badge
+                                            bg='light'
+                                            className="py-2 px-3 me-3"
+                                            style={{width: '40px'}}
+                                        >
+                                            ...
+                                        </Badge>
+                                        <span className={`text-light fw-bold`}>{userData.username}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-center px-3">
+                                <h4 className="text-light">Classifica non ancora disponibile</h4>
+                            </div>
+                        )}
                     </div>
                 </Col>
             </Row>
+
             <Row className="mt-auto mb-0 mx-0">
                 <Col className="p-0">
                     <div className="dashboard-container-background py-3 w-100 rounded-top-4">
@@ -304,6 +347,65 @@ const UserDashboardDesktop = ({ userData, userStatistics, pointStatistics, team,
                         variant="outline-light"
                         className="rounded-5"
                         onClick={handlePremiModalClose}
+                    >
+                        Chiudi
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Full Ranking Modal */}
+            <Modal
+                show={showFullRankingModal}
+                onHide={handleFullRankingModalClose}
+                centered
+                size="lg"
+                className="text-light"
+            >
+                <Modal.Header closeButton className="dashboard-container-background border-0">
+                    <Modal.Title className="text-light fw-bold">Classifica Completa</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="dashboard-container-background">
+                    <div className="table-responsive text-center overflow-container" style={{maxHeight: "400px", overflowY: "auto"}}>
+                        <table className="table table-borderless classification-table">
+                            <thead className="sticky-top" style={{backgroundColor: "inherit"}}>
+                            <tr className="border-bottom">
+                                <th scope="col">Posizione</th>
+                                <th scope="col">Utente</th>
+                                <th scope="col">Punti</th>
+                                <th scope="col">Squadra</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {pointStatistics && pointStatistics.map((user, index) => (
+                                <tr
+                                    key={index}
+                                    className={`border-bottom ${user.username === userData.name ? 'bg-primary bg-opacity-25' : ''}`}
+                                >
+                                    <td>
+                                        <Badge
+                                            bg={getRankColor(index)}
+                                            className="py-2 px-3"
+                                            style={{width: '40px'}}
+                                        >
+                                            {index + 1}
+                                        </Badge>
+                                    </td>
+                                    <td className={user.username === userData.name ? 'fw-bold' : ''}>
+                                        {user.username}
+                                    </td>
+                                    <td>{user.points}</td>
+                                    <td>{user.team || user.favouriteTeam}</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer className="dashboard-container-background border-0 d-flex justify-content-end">
+                    <Button
+                        variant="outline-light"
+                        className="rounded-5"
+                        onClick={handleFullRankingModalClose}
                     >
                         Chiudi
                     </Button>
