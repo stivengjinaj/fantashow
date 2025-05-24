@@ -30,7 +30,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 checkoutRoutes.get('/api/create-payment-intent', async (req, res) => {
     try {
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: 2000,
+            amount: 4175, // Amount in cents (e.g., 41.75 EUR)
             currency: 'eur',
             payment_method_types: ['card'],
         });
