@@ -43,28 +43,24 @@ const Checkout = (props) => {
 
                             <div className="border-bottom pb-3 mb-3">
                                 <div className="d-flex justify-content-between mb-2">
-                                    <span>Subtotale</span>
-                                    <span className="fw-bold">€XX.XX</span>
+                                    <span>Costo Torneo</span>
+                                    <span className="fw-bold">€40.00</span>
                                 </div>
                                 <div className="d-flex justify-content-between mb-2">
-                                    <span>IVA (22%)</span>
-                                    <span className="fw-bold">€XX.XX</span>
+                                    <span>Commissioni di servizio</span>
+                                    <span className="fw-bold">€1.75</span>
                                 </div>
                             </div>
 
-                            <div className="d-flex justify-content-between mt-3">
+                            <div className="d-flex justify-content-between align-items-center mt-3 border-bottom">
                                 <span className="h5">Totale</span>
-                                <span className="h5">€XX.XX</span>
+                                <span className="h5">€41.75</span>
                             </div>
 
-                            <div className="mt-4 pt-3 border-top">
+                            <div className="mt-4 pt-3">
                                 <div className="d-flex align-items-center mb-1">
                                     <i className="bi bi-shield-check me-2"></i>
                                     <small>Pagamento sicuro tramite Stripe</small>
-                                </div>
-                                <div className="d-flex align-items-center">
-                                    <i className="bi bi-info-circle me-2"></i>
-                                    <small>Riceverai la conferma via email</small>
                                 </div>
                             </div>
                         </div>
