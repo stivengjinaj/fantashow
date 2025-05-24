@@ -61,13 +61,13 @@ function ReferralLink() {
                             {/*Main Title*/}
                             <Container fluid className="d-flex flex-column align-items-center justify-content-center pt-5">
                                 <Image fluid src="/favicon.png" width={400} height={250} alt="Fantashow logo"/>
-                                <h2 className="mt-5 main-title-margin text-light text-center lh-base">
+                                <h2 className="mt-3 mt-md5 main-title-margin text-light text-center">
                                     {referrer} ti ha invitato a partecipare al prossimo fantashow, <br/> guadagna subito 20 coin.
                                 </h2>
                             </Container>
 
                             {/*Registration Button*/}
-                            <Container fluid className="d-flex justify-content-center mt-5">
+                            <Container fluid className="d-flex justify-content-center mt-md-3">
                                 <Button className="outlined-orange-button mt-5 px-5 py-2" onClick={() => navigate(`/register/${params.referralCode}`)}>
                                     Registrati
                                 </Button>

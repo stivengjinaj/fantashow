@@ -9,8 +9,8 @@ function ReferralError() {
             <Guide/>
 
             {/*Error Title*/}
-            <Container fluid className="d-flex flex-column align-items-center justify-content-center pt-5">
-                <h2 className="mt-5 main-title-margin text-light text-center pt-5">
+            <Container fluid className="d-flex flex-column align-items-center justify-content-center pt-3 pt-md-5">
+                <h2 className="mt-md-5 main-title-margin text-light text-center pt-5">
                     Il link di referral non è valido
                 </h2>
                 <h4 className={"mt-3 text-light text-center"}>
@@ -21,7 +21,7 @@ function ReferralError() {
 
             {/*Registration Button*/}
             <Container fluid className="d-flex justify-content-center mt-5">
-                <Button className="blue-button mt-5 px-5 py-2" onClick={() => navigate("/")}>
+                <Button className="blue-button mt-2 px-5 py-2" onClick={() => navigate("/")}>
                     Vai alla home
                 </Button>
             </Container>
