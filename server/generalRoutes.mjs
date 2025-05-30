@@ -349,7 +349,6 @@ generalRoutes.get("/api/user/statistics/:uuid", verifyToken, verifyPayment, asyn
         const userQuery = userCollection
             .where("isAdmin", "==", false)
             .orderBy("points", "desc")
-            .limit(5)
             .select("username", "points", "team", "favouriteTeam")
 
         const userSnapshot = await userQuery.get();
