@@ -80,7 +80,7 @@ const UserDashboardDesktop = ({ userData, userStatistics, pointStatistics, team,
                             <h2 className="text-light text-center fw-bold user-name">Fantashow</h2>
                             <div>
                                 <Button onClick={handleCopy} className="glowing-border-blue rounded-5">Copia referral</Button>
-                                <QrCodeDownloadButton url={`https://fantashow.onrender.com/referral/${userData.referralCode}`} />
+                                <QrCodeDownloadButton url={`https://fantashowsc.onrender.com/referral/${userData.referralCode}`} />
                             </div>
 
                             <h5 className="text-center text-light fw-bold mt-2">{mapStatus(userData.status)}</h5>

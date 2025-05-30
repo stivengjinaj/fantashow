@@ -124,7 +124,7 @@ function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, 
                                 >
                                     Copia referral
                                 </Button>
-                                <QrCodeDownloadButton url={`https://fantashow.onrender.com/referral/${userData.referralCode}`} smallScreen={true}/>
+                                <QrCodeDownloadButton url={`https://fantashowsc.onrender.com/referral/${userData.referralCode}`} smallScreen={true}/>
                             </div>
                         </Col>
                         {/* Points and status */}

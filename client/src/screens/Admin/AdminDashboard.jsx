@@ -257,7 +257,7 @@ function AdminDashboard() {
                         </button>
                         <h4 className="m-0">Admin Dashboard</h4>
                         {adminData && <Button className="mx-3 blue-button" onClick={handleCopyReferral}>Copia referral</Button>}
-                        {adminData && <QrCodeDownloadButton url={`https://fantashow.onrender.com/referral/${adminData.referralCode}`} smallScreen={false} /> }
+                        {adminData && <QrCodeDownloadButton url={`https://fantashowsc.onrender.com/referral/${adminData.referralCode}`} smallScreen={false} /> }
                     </div>
 
                     {/* Dashboard Summary Cards */}
