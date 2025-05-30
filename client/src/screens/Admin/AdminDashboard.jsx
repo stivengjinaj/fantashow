@@ -14,6 +14,7 @@ import {UserContext} from "../Contexts/UserContext.jsx";
 import { debounce } from 'lodash';
 import NewAdmin from "./NewAdmin.jsx";
 import NewUser from "./NewUser.jsx";
+import QrCodeDownloadButton from "../misc/QrCodeDownloadButton.jsx";
 
 function AdminDashboard() {
     const { user } = useContext(UserContext);
@@ -255,7 +256,8 @@ function AdminDashboard() {
                             <List size={20} />
                         </button>
                         <h4 className="m-0">Admin Dashboard</h4>
-                        {adminData && <Button className="mx-5 blue-button" onClick={handleCopyReferral}>Copia referral</Button>}
+                        {adminData && <Button className="mx-3 blue-button" onClick={handleCopyReferral}>Copia referral</Button>}
+                        {adminData && <QrCodeDownloadButton url={`https://fantashow.onrender.com/referral/${adminData.referralCode}`} smallScreen={false} /> }
                     </div>
 
                     {/* Dashboard Summary Cards */}
