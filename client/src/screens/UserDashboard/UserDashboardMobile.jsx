@@ -7,10 +7,11 @@ import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YA
 import whatsappIcon from "../../assets/icons/whatsapp.svg";
 import emailIcon from "../../assets/icons/email.svg";
 import telegramIcon from "../../assets/icons/telegram.svg";
-import coin from "../../assets/icons/coin.svg";
+import treasury from "../../assets/icons/treasury.svg";
 import {logout} from "../../utils/auth.js";
 import {CheckCircleFill, Pencil, XCircleFill, ChevronDown} from "react-bootstrap-icons";
 import {mapStatus} from "../../utils/helper.js";
+import QrCodeDownloadButton from "../misc/QrCodeDownloadButton.jsx";
 
 function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, editTeam, setEditTeam, handleTeamChange, handleTeamSubmit }) {
     const [showPremiModal, setShowPremiModal] = useState(false);
@@ -123,12 +124,13 @@ function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, 
                                 >
                                     Copia referral
                                 </Button>
+                                <QrCodeDownloadButton url={`https://fantashow.onrender.com/referral/${userData.referralCode}`} smallScreen={true}/>
                             </div>
                         </Col>
                         {/* Points and status */}
                         <Col xs={6} className="dashboard-container-background d-flex flex-column justify-content-evenly rounded-4 px-0 py-3">
                             <div className="d-flex flex-row container-fluid justify-content-center mt-3">
-                                <Image src={coin} width={60} height={60} alt={"coin"} />
+                                <Image src={treasury} width={60} height={60} alt={"coin"} />
                             </div>
                             <div className="d-flex flex-column container-fluid justify-content-center align-items-center mt-3">
                                 <h5 className="text-light fw-bold">Punti: {userData.points}</h5>

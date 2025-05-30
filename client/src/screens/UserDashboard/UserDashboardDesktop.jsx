@@ -5,12 +5,13 @@ import logoutIcon from '../../assets/icons/logout.svg';
 import whatsappIcon from '../../assets/icons/whatsapp.svg';
 import emailIcon from '../../assets/icons/email.svg';
 import telegramIcon from '../../assets/icons/telegram.svg';
-import coin from '../../assets/icons/coin.svg';
+import treasury from '../../assets/icons/treasury.svg';
 import {CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import {logout} from "../../utils/auth.js";
 import {CheckCircleFill, Pencil, XCircleFill, ChevronDown} from "react-bootstrap-icons";
 import {mapStatus} from "../../utils/helper.js";
 import {useNavigate} from "react-router-dom";
+import QrCodeDownloadButton from "../misc/QrCodeDownloadButton.jsx";
 
 
 const UserDashboardDesktop = ({ userData, userStatistics, pointStatistics, team, editTeam, setEditTeam, handleTeamChange, handleTeamSubmit }) => {
@@ -77,12 +78,16 @@ const UserDashboardDesktop = ({ userData, userStatistics, pointStatistics, team,
                         </div>
                         <div className="d-flex flex-column align-items-center">
                             <h2 className="text-light text-center fw-bold user-name">Fantashow</h2>
-                            <Button onClick={handleCopy} className="glowing-border-blue rounded-5">Copia referral</Button>
+                            <div>
+                                <Button onClick={handleCopy} className="glowing-border-blue rounded-5">Copia referral</Button>
+                                <QrCodeDownloadButton url={`https://fantashow.onrender.com/referral/${userData.referralCode}`} />
+                            </div>
+
                             <h5 className="text-center text-light fw-bold mt-2">{mapStatus(userData.status)}</h5>
                         </div>
                         <div className="d-flex flex-row align-items-center justify-content-between">
                             <div className="d-flex flex-column align-items-center mx-5">
-                                <Image src={coin} alt="treasury" width={50} height={50} />
+                                <Image src={treasury} alt="treasury" width={50} height={50} />
                                 <h5 className="text-light text-center fw-bold mt-2">{userData.points || 0} Punti</h5>
                                 <h5 className="text-light text-center fw-bold">{userData.coins || 0} Coin</h5>
                             </div>
