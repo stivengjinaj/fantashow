@@ -25,7 +25,7 @@ const UserDashboardDesktop = ({ userData, userStatistics, pointStatistics, team,
     const handleFullRankingModalClose = () => setShowFullRankingModal(false);
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(`https://fantashow.onrender.com/referral/${userData.referralCode}`);
+        navigator.clipboard.writeText(`https://fantashowsc.onrender.com/referral/${userData.referralCode}`);
     };
 
     const getRankColor = useCallback((index) => {

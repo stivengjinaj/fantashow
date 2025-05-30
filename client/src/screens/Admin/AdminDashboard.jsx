@@ -211,7 +211,7 @@ function AdminDashboard() {
     }
 
     const handleCopyReferral = () => {
-        navigator.clipboard.writeText(`https://fantashow.onrender.com/referral/${adminData.referralCode}`)
+        navigator.clipboard.writeText(`https://fantashowsc.onrender.com/referral/${adminData.referralCode}`)
             .then(() => {
                 alert("Codice referral copiato!");
             })
