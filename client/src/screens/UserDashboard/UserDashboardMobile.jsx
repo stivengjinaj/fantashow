@@ -134,7 +134,7 @@ function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, 
                             </div>
                             <div className="d-flex flex-column container-fluid justify-content-center align-items-center mt-3">
                                 <h5 className="text-light fw-bold">Punti: {userData.points}</h5>
-                                <h5 className="text-light fw-bold">Coin: {userData.points}</h5>
+                                <h5 className="text-light fw-bold">Coin: {userData.coins}</h5>
                             </div>
                         </Col>
                     </Row>
