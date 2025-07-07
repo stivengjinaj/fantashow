@@ -207,16 +207,17 @@ adminRoutes.get("/api/admin/:uid", verifyToken, async (req, res) => {
  */
 adminRoutes.get("/api/admin/all-users/:uid", verifyToken, verifyAdmin, async (req, res) => {
     try {
+        console.log("Fetching all users");
         const { orderBy, orderDirection } = req.query;
         const usersCollection = await db.collection("users").orderBy(orderBy, orderDirection).get();
-
+        console.log("Users collection fetched");
         const users = usersCollection.docs
             .filter(doc => !doc.data().isAdmin)
             .map(doc => ({
                 id: doc.id,
                 ...doc.data()
             }));
-
+        console.log("Users filtered and mapped");
         res.status(200).json({
             message: "Users retrieved successfully",
             users: users

@@ -445,9 +445,9 @@ const getAdminData = async (uuid, idToken) => {
     }
 };
 
-const getAllUsers = async (uid, idToken) => {
+const getAllUsers = async (uid, idToken, orderBy="createdAt", orderDirection="desc") => {
     try {
-        const response = await fetch(`${remoteURL}/api/admin/all-users/${uid}`, {
+        const response = await fetch(`${remoteURL}/api/admin/all-users/${uid}?orderBy=${orderBy}&orderDirection=${orderDirection}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
