@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "react-bootstrap";
 import QRCode from "qrcode";
-import {ArrowDown, Download} from "react-bootstrap-icons";
+import {Download} from "react-bootstrap-icons";
 
 const QrCodeDownloadButton = ({ url, smallScreen }) => {
     const downloadQRCode = async () => {

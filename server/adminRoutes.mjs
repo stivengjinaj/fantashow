@@ -2,7 +2,6 @@ import express from "express";
 import admin from "firebase-admin";
 import dotenv from "dotenv";
 import {generateReferralCode, verifyAdmin, verifyToken} from "./utils.mjs";
-import sendVerificationEmail from "./verificationEmail.mjs";
 
 dotenv.config();
 
