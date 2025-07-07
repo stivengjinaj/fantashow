@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Card, Table, Form, Button, Badge, InputGroup, Modal } from 'react-bootstrap';
-import { Search, PencilSquare, Trash, ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
+import {Search, PencilSquare, Trash, ChevronLeft, ChevronRight, ChevronUp, ChevronDown} from 'react-bootstrap-icons';
 import {formatFirebaseTimestamp, mapStatus} from "../../utils/helper.js";
 import {adminDeleteUser} from "../../API.js";
 
-function RegisteredUsers({ admin, users, onEditUser, onDeleteUser }) {
+function RegisteredUsers({ admin, users, setUsers, onEditUser, onDeleteUser }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const usersPerPage = 10;
-
+    const [usersPerPage, setUsersPerPage] = useState(10);
+    const [orderDirection, setOrderDirection] = useState('desc');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
 
@@ -27,6 +27,40 @@ function RegisteredUsers({ admin, users, onEditUser, onDeleteUser }) {
             setCurrentPage(pageNumber);
         }
     };
+
+    const handleUserPerPageChange = (e) => {
+        const value = parseInt(e.target.value, 10);
+        setUsersPerPage(value === 999 ? filteredUsers.length : value);
+        setCurrentPage(1);
+    }
+
+    const handleOrderChange = (e) => {
+        const field = e.target.value;
+
+        const sortedUsers = [...users].sort((a, b) => {
+            if (field === 'createdAt') {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            } else if (field === 'name') {
+                return a.name.localeCompare(b.name);
+            } else if (field === 'points') {
+                return b.points - a.points;
+            } else if (field === 'coins') {
+                return b.coins - a.coins;
+            }
+            return 0;
+        });
+
+        setUsers(sortedUsers);
+    };
+
+
+    const handleOrderDirectionChange = () => {
+        setOrderDirection(prevDirection => {
+            const newDirection = prevDirection === 'asc' ? 'desc' : 'asc';
+            users.reverse();
+            return newDirection;
+        });
+    }
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
@@ -67,7 +101,25 @@ function RegisteredUsers({ admin, users, onEditUser, onDeleteUser }) {
             <Card>
                 <Card.Header className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
                     <h5 className="mb-md-0">Utenti Registrati</h5>
-                    <InputGroup style={{ maxWidth: '300px' }}>
+                    <InputGroup style={{ maxWidth: '900px' }}>
+                        <Form.Select defaultValue="desc" onChange={handleOrderChange} className="me-1">
+                            <option value={"createdAt"}>Ordina</option>
+                            <option value={"createdAt"}>Iscrizione</option>
+                            <option value={"name"}>Nome</option>
+                            <option value={"points"}>Punti</option>
+                            <option value={"coins"}>Coin</option>
+                        </Form.Select>
+                        <Button variant={"secondary"} onClick={handleOrderDirectionChange} className="me-2 rounded-3">
+                            {orderDirection === 'asc' ? <ChevronUp /> : <ChevronDown />}
+                        </Button>
+                        <Form.Select defaultValue={10} onChange={handleUserPerPageChange} className="me-3">
+                            <option value={10}>Utenti per pagina</option>
+                            <option value={999}>Tutti gli Utenti</option>
+                            <option value={10}>10</option>
+                            <option value={15}>15</option>
+                            <option value={20}>20</option>
+                            <option value={30}>30</option>
+                        </Form.Select>
                         <Form.Control
                             type="text"
                             placeholder="Cerca utente..."
@@ -145,7 +197,7 @@ function RegisteredUsers({ admin, users, onEditUser, onDeleteUser }) {
                     {filteredUsers.length > usersPerPage && (
                         <div className="d-flex justify-content-between align-items-center mt-3">
                             <div>
-                                Showing {indexOfFirstUser + 1} to {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} entries
+                                Mostrando da {indexOfFirstUser + 1} a {Math.min(indexOfLastUser, filteredUsers.length)}. Totale: {filteredUsers.length} utenti
                             </div>
                             <div>
                                 <Button

@@ -208,7 +208,8 @@ adminRoutes.get("/api/admin/:uid", verifyToken, async (req, res) => {
  */
 adminRoutes.get("/api/admin/all-users/:uid", verifyToken, verifyAdmin, async (req, res) => {
     try {
-        const usersCollection = await db.collection("users").get();
+        const { orderBy, orderDirection } = req.query;
+        const usersCollection = await db.collection("users").orderBy(orderBy, orderDirection).get();
 
         const users = usersCollection.docs
             .filter(doc => !doc.data().isAdmin)

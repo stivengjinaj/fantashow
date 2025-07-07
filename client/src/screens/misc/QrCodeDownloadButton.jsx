@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "react-bootstrap";
 import QRCode from "qrcode";
-import {ArrowDown} from "react-bootstrap-icons";
+import {ArrowDown, Download} from "react-bootstrap-icons";
 
 const QrCodeDownloadButton = ({ url, smallScreen }) => {
     const downloadQRCode = async () => {
@@ -26,7 +26,7 @@ const QrCodeDownloadButton = ({ url, smallScreen }) => {
             </Button>
         ) : (
             <Button onClick={downloadQRCode} className="glowing-border-blue mx-2" style={{borderRadius: "100%"}}>
-                <ArrowDown />
+                <Download />
             </Button>
         )
     );

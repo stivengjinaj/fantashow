@@ -130,6 +130,7 @@ function AdminDashboard() {
                 return <RegisteredUsers
                     admin={user}
                     users={users}
+                    setUsers={setUsers}
                     onEditUser={handleEditUser}
                     onDeleteUser={handleUserDelete}
                 />;
