@@ -37,9 +37,11 @@ function RegisteredUsers({ admin, users, setUsers, onEditUser, onDeleteUser }) {
     const handleOrderChange = (e) => {
         const field = e.target.value;
 
+        const toDate = (ts) => new Date(ts._seconds * 1000);
+
         const sortedUsers = [...users].sort((a, b) => {
             if (field === 'createdAt') {
-                return new Date(b.createdAt) - new Date(a.createdAt);
+                return toDate(b.createdAt).getTime() - toDate(a.createdAt).getTime();
             } else if (field === 'name') {
                 return a.name.localeCompare(b.name);
             } else if (field === 'points') {
