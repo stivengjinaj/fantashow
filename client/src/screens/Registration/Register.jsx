@@ -9,7 +9,7 @@ import ContactData from "./ContactData.jsx";
 import LoginData from "./LoginData.jsx";
 import Checkout from "../Checkout/Checkout.jsx";
 import PaymentMethod from "./PaymentMethod.jsx";
-import Guide from "../misc/Guide.jsx";
+import GuideButton from "../misc/GuideButton.jsx";
 import {checkReferral} from "../../API.js";
 import ReferralError from "../Referral/ReferralError.jsx";
 
@@ -51,7 +51,7 @@ function Register() {
                     ? (<PaymentMethod nextStep={nextStep} uid={uid}/>)
                     : (
                         <Container fluid className="animated-bg">
-                            <Guide/>
+                            <GuideButton/>
 
                             {step === 0 && <PersonalData dispatch={dispatch} state={state} nextStep={nextStep}/>}
                             {step === 1 && <ContactData dispatch={dispatch} state={state} nextStep={nextStep} prevStep={prevStep}/>}

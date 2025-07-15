@@ -1,5 +1,5 @@
 import {Button, Container} from "react-bootstrap";
-import Guide from "../misc/Guide.jsx";
+import GuideButton from "../misc/GuideButton.jsx";
 import {useNavigate} from "react-router";
 
 
@@ -7,7 +7,7 @@ function PasswordResetSuccess() {
     const navigate = useNavigate();
     return (
         <Container fluid className="animated-bg">
-            <Guide/>
+            <GuideButton/>
 
             <Container fluid className="d-flex flex-column justify-content-center align-items-center mt-5">
                 <h2 className="mt-5 main-title-margin text-light text-center">

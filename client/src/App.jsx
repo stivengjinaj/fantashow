@@ -18,6 +18,7 @@ import ErrorBoundary from "./screens/misc/ErrorBoundary.jsx";
 import { UserProvider, UserContext } from "./screens/Contexts/UserContext.jsx";
 import {useContext} from "react";
 import AdminDashboard from "./screens/Admin/AdminDashboard.jsx";
+import Guide from "./screens/misc/Guide.jsx";
 
 function AppRoutes() {
     const { user, isAdmin, loading } = useContext(UserContext);
@@ -50,6 +51,7 @@ function AppRoutes() {
             <Route path="/checkout/success" element={<PaymentSuccess />} />
             <Route path="/checkout/error" element={<PaymentError />} />
             <Route path="*" element={<NotFound />} />
+            <Route path="/guide" element={<Guide />} />
         </Routes>
     );
 }

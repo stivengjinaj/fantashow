@@ -4,7 +4,7 @@ import gsap from "gsap";
 import {useGSAP} from "@gsap/react";
 import {useEffect, useState} from "react";
 import RequestRegistration from "./RequestRegistration.jsx";
-import Guide from "../misc/Guide.jsx";
+import GuideButton from "../misc/GuideButton.jsx";
 import {clearRegistrationFlag} from "../../utils/helper.js";
 
 gsap.registerPlugin(useGSAP);
@@ -39,8 +39,8 @@ function Homepage() {
 
     return (
         <Container fluid className="animated-bg p-0">
-            {/*Guide Button*/}
-            <Guide/>
+            {/*GuideButton Button*/}
+            <GuideButton/>
 
             <Container fluid className="d-flex justify-content-center">
                 <Image fluid src="/favicon.png" width={400} height={250} alt="Fantashow logo"/>

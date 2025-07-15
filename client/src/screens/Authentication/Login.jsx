@@ -7,6 +7,7 @@ import gsap from "gsap";
 import {resendEmailVerification, updateLastLogin} from "../../API.js";
 import {loginWithEmail} from "../../utils/auth.js";
 import {clearRegistrationFlag} from "../../utils/helper.js";
+import GuideButton from "../misc/GuideButton.jsx";
 
 
 function Login(){
@@ -100,11 +101,7 @@ function Login(){
 
     return(
         <Container fluid className="animated-bg">
-            <Container fluid className="d-flex align-items-center justify-content-end">
-                <Button className="guideButton px-5 mt-4 mx-3 fw-bold">
-                    Guida
-                </Button>
-            </Container>
+            <GuideButton />
 
             {/*Main Title*/}
             <Container fluid className="d-flex justify-content-center mt-5">

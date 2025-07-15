@@ -1,7 +1,7 @@
 import {Button, Container, Image, Spinner} from "react-bootstrap";
 import {useNavigate, useParams} from "react-router";
 import ReferralError from "./ReferralError.jsx";
-import Guide from "../misc/Guide.jsx";
+import GuideButton from "../misc/GuideButton.jsx";
 import {useEffect, useState} from "react";
 import {checkReferral} from "../../API.js";
 import {useGSAP} from "@gsap/react";
@@ -56,7 +56,7 @@ function ReferralLink() {
                     : (
                         <Container fluid className="animated-bg pb-4">
 
-                            <Guide/>
+                            <GuideButton/>
 
                             {/*Main Title*/}
                             <Container fluid className="d-flex flex-column align-items-center justify-content-center pt-5">

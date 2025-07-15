@@ -3,7 +3,7 @@ import {useState} from "react";
 import emailIcon from "../../assets/icons/email.svg";
 import {resetPassword} from "../../utils/auth.js";
 import {useNavigate} from "react-router";
-import Guide from "../misc/Guide.jsx";
+import GuideButton from "../misc/GuideButton.jsx";
 import PasswordResetSuccess from "./PasswordResetSuccess.jsx";
 
 
@@ -43,7 +43,7 @@ function ResetPassword() {
             ? (<PasswordResetSuccess />)
             : (
                 <Container fluid className="animated-bg">
-                    <Guide/>
+                    <GuideButton/>
 
                     <Container fluid className="d-flex justify-content-center mt-5">
                         <h2 className="mt-5 main-title-margin text-light text-center">
