@@ -21,9 +21,24 @@ function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, 
     const handlePremiModalClose = () => setShowPremiModal(false);
     const handleFullRankingModalOpen = () => setShowFullRankingModal(true);
     const handleFullRankingModalClose = () => setShowFullRankingModal(false);
+    const pdfUrl = '/Guida.pdf';
 
     const handleCopy = () => {
         navigator.clipboard.writeText(`https://fantashowsc.onrender.com/referral/${userData.referralCode}`);
+    };
+
+    const handleDownload = () => {
+        // Create a download link
+        const link = document.createElement('a');
+        link.href = pdfUrl;
+        link.download = 'Reg_smart.pdf';
+
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setTimeout( () => {},1000);
     };
 
     const getRankColor = useCallback((index) => {
@@ -188,7 +203,11 @@ function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, 
                         >
                             Premi
                         </Button>
-                        <Button style={{width: "45%"}} className="dashboard-container-background border-0 rounded-5 px-3 px-lg-5 fw-bold">
+                        <Button
+                            style={{width: "45%"}}
+                            className="dashboard-container-background border-0 rounded-5 px-3 px-lg-5 fw-bold"
+                            onClick={handleDownload}
+                        >
                             Guida
                         </Button>
                     </div>
