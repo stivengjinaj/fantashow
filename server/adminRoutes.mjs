@@ -207,17 +207,14 @@ adminRoutes.get("/api/admin/:uid", verifyToken, async (req, res) => {
  */
 adminRoutes.get("/api/admin/all-users/:uid", verifyToken, verifyAdmin, async (req, res) => {
     try {
-        console.log("Fetching all users");
         const { orderBy, orderDirection } = req.query;
         const usersCollection = await db.collection("users").orderBy(orderBy, orderDirection).get();
-        console.log("Users collection fetched");
         const users = usersCollection.docs
             .filter(doc => !doc.data().isAdmin)
             .map(doc => ({
                 id: doc.id,
                 ...doc.data()
             }));
-        console.log("Users filtered and mapped");
         res.status(200).json({
             message: "Users retrieved successfully",
             users: users
@@ -279,16 +276,66 @@ adminRoutes.patch("/api/admin/edit-user/:uid", verifyToken, verifyAdmin, async (
 
         const allowedFields = ["name", "points", "coins", "status", "isAdmin", "paid"];
         const invalidFields = Object.keys(updatedFields).filter(field => !allowedFields.includes(field));
+
         if (invalidFields.length > 0) {
             return res.status(400).json({ error: `Invalid fields: ${invalidFields.join(", ")}` });
         }
-        const userRef = admin.firestore().collection("users").doc(targetUid);
 
-        await userRef.update(updatedFields);
+        const userRef = db.collection("users").doc(targetUid);
+        const userDoc = await userRef.get();
 
+        if (updatedFields.paid && userDoc.data().paid === false) {
+            await db.runTransaction(async (transaction) => {
+                const userDoc = await transaction.get(userRef);
+
+                if (!userDoc.exists) {
+                    return res.status(404).json({ error: "User not found" });
+                }
+
+                const userData = userDoc.data();
+
+                const referredBy = userData.referredBy;
+
+                const paymentDate = admin.firestore.FieldValue.serverTimestamp();
+
+                transaction.update(userRef, {
+                    paid: true,
+                    coins: 20,
+                    paymentId: "Confermato Manualmente",
+                    paymentDate
+                });
+                if (referredBy) {
+                    const referrerQuery = await db.collection("users")
+                        .where("referralCode", "==", referredBy)
+                        .limit(1)
+                        .get();
+
+                    if (!referrerQuery.empty) {
+                        const referrerDoc = referrerQuery.docs[0];
+                        const referrerDocRef = referrerDoc.ref;
+                        const referrerData = referrerDoc.data();
+
+                        const pointsToAdd = referrerData.status === 0
+                            ? 50
+                            : referrerData.status === 1
+                                ? 75
+                                : 100;
+
+                        transaction.update(referrerDocRef, {
+                            points: admin.firestore.FieldValue.increment(pointsToAdd)
+                        });
+                    } else {
+                        return res.status(404).json({ error: "Referrer not found" });
+                    }
+                } else {
+                    return res.status(400).json({ error: "User has no referrer" });
+                }
+            });
+        }else {
+            await userRef.update(updatedFields);
+        }
         return res.status(200).json({ success: true, message: "User updated successfully" });
     } catch (error) {
-        console.error("Update error:", error);
         return res.status(500).json({ error: "Failed to update user" });
     }
 });
