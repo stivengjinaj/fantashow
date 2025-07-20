@@ -10,13 +10,17 @@ export async function generateReferralCode(name) {
     const db = admin.firestore();
     let referralCode;
     let isUnique = false;
+
+    const cleanedName = name.trim().toLowerCase().replace(/\s+/g, '');
+
     while (!isUnique) {
-        referralCode = `${name.toLowerCase()}-${uuidv4().slice(0, 4)}`;
+        referralCode = `${cleanedName}-${uuidv4().slice(0, 4)}`;
         const existingUser = await db.collection("users")
             .where("referralCode", "==", referralCode)
             .get();
         if (existingUser.empty) isUnique = true;
     }
+
     return referralCode;
 }
 
