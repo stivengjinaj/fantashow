@@ -3,7 +3,7 @@ import next from "../../assets/icons/next.svg";
 import {useState} from "react";
 import {registerUser} from "../../API.js";
 import {deleteUnregisteredUser, registerUserWithFirebase} from "../../utils/auth.js";
-import {Eye, EyeOff} from "lucide-react";
+import {ArrowLeft, Eye, EyeOff} from "lucide-react";
 
 function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
     const [errors, setErrors] = useState({});
@@ -150,8 +150,8 @@ function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
                 </Form.Group>
             </Form>
             <Container fluid className="d-flex justify-content-center mt-3">
-                <Button onClick={prevStep} className="sendIcon p-3 mt-3 mx-5">
-                    <Image src={next} width={30} height={30} style={{transform: `rotate(-180deg)`}}/>
+                <Button onClick={prevStep} className="sendIcon py-3 px-4 px-sm-3 mt-3 mx-4">
+                    <ArrowLeft />
                 </Button>
                 <Button onClick={register} className="guideButton p-3 mt-3 mx-3">
                     {loading ? <Spinner animation="border" variant="warning" /> : "Vai al pagamento"}
