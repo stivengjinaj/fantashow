@@ -1,5 +1,4 @@
-import {Button, Container, Form, Image, InputGroup, Spinner} from "react-bootstrap";
-import next from "../../assets/icons/next.svg";
+import {Button, Container, Form, InputGroup, Spinner} from "react-bootstrap";
 import {useState} from "react";
 import {registerUser} from "../../API.js";
 import {deleteUnregisteredUser, registerUserWithFirebase} from "../../utils/auth.js";
