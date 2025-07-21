@@ -8,11 +8,13 @@ import {resendEmailVerification, updateLastLogin} from "../../API.js";
 import {loginWithEmail} from "../../utils/auth.js";
 import {clearRegistrationFlag} from "../../utils/helper.js";
 import GuideButton from "../misc/GuideButton.jsx";
+import {Eye, EyeOff} from "lucide-react";
 
 
 function Login(){
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [passwordVisible, setPasswordVisible] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -95,7 +97,7 @@ function Login(){
     const sendEmail = () => {
         resendEmailVerification(email).then(() => {
             setResendVerification(false);
-            setErrorMessage("Controlla la tua email. Se non la trovi, controlla anche la cartella spam.");
+            setErrorMessage("Controlla la tua email (controlla nella spam)");
         });
     }
 
@@ -131,7 +133,13 @@ function Login(){
                             <InputGroup.Text className="login-input-icon">
                                 <Image src={lock} width={20} height={20} alt="Lock icon" />
                             </InputGroup.Text>
-                            <Form.Control type="password" placeholder="Password" className="login-input" onChange={handlePasswordChange}/>
+                            <Form.Control type={`${passwordVisible ? "text" : "password"}`} placeholder="Password" className="login-input" onChange={handlePasswordChange}/>
+                            <InputGroup.Text className="password-visible-icon">
+                                {passwordVisible
+                                    ? <EyeOff color="white" onClick={() => setPasswordVisible((prevState) => !prevState)}/>
+                                    : <Eye color="white" onClick={() => setPasswordVisible((prevState) => !prevState)} />
+                                }
+                            </InputGroup.Text>
                         </InputGroup>
                     </Form.Group>
                     <Form.Group className="mt-3 mx-3">

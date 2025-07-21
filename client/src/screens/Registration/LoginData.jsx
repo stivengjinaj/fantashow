@@ -1,12 +1,14 @@
-import {Button, Container, Form, Image, Spinner} from "react-bootstrap";
+import {Button, Container, Form, Image, InputGroup, Spinner} from "react-bootstrap";
 import next from "../../assets/icons/next.svg";
 import {useState} from "react";
 import {registerUser} from "../../API.js";
 import {deleteUnregisteredUser, registerUserWithFirebase} from "../../utils/auth.js";
+import {Eye, EyeOff} from "lucide-react";
 
 function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [passwordVisible, setPasswordVisible] = useState(false);
 
     const handleChange = (e) => {
         if (Object.keys(errors).length > 0) {
@@ -108,26 +110,42 @@ function LoginData({dispatch, state, nextStep, prevStep, saveUid}) {
                     {errors.username && <p className="mx-2 text-danger">{errors.username}</p>}
                 </Form.Group>
                 <Form.Group className="mb-md-4 mb-3">
-                    <Form.Control
-                        type="password"
-                        placeholder="Password*"
-                        className="outlined-orange-input"
-                        name="password"
-                        value={state.password || ""}
-                        onChange={handleChange}
-                    />
+                    <InputGroup>
+                        <Form.Control
+                            type={passwordVisible ? "text" : "password"}
+                            placeholder="Password*"
+                            className="outlined-orange-input"
+                            name="password"
+                            value={state.password || ""}
+                            onChange={handleChange}
+                        />
+                        <InputGroup.Text className="orange-password-visible-icon">
+                            {passwordVisible
+                                ? <EyeOff color="white" onClick={() => setPasswordVisible((prevState) => !prevState)}/>
+                                : <Eye color="white" onClick={() => setPasswordVisible((prevState) => !prevState)} />
+                            }
+                        </InputGroup.Text>
+                    </InputGroup>
                     {!errors.password && <p className="mx-2 text-warning">6 caratteri minimo</p> }
                     {errors.password && <p className="mx-2 text-danger">{errors.password}</p>}
                 </Form.Group>
                 <Form.Group className="mb-md-5 mb-4">
-                    <Form.Control
-                        type="password"
-                        placeholder="Conferma Password*"
-                        className="outlined-orange-input"
-                        name="passwordConfirm"
-                        value={state.passwordConfirm || ""}
-                        onChange={handleChange}
-                    />
+                    <InputGroup>
+                        <Form.Control
+                            type={passwordVisible ? "text" : "password"}
+                            placeholder="Conferma Password*"
+                            className="outlined-orange-input"
+                            name="passwordConfirm"
+                            value={state.passwordConfirm || ""}
+                            onChange={handleChange}
+                        />
+                        <InputGroup.Text className="orange-password-visible-icon">
+                            {passwordVisible
+                                ? <EyeOff color="white" onClick={() => setPasswordVisible((prevState) => !prevState)}/>
+                                : <Eye color="white" onClick={() => setPasswordVisible((prevState) => !prevState)} />
+                            }
+                        </InputGroup.Text>
+                    </InputGroup>
                     {errors.passwordConfirm && <p className="mx-2 text-danger">{errors.passwordConfirm}</p>}
                 </Form.Group>
             </Form>
