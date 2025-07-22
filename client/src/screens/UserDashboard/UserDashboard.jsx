@@ -1,8 +1,8 @@
-import { useContext, useEffect, useState } from "react";
-import { Container, Spinner } from "react-bootstrap";
+import {useContext, useEffect, useState} from "react";
+import {Container, Spinner} from "react-bootstrap";
 import UserDashboardDesktop from "./UserDashboardDesktop.jsx";
 import UserDashboardMobile from "./UserDashboardMobile.jsx";
-import { UserContext } from "../Contexts/UserContext.jsx";
+import {UserContext} from "../Contexts/UserContext.jsx";
 import {getStatistics, getUserData, getUserSubscriptions, updateTeam} from "../../API.js";
 import DashboardPayment from "./DashboardPayment.jsx";
 import Error from "../misc/Error.jsx";
@@ -97,6 +97,18 @@ function UserDashboard() {
         fetchData();
     }, [user]);
 
+    const handleWhatsappRedirect = () => {
+        window.location.href = "https://wa.me/393517088136?text=Ciao%20Stefano%2C%20mi%20servirebbe%20un%20aiuto%20per%E2%80%A6";
+    }
+
+    const handleTelegramRedirect = () => {
+        window.location.href = "https://t.me/+EFV1dZg8izdkNGVk";
+    }
+
+    const handleEmailRedirect = () => {
+        //window.location.href = "mailto:support@example.com?subject=SendMail&body=Description";
+    }
+
     if (loading || !user) {
         return (
             <Container fluid className="p-0">
@@ -118,6 +130,9 @@ function UserDashboard() {
                 setEditTeam={setEditTeam}
                 handleTeamChange={handleTeamChange}
                 handleTeamSubmit={handleTeamSubmit}
+                handleWhatsappRedirect={handleWhatsappRedirect}
+                handleTelegramRedirect={handleTelegramRedirect}
+                handleEmailRedirect={handleEmailRedirect}
             />
             : <UserDashboardMobile
                 userData={userData}
@@ -128,6 +143,9 @@ function UserDashboard() {
                 setEditTeam={setEditTeam}
                 handleTeamChange={handleTeamChange}
                 handleTeamSubmit={handleTeamSubmit}
+                handleWhatsappRedirect={handleWhatsappRedirect}
+                handleTelegramRedirect={handleTelegramRedirect}
+                handleEmailRedirect={handleEmailRedirect}
             />
         :  !error
             ? <DashboardPayment title={"Il tuo account non è attivo perché non hai ancora effettuato il pagamento.\n" +

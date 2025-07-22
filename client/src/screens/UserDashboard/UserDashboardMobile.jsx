@@ -13,7 +13,20 @@ import {CheckCircleFill, Pencil, XCircleFill, ChevronDown} from "react-bootstrap
 import {mapStatus} from "../../utils/helper.js";
 import QrCodeDownloadButton from "../misc/QrCodeDownloadButton.jsx";
 
-function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, editTeam, setEditTeam, handleTeamChange, handleTeamSubmit }) {
+function UserDashboardMobile(
+    {
+        userData,
+        userStatistics,
+        pointStatistics,
+        team,
+        editTeam,
+        setEditTeam,
+        handleTeamChange,
+        handleTeamSubmit,
+        handleWhatsappRedirect,
+        handleTelegramRedirect,
+        handleEmailRedirect,
+    }) {
     const [showPremiModal, setShowPremiModal] = useState(false);
     const [showFullRankingModal, setShowFullRankingModal] = useState(false);
 
@@ -185,13 +198,13 @@ function UserDashboardMobile({ userData, userStatistics, pointStatistics, team, 
                         e vinci fantastici premi prima
                         ancora di partecipare!</h5>
                     <div className="dashboard-container-background rounded-3 py-2 mt-4 d-flex flex-row justify-content-around align-items-center">
-                        <Button className="bg-transparent border-0">
+                        <Button className="bg-transparent border-0" onClick={handleWhatsappRedirect}>
                             <Image src={whatsappIcon} alt="whatsapp-icon" width={40} height={40}/>
                         </Button>
-                        <Button className="bg-transparent border-0">
+                        <Button className="bg-transparent border-0" onClick={handleEmailRedirect}>
                             <Image src={emailIcon} alt="email-icon" width={40} height={40} style={{color: "red"}}/>
                         </Button>
-                        <Button className="bg-transparent border-0">
+                        <Button className="bg-transparent border-0" onClick={handleTelegramRedirect}>
                             <Image src={telegramIcon} alt="email-icon" width={40} height={40} style={{color: "red"}}/>
                         </Button>
                     </div>
