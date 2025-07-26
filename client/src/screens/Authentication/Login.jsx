@@ -4,11 +4,13 @@ import lock from "../../assets/icons/lock.svg";
 import {useEffect, useState} from "react";
 import {useGSAP} from "@gsap/react";
 import gsap from "gsap";
-import {resendEmailVerification, updateLastLogin} from "../../API.js";
+import {updateLastLogin} from "../../API.js";
 import {loginWithEmail} from "../../utils/auth.js";
+import {auth} from "../../utils/firebase.mjs";
 import {clearRegistrationFlag} from "../../utils/helper.js";
 import GuideButton from "../misc/GuideButton.jsx";
 import {Eye, EyeOff} from "lucide-react";
+import {sendEmailVerification, signInWithEmailAndPassword} from "firebase/auth";
 
 
 function Login(){
@@ -94,12 +96,29 @@ function Login(){
         setPassword(e.target.value);
     }
 
-    const sendEmail = () => {
-        resendEmailVerification(email).then(() => {
+    const sendEmail = async () => {
+        try {
+            localStorage.setItem("registrationInProgress", "true");
+
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            await sendEmailVerification(user);
+
+            await auth.signOut();
+
+            localStorage.removeItem("registrationInProgress");
+
             setResendVerification(false);
             setErrorMessage("Controlla la tua email (controlla nella spam)");
-        });
-    }
+
+        } catch (error) {
+            console.error("Error sending verification email:", error);
+            setErrorMessage("Errore durante l'invio dell'email di verifica. Riprova.");
+
+            localStorage.removeItem("registrationInProgress");
+        }
+    };
 
     return(
         <Container fluid className="animated-bg">
