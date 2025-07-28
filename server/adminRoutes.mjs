@@ -268,23 +268,45 @@ adminRoutes.get("/api/admin/all-users/:uid", verifyToken, verifyAdmin, async (re
  */
 adminRoutes.patch("/api/admin/edit-user/:uid", verifyToken, verifyAdmin, async (req, res) => {
     try {
-        const { id: targetUid, ...updatedFields } = req.body;
+        const { id: targetUid, ...rawFields } = req.body;
 
         if (!targetUid) {
             return res.status(400).json({ error: "Target user UID is required in the body" });
         }
 
         const allowedFields = ["name", "points", "coins", "status", "isAdmin", "paid"];
-        const invalidFields = Object.keys(updatedFields).filter(field => !allowedFields.includes(field));
+        const invalidFields = Object.keys(rawFields).filter(field => !allowedFields.includes(field));
 
         if (invalidFields.length > 0) {
             return res.status(400).json({ error: `Invalid fields: ${invalidFields.join(", ")}` });
         }
 
+        const updatedFields = {};
+        for (const key of Object.keys(rawFields)) {
+            const value = rawFields[key];
+
+            if ((key === "points" || key === "coins") && value !== undefined) {
+                const numValue = Number(value);
+                if (!isNaN(numValue)) {
+                    updatedFields[key] = numValue;
+                }
+            } else if (key === "status") {
+                updatedFields[key] = typeof value === "string" ? Number(value) : value;
+            } else if (key === "isAdmin" || key === "paid") {
+                if (typeof value === "string") {
+                    updatedFields[key] = value.toLowerCase() === "true";
+                } else {
+                    updatedFields[key] = Boolean(value);
+                }
+            } else if (key === "name") {
+                updatedFields[key] = String(value);
+            }
+        }
+
         const userRef = db.collection("users").doc(targetUid);
         const userDoc = await userRef.get();
 
-        if (updatedFields.paid && userDoc.data().paid === false) {
+        if (updatedFields.paid && userDoc.data()?.paid === false) {
             await db.runTransaction(async (transaction) => {
                 const userDoc = await transaction.get(userRef);
 
@@ -293,9 +315,7 @@ adminRoutes.patch("/api/admin/edit-user/:uid", verifyToken, verifyAdmin, async (
                 }
 
                 const userData = userDoc.data();
-
                 const referredBy = userData.referredBy;
-
                 const paymentDate = admin.firestore.FieldValue.serverTimestamp();
 
                 transaction.update(userRef, {
@@ -304,6 +324,7 @@ adminRoutes.patch("/api/admin/edit-user/:uid", verifyToken, verifyAdmin, async (
                     paymentId: "Confermato Manualmente",
                     paymentDate
                 });
+
                 if (referredBy) {
                     const referrerQuery = await db.collection("users")
                         .where("referralCode", "==", referredBy)
@@ -331,11 +352,13 @@ adminRoutes.patch("/api/admin/edit-user/:uid", verifyToken, verifyAdmin, async (
                     return res.status(400).json({ error: "User has no referrer" });
                 }
             });
-        }else {
+        } else {
             await userRef.update(updatedFields);
         }
+
         return res.status(200).json({ success: true, message: "User updated successfully" });
     } catch (error) {
+        console.error("Error updating user:", error);
         return res.status(500).json({ error: "Failed to update user" });
     }
 });
