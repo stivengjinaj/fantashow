@@ -84,6 +84,7 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                 coins: parseInt(formData.coins, 10) || formData.coins,
                 status: parseInt(formData.status, 10) || 0,
                 isAdmin: formData.isAdmin,
+                team: formData.team,
                 paid: formData.paid
             };
 
@@ -276,7 +277,6 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                             name="team"
                                             value={formData.team}
                                             onChange={handleChange}
-                                            disabled
                                         />
                                     </Form.Group>
                                 </Col>
@@ -320,6 +320,18 @@ function UserEditModal({ show, edittingUser, onHide, onUserUpdated }) {
                                                 <option value="2">PRO</option>
                                             </Form.Select>
                                         </Form.Group>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col md={12}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label column={"sm"}>Squadra Preferita</Form.Label>
+                                        <Form.Control
+                                            name={`squadraPreferita`}
+                                            value={edittingUser.favouriteTeam || ''}
+                                            disabled
+                                        />
                                     </Form.Group>
                                 </Col>
                             </Row>

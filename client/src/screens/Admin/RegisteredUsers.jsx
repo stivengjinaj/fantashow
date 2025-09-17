@@ -140,6 +140,7 @@ function RegisteredUsers({ admin, users, setUsers, onEditUser, onDeleteUser }) {
                             <tr>
                                 <th>Utente</th>
                                 <th>Email</th>
+                                <th>Squadra Fanta</th>
                                 <th>Punti</th>
                                 <th>Coin</th>
                                 <th>Stato</th>
@@ -154,8 +155,9 @@ function RegisteredUsers({ admin, users, setUsers, onEditUser, onDeleteUser }) {
                                     <tr key={user.id}>
                                         <td>{user.name+" "+user.surname}</td>
                                         <td>{user.email}</td>
+                                        <td>{user.team ? user.team : "Non presente"}</td>
                                         <td>{user.points}</td>
-                                        <td>{user.coins}</td>
+                                        <td >{user.coins}</td>
                                         <td>
                                             <Badge bg={user.status === 0 ? 'secondary' : user.status === 1 ? 'info' : 'warning'}>
                                                 {mapStatus(user.status)}
