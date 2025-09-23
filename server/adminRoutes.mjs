@@ -274,7 +274,7 @@ adminRoutes.patch("/api/admin/edit-user/:uid", verifyToken, verifyAdmin, async (
             return res.status(400).json({ error: "Target user UID is required in the body" });
         }
 
-        const allowedFields = ["name", "points", "coins", "status", "isAdmin", "paid"];
+        const allowedFields = ["name", "points", "coins", "status", "isAdmin", "team", "paid"];
         const invalidFields = Object.keys(rawFields).filter(field => !allowedFields.includes(field));
 
         if (invalidFields.length > 0) {
@@ -300,6 +300,8 @@ adminRoutes.patch("/api/admin/edit-user/:uid", verifyToken, verifyAdmin, async (
                 }
             } else if (key === "name") {
                 updatedFields[key] = String(value);
+            } else if (key === "team") {
+                updatedFields[key] = value ? String(value) : "";
             }
         }
 
