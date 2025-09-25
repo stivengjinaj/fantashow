@@ -21,12 +21,12 @@ const QrCodeDownloadButton = ({ url, smallScreen }) => {
 
     return (
         smallScreen ? (
-            <Button onClick={downloadQRCode} className="outlined-orange-button rounded-3 mt-1" style={{fontSize: "0.8rem"}}>
-                Scarica QR
+            <Button onClick={downloadQRCode} className="btn-dark ms-3" style={{borderRadius: "100%"}}>
+                <Download />
             </Button>
         ) : (
-            <Button onClick={downloadQRCode} className="glowing-border-blue mx-2" style={{borderRadius: "100%"}}>
-                <Download />
+            <Button onClick={downloadQRCode} className="btn-dark ms-3 rounded-5 px-3 py-2" style={{fontSize: "0.8rem"}}>
+                Scarica QR
             </Button>
         )
     );

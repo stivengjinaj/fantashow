@@ -8,13 +8,15 @@ import CashPaymentRequests from './CashPaymentRequests';
 import AllPayments from './AllPayments';
 import SupportSection from './SupportSection';
 import UserEditModal from './UserEditModal';
-import { List } from 'react-bootstrap-icons';
+import {List} from 'react-bootstrap-icons';
 import {getAdminData, getAllCashPaymentRequests, getAllUsers, getSupportTickets} from "../../API.js";
 import {UserContext} from "../Contexts/UserContext.jsx";
 import { debounce } from 'lodash';
 import NewAdmin from "./NewAdmin.jsx";
 import NewUser from "./NewUser.jsx";
 import QrCodeDownloadButton from "../misc/QrCodeDownloadButton.jsx";
+import {Copy, LucideFileSpreadsheet} from "lucide-react";
+import * as XLSX from "xlsx";
 
 function AdminDashboard() {
     const { user } = useContext(UserContext);
@@ -221,6 +223,20 @@ function AdminDashboard() {
             });
     }
 
+    const handleDownloadExcel = () => {
+        const not_include = ["id", "isAdmin", "createdAt"];
+        const filteredUsers = users.map(user =>
+            Object.fromEntries(
+                Object.entries(user).filter(([key]) => !not_include.includes(key))
+            )
+        );
+        const worksheet = XLSX.utils.json_to_sheet(filteredUsers);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+        XLSX.writeFile(workbook, "utenti.xlsx");
+    }
+
     return (
         <Container fluid className="p-0">
             <Row className="g-0">
@@ -257,8 +273,18 @@ function AdminDashboard() {
                             <List size={20} />
                         </button>
                         <h4 className="m-0">Admin Dashboard</h4>
-                        {adminData && <Button className="mx-3 blue-button" onClick={handleCopyReferral}>Copia referral</Button>}
-                        {adminData && <QrCodeDownloadButton url={`https://fantashowsc.onrender.com/referral/${adminData.referralCode}`} smallScreen={false} /> }
+                        {/* Copy referral button */}
+                        {adminData && !isMobile
+                            ? <Button className="ms-3 blue-button" onClick={handleCopyReferral}>Copia referral</Button>
+                            : <Button className="ms-3 blue-button" onClick={handleCopyReferral}><Copy/></Button>
+                        }
+                        {/* Download qr code button */}
+                        {adminData && <QrCodeDownloadButton url={`https://fantashowsc.onrender.com/referral/${adminData.referralCode}`} smallScreen={isMobile} /> }
+                        {/* Download excel button */}
+                        {adminData && !isMobile
+                            ? <Button className="btn-success ms-3 rounded-5" onClick={handleDownloadExcel}>Scarica Excel</Button>
+                            : <Button className="btn-success ms-3 rounded-5" onClick={handleDownloadExcel}><LucideFileSpreadsheet/></Button>
+                        }
                     </div>
 
                     {/* Dashboard Summary Cards */}
